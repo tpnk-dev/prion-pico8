@@ -197,13 +197,14 @@ s=rle()
 
 print("terrain 0:{:d}".format(math.floor((len(s)-1)/2)))
 
-im = Image.open(args.objs)
-w, h = im.size
-result = [None] * (w*h)
+if(args.objs):
+    im = Image.open(args.objs)
+    w, h = im.size
+    result = [None] * (w*h)
 
-getcolors(im,pal)
-s += rle()
-print("objs:{:d}".format(math.floor((len(s)-1)/2)))
+    getcolors(im,pal)
+    s += rle()
+    print("objs:{:d}".format(math.floor((len(s)-1)/2)))
 
 
 s+=get_models()
