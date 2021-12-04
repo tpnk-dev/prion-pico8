@@ -1,9 +1,9 @@
 -- terrain/models decoder
 -- 895 tokens
 
-NUM_PASSES = 4
-TERRAIN_MEMLOC_START = 5342
-OBJS_MEMLOC_END = 6685
+NUM_PASSES = -1
+TERRAIN_MEMLOC_START = 4979
+OBJS_MEMLOC_END = 5881
 
 function init_terrain(t_256)
     w = peek(0)+1
@@ -35,14 +35,15 @@ function init_terrain(t_256)
         else
             for z=1, rep_count do
                 terrainmesh[c_index][(h-1)-r_index] = (peek(i)&0x0030)>>4
-
                 up_indices()
             end 
             terrainmesh[c_index][(h-1)-r_index] = (peek(i)&0x000c)>>2
+            
             up_indices()
             terrainmesh[c_index][(h-1)-r_index] = peek(i)&0x0003
             up_indices()
             rep_count = 1
+
         end
     end
 
@@ -88,21 +89,10 @@ function init_terrain(t_256)
     rep_count = 1
     esc = false
 
-    for i=TERRAIN_MEMLOC_START+1, OBJS_MEMLOC_END  do
-        if((peek(i)&0x80)>>7 == 1) then
-            rep_count += peek(i)&0x7f            
-        else
-            for z=1, rep_count do
-                terrainmesh[c_index][(h-1)-r_index] |= ((peek(i)&0x0030)<<4)&0x0f00
-                up_indices()
-                if(r_index > (h-1)) esc=true break
-            end 
-            if(esc) break
-            terrainmesh[c_index][(h-1)-r_index] |= ((peek(i)&0x000c)<<6)&0x0f00
-            up_indices()
-            terrainmesh[c_index][(h-1)-r_index] |= ((peek(i)&0x0003)<<8)&0x0f00
-            up_indices()
-            rep_count = 1
+    for j=0,h-1 do 
+        for i=0, w-1 do
+            srand(i*j)
+            if(flr(rnd(22)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0x100
         end
     end
 end
