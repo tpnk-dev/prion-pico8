@@ -1,40 +1,49 @@
 -- @marcospiv's 'ZARCHY' engine - 2021
--- 2595 tokens
+-- 2965 tokens
 -- tpnk_dev
 -- UPPER CASE ARE CONSTANTS. ONLY MODIFY THEM, UNLESS YOU KNOW WHAT YOU ARE DOING. REPLACE WITH FINAL VALUE IN PRODUCTION CODE.
 
-function init_engine()
-    --TIME VARS
-    lasttime=time()
-    -- TILE SETTING
-    TILE_SIZE=15
+--TIME VARS
+lasttime=time()
+-- TERRAIN SETTINGS
+TERRAIN_NUMVERTS=241 -- HAS TO BE AN ODD NUMBER
+terrain_size = 0
+-- MESH SETTINGS
+mesh_leftmost_x,mesh_rightmost_x,mesh_upmost_z,mesh_downmost_z=-33,33,33,-33
+-- SECTOR SETTINGS
+NUMSECTS=30 --terrain_numfaces MUST BE DIVISIBLE BY THIS!
+-- MINIMAP SETTINGS
+minimap_memory_start = 16*8 -(ceil(NUMSECTS/8)*8)
+-- TILE SETTING
+TILE_SIZE=15
+-- PROJECTION SETTINGS
+K_SCREEN_SCALE,K_X_CENTER,K_Y_CENTER,Z_CLIP,Z_MAX=80,63,63,-3,-300
+-- CAMERA SETTINGS
+cam_x,cam_y,cam_z, CAM_DIST_TERRAIN=0,0,0,110
+cam_ax,cam_ay,cam_az = 0,0.5,0
+-- PLAYER GLOBAL PARAMS
+player, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_player,t_height_player_smooth=nil,0,0,0,0,0,0
+-- RENDER STUFF
+to_draw, game_objects3d={},{}
+-- cam_matrix_transform
+sx,sy,sz,cx,cy,cz=sin(cam_ax),sin(cam_ay),sin(cam_az),cos(cam_ax),cos(cam_ay),cos(cam_az)
+cam_mat00,cam_mat10,cam_mat20,cam_mat01,cam_mat11,cam_mat21,cam_mat02,cam_mat12,cam_mat22=cz*cy,-sz,cz*sy,cx*sz*cy+sx*sy,cx*cz,cx*sz*sy-sx*cy,sx*sz*cy-cx*sy,sx*cz,sx*sz*sy+cx*cy
+-- other
+NOP=function()end
+
+function init_terrain()
     -- TERRAIN SETTINGS
     HEIGHTMULTIPLIER,terrainmesh=3,{}
-    init_terrain(t_256)
-    terrain_numverts=#terrainmesh+1 -- HAS TO BE AN ODD NUMBER
-    terrain_numfaces=terrain_numverts-1
-    terrain_size=terrain_numverts*TILE_SIZE
+    generate_terrain()
+    terrain_numfaces=TERRAIN_NUMVERTS-1
+    terrain_size=TERRAIN_NUMVERTS*TILE_SIZE
     rnd_dirt = {11,3,4,13,15}
     -- MESH SETTINGS
     mesh_numfaces=12
     mesh_numverts=mesh_numfaces + 1
-    mesh_leftmost_x,mesh_rightmost_x,mesh_upmost_z,mesh_downmost_z=0,0,0,0
     -- SECTOR SETTINGS
-    NUMSECTS=30 --terrain_numfaces MUST BE DIVISIBLE BY THIS!
     sector_numfaces=terrain_numfaces/NUMSECTS
     save_map_memory()
-    -- PROJECTION SETTINGS
-    K_SCREEN_SCALE,K_X_CENTER,K_Y_CENTER,Z_CLIP,Z_MAX=80,63,63,-3,-300
-    -- CAMERA SETTINGS
-    cam_x,cam_y,cam_z, CAM_DIST_TERRAIN=0,0,0,110
-    cam_ax,cam_ay,cam_az = 0,0.5,0
-    -- PLAYER GLOBAL PARAMS
-    player, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_player,t_height_player_smooth=nil,0,0,0,0,0,0
-    -- RENDER STUFF
-    to_draw, game_objects3d={},{}
-    -- cam_matrix_transform
-    sx,sy,sz,cx,cy,cz=sin(cam_ax),sin(cam_ay),sin(cam_az),cos(cam_ax),cos(cam_ay),cos(cam_az)
-    cam_mat00,cam_mat10,cam_mat20,cam_mat01,cam_mat11,cam_mat21,cam_mat02,cam_mat12,cam_mat22=cz*cy,-sz,cz*sy,cx*sz*cy+sx*sy,cx*cz,cx*sz*sy-sx*cy,sx*sz*cy-cx*sy,sx*cz,sx*sz*sy+cx*cy
 end
 
 function get_tileid(pos) 
@@ -63,17 +72,16 @@ function get_type_id(idx,idz)
 end
 
 function get_height_pos(posx,posz)
-    return (terrainmesh[posx\TILE_SIZE][posz\TILE_SIZE]&0x00ff)/HEIGHTMULTIPLIER
+    return (terrainmesh[posx\TILE_SIZE][posz\TILE_SIZE]&0x00ff)--/HEIGHTMULTIPLIER
 end
 
 function get_height_id(idx,idz)
-    return (terrainmesh[idx][idz]&0x00ff)/HEIGHTMULTIPLIER
+    return (terrainmesh[idx][idz]&0x00ff)--/HEIGHTMULTIPLIER
 end
 
 function add_virus_level_pos(posx,posz)
     terrainmesh[posx\TILE_SIZE][posz\TILE_SIZE] += 0x1000
-
-    sset(96+(posx\(sector_numfaces*TILE_SIZE)),(96+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)),4)
+    sset(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)),4)
 end
 
 function mat_rotate_cam_point(x,y,z)
@@ -94,8 +102,11 @@ function is_inside_cam_cone_z(posz)
     return posz > mesh_downmost_z*TILE_SIZE and posz < mesh_upmost_z*TILE_SIZE
 end
 
+function is_inside_cam_cone_y(posy)
+    return posy > cam_y - 200 and posy < cam_y + 200
+end
+
 function get_draw_x_z(x,z)
-    --not worth it
     local d_x = x
     if (is_inside_cam_cone_x(x-terrain_size)) d_x = x-terrain_size
     if (is_inside_cam_cone_x(x+terrain_size)) d_x = x+terrain_size
@@ -233,14 +244,33 @@ function save_map_memory()
     local y_count = 0
     local x_count = 0
     local color_p = 0
-    for y=terrain_numverts-sector_numfaces,0,-sector_numfaces do
-        for x=0,terrain_numverts-sector_numfaces,sector_numfaces do
-            
-            local h = get_height_id(x+sector_numfaces\2,y+sector_numfaces\2)
-            if (h>20) color_p=3 
-            if (h>0 and h <= 20) color_p=11 
-            if (h==0) color_p=1 
-            sset( 96+x_count, 96+y_count, color_p )
+    local sector_slopes = {}
+
+    for y=TERRAIN_NUMVERTS-sector_numfaces,0,-sector_numfaces do
+        sector_slopes[y_count] = {}
+        for x=0,TERRAIN_NUMVERTS-sector_numfaces,sector_numfaces do
+            local h = 2
+            local current_sect_height = get_height_id(x+sector_numfaces\2,y+sector_numfaces\2)
+            if(sector_slopes[y_count][(x_count-1)%NUMSECTS])then
+                h = current_sect_height - sector_slopes[y_count][(x_count-1)%NUMSECTS]
+            else
+                h = current_sect_height
+            end
+
+            local color_p = 1
+            if(h >= 0)  then
+                color_p = 3 
+            elseif (h < 0) then 
+                color_p = 11
+            end
+
+            if(current_sect_height == 0) then
+                color_p = 1
+            end
+
+            sector_slopes[y_count][x_count] = current_sect_height
+
+            sset( minimap_memory_start+x_count, minimap_memory_start+y_count, color_p)
             x_count += 1
         end
         x_count = 0
@@ -248,145 +278,139 @@ function save_map_memory()
     end 
 end
 function render_gui()
-    sspr(96, 96, 30, 30, 0, 0,31,31)
+    sspr(minimap_memory_start, minimap_memory_start, NUMSECTS, NUMSECTS, 0, 0,NUMSECTS+1,NUMSECTS+1)
     pset(((mov_tiles_x)\(sector_numfaces)),NUMSECTS+((-mov_tiles_z)\sector_numfaces), 7)
-
-    for i=1, #enemies do
-        local enemy = enemies[i]
-        enemy_tiles_x,enemy_tiles_z=get_tileid(enemy.x),get_tileid(enemy.z)
-        pset(((enemy_tiles_x)\(sector_numfaces)),NUMSECTS+((-enemy_tiles_z)\sector_numfaces), 12)
-    end
 end
 
 -- @TRANSFORM AND DRAW TERRAIN
 function render_terrain()
     update_view()
 
-    local trans_proj_verts = {}
+    if(is_inside_cam_cone_y((terrainmesh[1][1])&0x00ff.ffff)) then
+        local trans_proj_verts = {}
+        for v=(mesh_numverts)*(mesh_numverts)-1,0,-1 do
+            -- instantiate vertices
 
-    for v=(mesh_numverts)*(mesh_numverts)-1,0,-1 do
-        -- instantiate vertices
+            local vert_x_id,vert_z_id=(v%mesh_numverts + mesh_leftmost_x)%TERRAIN_NUMVERTS , (v\mesh_numverts + mesh_downmost_z)%TERRAIN_NUMVERTS
+            local vert_world_x,vert_world_y,vert_world_z=(v%mesh_numverts)*TILE_SIZE+mesh_leftmost_x*TILE_SIZE,((terrainmesh[vert_x_id][vert_z_id])&0x00ff.ffff),v\mesh_numverts*TILE_SIZE + mesh_downmost_z*TILE_SIZE
+            local vert_camera_x, vert_camera_y, vert_camera_z = vert_world_x-cam_x,vert_world_y-cam_y,vert_world_z-cam_z
+            -- terrain mesh edge handling
+            if (v%mesh_numverts == 0) then vert_camera_x+=sub_mov_x*TILE_SIZE  
+            elseif (v%mesh_numverts == mesh_numfaces) then vert_camera_x+=sub_mov_x*TILE_SIZE-TILE_SIZE
+            elseif (v\mesh_numverts == 0) then vert_camera_z+=sub_mov_z*TILE_SIZE
+            elseif (v\mesh_numverts == mesh_numfaces) then vert_camera_z+=sub_mov_z*TILE_SIZE - TILE_SIZE end
 
-        local vert_x_id,vert_z_id=(v%mesh_numverts + mesh_leftmost_x)%terrain_numverts , (v\mesh_numverts + mesh_downmost_z)%terrain_numverts
-        local vert_world_x,vert_world_y,vert_world_z=(v%mesh_numverts)*TILE_SIZE+mesh_leftmost_x*TILE_SIZE,((terrainmesh[vert_x_id][vert_z_id])&0x00ff.ffff)/3,v\mesh_numverts*TILE_SIZE + mesh_downmost_z*TILE_SIZE
-        local vert_camera_x, vert_camera_y, vert_camera_z = vert_world_x-cam_x,vert_world_y-cam_y,vert_world_z-cam_z
-        -- terrain mesh edge handling
-        if (v%mesh_numverts == 0) then vert_camera_x+=sub_mov_x*TILE_SIZE  
-        elseif (v%mesh_numverts == mesh_numfaces) then vert_camera_x+=sub_mov_x*TILE_SIZE-TILE_SIZE
-        elseif (v\mesh_numverts == 0) then vert_camera_z+=sub_mov_z*TILE_SIZE
-        elseif (v\mesh_numverts == mesh_numfaces) then vert_camera_z+=sub_mov_z*TILE_SIZE - TILE_SIZE end
+            local vert_camera_x,vert_camera_y,vert_camera_z=mat_rotate_cam_point(vert_camera_x,vert_camera_y,vert_camera_z)
+            local vert_proj_x,vert_proj_y=project_point(vert_camera_x,vert_camera_y,vert_camera_z)
+            local trans_proj_vert=add(trans_proj_verts,{vert_camera_x,vert_camera_y,vert_camera_z,vert_proj_x,vert_proj_y,vert_x_id,vert_z_id})
 
-        local vert_camera_x,vert_camera_y,vert_camera_z=mat_rotate_cam_point(vert_camera_x,vert_camera_y,vert_camera_z)
-        local vert_proj_x,vert_proj_y=project_point(vert_camera_x,vert_camera_y,vert_camera_z)
-        local trans_proj_vert=add(trans_proj_verts,{vert_camera_x,vert_camera_y,vert_camera_z,vert_proj_x,vert_proj_y,vert_x_id,vert_z_id})
+            if(v%mesh_numverts!=0 and v%mesh_numverts<mesh_numverts-1 and v\mesh_numverts!=0)then 
+                local type_object3d=get_type_id(vert_x_id,vert_z_id)
+                srand(vert_x_id)
+                if(type_object3d > 0) create_object3d(get_type_id(vert_x_id, vert_z_id), vert_world_x, vert_world_y, vert_world_z,nil,nil,nil,nil,nil,nil,nil,nil,true,true)
+            end
 
-        if(v%mesh_numverts!=0 and v%mesh_numverts<mesh_numverts-1 and v\mesh_numverts!=0)then 
-            local type_object3d=get_type_id(vert_x_id,vert_z_id)
-            srand(vert_x_id)
-            if(type_object3d > 0) add(to_draw, create_object3d(get_type_id(vert_x_id, vert_z_id), vert_world_x, vert_world_y, vert_world_z))
+            --x[[ DEBUG PRINT VERTEX DATA
+                --if(v%mesh_numverts == 0)then 
+                --print(tostr(vert_z_id), trans_proj_vert[4]-13, trans_proj_vert[5]-2, 11)
+                --end
+
+                if(v\mesh_numverts == 0)then 
+                    print(tostr(vert_x_id), trans_proj_vert[4], trans_proj_vert[5]+6, 11)
+                end
+            --]]
+
+            --[[ DEBUG PRINT . 
+                rect( trans_proj_vert[4], trans_proj_vert[5],trans_proj_vert[4], trans_proj_vert[5], ((terrainmesh[vert_x_id][vert_z_id]&0x0f00)>>4) + 2 )
+            --]]
+            
+            --[[ DEBUG PRINT VERTEX DATA
+                print(vert_world_x, trans_proj_vert[4], trans_proj_vert[5]+3, 5)
+            --]]
         end
 
-        --[[ DEBUG PRINT VERTEX DATA
-            --if(v%mesh_numverts == 0)then 
-           --     print(tostr(vert_z_id), trans_proj_vert[4]-13, trans_proj_vert[5]-2, 11)
-            --end
-
-            if(v\mesh_numverts == 0)then 
-                print(tostr(vert_x_id), trans_proj_vert[4], trans_proj_vert[5]+6, 11)
-            end
+        --x[[ DEBUG PRINT POS&COORDS
+            print("player_pos: "..player.x..","..player.z,40,10, 6)
+            print("mov_tiles: "..mov_tiles_x..","..mov_tiles_z,40,20, 6)
+            print("tile_type: "..((terrainmesh[mov_tiles_x][mov_tiles_z]&0x00ff)),40,30, 6)
         --]]
 
-        --[[ DEBUG PRINT . 
-            rect( trans_proj_vert[4], trans_proj_vert[5],trans_proj_vert[4], trans_proj_vert[5], ((terrainmesh[vert_x_id][vert_z_id]&0x0f00)>>4) + 2 )
-        --]]
-        
-        --[[ DEBUG PRINT VERTEX DATA
-            print(vert_world_x, trans_proj_vert[4], trans_proj_vert[5]+3, 5)
-        --]]
-    end
+        for v=1,#trans_proj_verts do
+            if(v%mesh_numverts != 0 and v>mesh_numverts-1) then
+                local p1,p2,p3,p4=trans_proj_verts[v+1],trans_proj_verts[v-mesh_numverts+1],trans_proj_verts[v],trans_proj_verts[v-mesh_numverts]
 
-    --[[ DEBUG PRINT POS&COORDS
-        print("player_pos: "..player.x..","..player.z,40,10, 6)
-        print("mov_tiles: "..mov_tiles_x..","..mov_tiles_z,40,20, 6)
-        print("tile_type: "..((terrainmesh[mov_tiles_x][mov_tiles_z]&0x00ff)/3),40,30, 6)
-    --]]
+                local height = get_height_id(p1[6], p1[7])
+                local virus_level = (terrainmesh[p1[6]][p1[7]]&0xf000)>>12
+                local p1x,p1y,p1z= p1[1], p1[2], p1[3] 
+                local p2x,p2y,p2z= p2[1], p2[2], p2[3] 
+                local p3x,p3y,p3z= p3[1], p3[2], p3[3] 
+                local p4x,p4y,p4z= p4[1], p4[2], p4[3]
 
-    for v=#trans_proj_verts,1,-1 do
-        if(v%mesh_numverts != 0 and v>mesh_numverts-1) then
-            local p1,p2,p3,p4=trans_proj_verts[v+1],trans_proj_verts[v-mesh_numverts+1],trans_proj_verts[v],trans_proj_verts[v-mesh_numverts]
-
-            local height = get_height_id(p1[6], p1[7])
-            local virus_level = (terrainmesh[p1[6]][p1[7]]&0xf000)>>12
-
-            local p1x,p1y,p1z= p1[1], p1[2], p1[3] 
-            local p2x,p2y,p2z= p2[1], p2[2], p2[3] 
-            local p3x,p3y,p3z= p3[1], p3[2], p3[3] 
-            local p4x,p4y,p4z= p4[1], p4[2], p4[3]
-
-            local fade_out = false
-            
-            local s1x,s1y = p1[4],p1[5]
-            local s2x,s2y = p2[4],p2[5]
-            local s3x,s3y = p3[4],p3[5]
-            local s4x,s4y = p4[4],p4[5]
-
-            srand(p1[6]*p1[7])
-            local color = 1
-            if(height&0x00ff.ffff==0) color=1
-            if(height&0x00ff.ffff>0) color=10
-            if(height&0x00ff>5) color=rnd_dirt[(p1[6]%5+p1[7]%5+flr((rnd(5))))%5 +1]
-
-            if(virus_level > 0) then 
-                if(virus_level==1) fillp(0b1010010110100101)  color|=0x80 
-                if(virus_level>=2) color=0x88 
+                local fade_out = false
                 
-            else fillp()
+                local s1x,s1y = p1[4],p1[5]
+                local s2x,s2y = p2[4],p2[5]
+                local s3x,s3y = p3[4],p3[5]
+                local s4x,s4y = p4[4],p4[5]
+
+                srand(p1[6]*p1[7])
+                local color = 1
+                if(height&0x00ff.ffff==0) color=1
+                if(height&0x00ff.ffff>0) color=10
+                if(height&0x00ff>5) color=rnd_dirt[(p1[6]%5+p1[7]%5+flr((rnd(5))))%5 +1]
+
+                if(virus_level > 0) then 
+                    if(virus_level==1) fillp(0b1010010110100101)  color|=0x80 
+                    if(virus_level>=2) color=0x88 
+                        
+                else fillp()
+                end
+                --x[[
+                if(((s1x-s2x)*(s4y-s2y)-(s1y-s2y)*(s4x-s2x)) < 0) trifill(s1x,s1y,s2x,s2y,s4x,s4y,color,fade_out)
+                if(((s4x-s3x)*(s1y-s3y)-(s4y-s3y)*(s1x-s3x)) < 0) trifill(s4x,s4y,s3x,s3y,s1x,s1y,color,fade_out)
+                --]]
+
+                --[[ DEBUG WIREFRAME
+                    line(p1[4],p1[5], p2[4],p2[5], 7)
+                    line(p2[4],p2[5], p4[4],p4[5], 7)
+                    --line(p4[4],p4[5], p1[4],p1[5], 7)
+
+                    line(p4[4],p4[5], p3[4],p3[5], 7)
+                    line(p3[4],p3[5], p1[4],p1[5], 7)
+                -- line(p1[4],p1[5], p4[4],p4[5], 7)
+                --]]
+                
+
+                --[[ DEBUG PRINT 
+                    rect( p1[4],p1[5],p1[4],p1[5], 8 )
+                    print(v, p1[4],p1[5]-3, 8)
+                --]]
             end
-
-
-            --x[[
-            if(((s1x-s2x)*(s4y-s2y)-(s1y-s2y)*(s4x-s2x)) < 0) trifill(s1x,s1y,s2x,s2y,s4x,s4y,color,fade_out)
-            if(((s4x-s3x)*(s1y-s3y)-(s4y-s3y)*(s1x-s3x)) < 0) trifill(s4x,s4y,s3x,s3y,s1x,s1y,color,fade_out)
-            --]]
             
-
-            --[[ DEBUG WIREFRAME
-                line(p1[4],p1[5], p2[4],p2[5], 7)
-                line(p2[4],p2[5], p4[4],p4[5], 7)
-                --line(p4[4],p4[5], p1[4],p1[5], 7)
-
-                line(p4[4],p4[5], p3[4],p3[5], 7)
-                line(p3[4],p3[5], p1[4],p1[5], 7)
-            -- line(p1[4],p1[5], p4[4],p4[5], 7)
-            --]]
-            
-
-            --[[ DEBUG PRINT 
-                rect( p1[4],p1[5],p1[4],p1[5], 8 )
-                print(v, p1[4],p1[5]-3, 8)
-            --]]
         end
-        
     end
-
     --[[ DEBUG PRINT OBJECTS TO DRAW
         print('draw '..#game_objects3d,0,30,8)
     --]]
 
-    for i=#game_objects3d,1,-1 do
-        local game_object = game_objects3d[i]
-        game_object:transform()
-        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x))add(to_draw, game_objects3d[i])
-    end
-
-    if (#to_draw>0) ce_heap_sort(to_draw) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
-
-    to_draw = {}
+    render_objects()
 
     --x[[ PRINT 
         --print("웃", trans_proj_verts[82][4]-3, trans_proj_verts[82][5]-5, 8)
         --print(p1[5], trans_proj_verts[82][4]-3, trans_proj_verts[71][5]+5, 8)
     --]]
+end
+
+function render_objects()
+    for i=#game_objects3d,1,-1 do
+        local game_object = game_objects3d[i]
+        game_object:transform()
+        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y))add(to_draw, game_objects3d[i])
+    end
+
+    if (#to_draw>0) ce_heap_sort(to_draw) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
+
+    to_draw = {}
 end
 
 function update_view()
@@ -438,6 +462,7 @@ function transform_sprite3d(sprite3d)
     local t_x,t_y,t_z=sprite3d.d_x-cam_x,sprite3d.y-cam_y,sprite3d.d_z-cam_z
     sprite3d.t_x,sprite3d.t_y,sprite3d.t_z=mat_rotate_cam_point(t_x, t_y, t_z)
 end
+
 function transform_object3d(object3d)
     object3d.d_x, object3d.d_z = get_draw_x_z(object3d.x, object3d.z)
     
@@ -472,7 +497,6 @@ function update_terrain()
             end
         end
 
-
         if(not deleted) then
             object:update_func()
             object.x %= (terrain_size)
@@ -502,7 +526,7 @@ function gravity(object3d, bouncy, strength)
 end
 
 -- @CREATE OBJECTS3D
-function create_sprite3d(x,y,z,vx,vy,vz,draw_func,update_func,start_func,life_span,has_shadow) 
+function create_sprite3d(x,y,z,vx,vy,vz,draw_func,update_func,start_func,life_span,no_shadow) 
     local sprite3d = {
         x = x,
         y = y,
@@ -522,32 +546,34 @@ function create_sprite3d(x,y,z,vx,vy,vz,draw_func,update_func,start_func,life_sp
         d_z = 0,
         shadow = nil
     }
+    local no_shadow = no_shadow or false
 
     sprite3d:start_func()
+    add(game_objects3d, sprite3d)
 
     --create shadow particle
-    if(has_shadow)then
-        sprite3d.shadow = add(game_objects3d, create_sprite3d(
+    if(not no_shadow)then
+        create_sprite3d(
             x,0,z,
             nil,nil,nil,
             function(sprite_shadow) local sx,sy=project_point(sprite_shadow.t_x,sprite_shadow.t_y,sprite_shadow.t_z) circfill(sx, sy, 0, 0 ) end,
             function(sprite_shadow) sprite_shadow.x=sprite3d.x sprite_shadow.z=sprite3d.z+0.05 sprite_shadow.y=get_height_pos(sprite3d.x, sprite3d.z) end,
-            function(sprite_shadow) end, 
-            life_span,false))
+            NOP, 
+            life_span, true)
     end
 
     return sprite3d
 end
-function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz)
-    object3d = {
+function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz,no_shadow,is_terrain)
+    local object3d = {
         x = x,
         y = y,
         z = z,
         ax = ax or 0,
         ay = ay or 0,
         az = az or 0,
-        update_func=update_func or gravity,
-        start_func=start_func or function()end,
+        update_func=update_func or NOP,
+        start_func=start_func or NOP,
         vy = vy or 0,
         vx = vx or 0,
         vz = vz or 0,
@@ -557,8 +583,25 @@ function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz)
         d_z = 0,
         t_verts={},
         draw=draw_object3d,
-        transform=transform_object3d
+        transform=transform_object3d,
+        shadow = nil
     }
+    is_terrain = is_terrain or false
+    local no_shadow = no_shadow or false
+
+    if(is_terrain) then
+        add(to_draw, object3d)
+    else
+        add(game_objects3d, object3d)
+        if(not no_shadow) then
+            --shadow is the next obj in obj_data
+            object3d.shadow = add(game_objects3d,create_object3d(
+                                obj_id + 1, 0,0,-0.1,0,0,0,
+                                function(shadow) shadow.x = object3d.x shadow.z = object3d.z + 1 shadow.y = get_height_pos(object3d.x,object3d.z) shadow.ay = object3d.ay end,
+                                nil,nil,nil,nil,true,false))     
+             
+        end 
+    end
 
     for i=1,#object3d.verts do
         object3d.t_verts[i]={}
