@@ -1,2 +1,2 @@
-py pico8rle.py test.png --models models.txt
+py encode_models.py models.txt
 pause
