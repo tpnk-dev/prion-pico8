@@ -1,10 +1,6 @@
 -- terrain/models decoder
 -- 895 tokens
 
-NUM_PASSES = 4
-TERRAIN_MEMLOC_START = 4979
-OBJS_MEMLOC_END = 5881
-
 function generate_terrain()
     for y=0,TERRAIN_NUMVERTS-1 do
         cls()
@@ -23,8 +19,8 @@ function generate_terrain()
 
             local noise = 0
 
-            u = nx*cos(0.15) - ny*sin(0.15)
-            v = nx*cos(0.25) - ny*sin(0.25)
+            u = nx*cos(0.15) - ny*sin(0.35)
+            v = nx*cos(0.15) - ny*sin(0.15)
 
             noise =   abs(sin(nx/4 + sin(nz/15)))  * 55
             noise +=   abs(sin(nw/4 + sin(nz/15)))  * 45
@@ -35,7 +31,11 @@ function generate_terrain()
             --noise +=  abs(sin(v/4 + sin(w/30))) * 40
 
             noise -= 145
-            if(noise < 0) noise = 0
+            if(noise <= 0)  then
+                noise = 0 
+            else 
+                infectable_areas += 0x0.0001
+            end
 
             terrainmesh[y][x] =  noise&0x00ff.ffff
         end
