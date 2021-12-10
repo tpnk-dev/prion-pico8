@@ -1,7 +1,7 @@
 mov_starting = 10
 function starting_screen_init()
     cam_y = 0
-    player = create_object3d(2, 0,0,500,0,0,0,false,false,function(object3d) end)   
+    player = create_object3d(2, 0,0,500,0,0,0)   
 
     --game_objects3d = {player}
 end
@@ -20,6 +20,7 @@ function update_starting_screen()
 end
 
 function draw_starting_screen()
+    rectfill(0,0,128,128,0)
     render_objects()
 
     rectfill( 0, 0, 128, 8, 6 ) 
