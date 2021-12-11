@@ -10,6 +10,8 @@ TERRAIN_NUMVERTS=241 -- HAS TO BE AN ODD NUMBER
 terrain_size = 0
 -- MESH SETTINGS
 mesh_leftmost_x,mesh_rightmost_x,mesh_upmost_z,mesh_downmost_z=-33,33,33,-33
+mesh_numfaces=12
+mesh_numverts=mesh_numfaces + 1
 -- SECTOR SETTINGS
 NUMSECTS=30 --terrain_numfaces MUST BE DIVISIBLE BY THIS!
 -- MINIMAP SETTINGS
@@ -19,17 +21,24 @@ TILE_SIZE=15
 -- PROJECTION SETTINGS
 K_SCREEN_SCALE,K_X_CENTER,K_Y_CENTER,Z_CLIP,Z_MAX=80,63,63,-3,-300
 -- CAMERA SETTINGS
-cam_x,cam_y,cam_z, CAM_DIST_TERRAIN=0,0,0,110
+cam_x,cam_y,cam_z, CAM_DIST_TERRAIN=0,0,0,125
 cam_ax,cam_ay,cam_az = 0,0.5,0
 -- PLAYER GLOBAL PARAMS
 player, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_player,t_height_player_smooth=nil,0,0,0,0,0,0
 -- RENDER STUFF
-to_draw, game_objects3d={},{}
+depth_buffer, game_objects3d={},{}
 -- cam_matrix_transform
 sx,sy,sz,cx,cy,cz=sin(cam_ax),sin(cam_ay),sin(cam_az),cos(cam_ax),cos(cam_ay),cos(cam_az)
 cam_mat00,cam_mat10,cam_mat20,cam_mat01,cam_mat11,cam_mat21,cam_mat02,cam_mat12,cam_mat22=cz*cy,-sz,cz*sy,cx*sz*cy+sx*sy,cx*cz,cx*sz*sy-sx*cy,sx*sz*cy-cx*sy,sx*cz,sx*sz*sy+cx*cy
 -- other
 NOP=function()end
+
+function clear_depth_buffer()
+    for i=0, mesh_numfaces-1 do depth_buffer[i] = {} end
+end
+
+clear_depth_buffer()
+
 
 function init_terrain()
     -- TERRAIN SETTINGS
@@ -37,13 +46,12 @@ function init_terrain()
     generate_terrain()
     terrain_numfaces=TERRAIN_NUMVERTS-1
     terrain_size=TERRAIN_NUMVERTS*TILE_SIZE
-    -- MESH SETTINGS
-    mesh_numfaces=12
-    mesh_numverts=mesh_numfaces + 1
     -- SECTOR SETTINGS
     sector_numfaces=terrain_numfaces/NUMSECTS
     save_map_memory()
 end
+
+
 
 function trunc_terrain(object)
     object.x %= (terrain_size)
@@ -58,17 +66,26 @@ function lerp(tar,pos,perc)
     return (1-perc)*tar + perc*pos;
 end
 
+
 function get_height_smooth(object)
-    local sub_mov_x,sub_mov_z=(object.x/TILE_SIZE)%1,(object.z/TILE_SIZE)%1 
-    local mov_tiles_x,mov_tiles_z=get_tileid(object.x),get_tileid(object.z)
+    sub_mov_x,sub_mov_z =(object.x/TILE_SIZE)%1, (object.z/TILE_SIZE)%1 
 
-    local next_tile_x = sgn(flr(sub_mov_x-0.5))
-    local next_tile_z = sgn(flr(sub_mov_z-0.5))
-    local dist_next_tile_x = abs(sgn(flr(sub_mov_x-0.5))-(sub_mov_x-0.5))
-    local dist_next_tile_z = abs(sgn(flr(sub_mov_z-0.5))-(sub_mov_z-0.5))
-    local dist_next_tile = abs(dist_next_tile_x+dist_next_tile_z)/2
+    local p1_x,p1_z=(object.x\TILE_SIZE)*TILE_SIZE,(object.z\TILE_SIZE)*TILE_SIZE
+    local p1_y=get_height_pos(p1_x,p1_z)
 
-    return lerp(get_height_id((mov_tiles_x+next_tile_x)%terrain_numfaces,(mov_tiles_z+next_tile_z)%terrain_numfaces),get_height_id(mov_tiles_x,mov_tiles_z),dist_next_tile)
+    local p2_x,p2_z=(p1_x+TILE_SIZE)%terrain_size,p1_z
+    local p2_y=get_height_pos(p2_x,p2_z)
+
+    local p3_x,p3_z=p1_x,(p1_z+TILE_SIZE)%terrain_size
+    local p3_y=get_height_pos(p3_x,p3_z)
+
+    local p4_x,p4_z=(p1_x+TILE_SIZE)%terrain_size,(p1_z+TILE_SIZE)%terrain_size
+    local p4_y=get_height_pos(p4_x,p4_z)
+
+    local yleft = p1_y + (p2_y - p1_y) * sub_mov_x;
+    local yright = p3_y + (p4_y - p3_y) * sub_mov_x;
+
+    return yleft + (yright - yleft) * sub_mov_z;
 end
 
 function get_type_id(idx,idz)
@@ -113,50 +130,6 @@ function get_draw_x_z(x,z)
     if (is_inside_cam_cone_z(z-terrain_size)) d_z = z-terrain_size
     if (is_inside_cam_cone_z(z+terrain_size)) d_z = z+terrain_size   
     return d_x,d_z
-end
-
--- #casualeffects/morgan3D heap sort, credits to them
-function ce_heap_sort(data)
-    local n = #data
-    for i = flr(n / 2) + 1, 1, -1 do
-        local parent, value, m = i, data[i], i + i
-        local key = value.d_z 
-
-        while m <= n do
-            if ((m < n) and (data[m + 1].d_z  > data[m].d_z )) m += 1
-            local mval = data[m]
-            if (key > mval.d_z ) break
-            data[parent] = mval
-            parent = m
-            m += m
-        end
-        data[parent] = value
-    end 
-
-    for i = n, 2, -1 do
-        local value = data[i]
-        data[i], data[1] = data[1], value
-
-        local parent, terminate, m = 1, i - 1, 2
-        local key = value.d_z  
-
-        while m <= terminate do
-            local mval = data[m]
-            local mkey = mval.d_z 
-            if (m < terminate) and (data[m + 1].d_z  > mkey) then
-                m += 1
-                mval = data[m]
-                mkey = mval.d_z 
-            end
-            if (key > mkey) break
-            data[parent] = mval
-            parent = m
-            m += m
-        end  
-
-        data[parent] = value
-    end
-
 end
 
 -- #electricgryphon's/ trifill method, credits to them
@@ -394,13 +367,19 @@ function render_objects()
     for i=#game_objects3d,1,-1 do
         local game_object = game_objects3d[i]
         game_object:transform()
-        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y)) add(to_draw, game_objects3d[i]) game_objects3d[i].is_visible=true
+        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y)) game_object.is_visible=true add(depth_buffer[abs(game_object.d_z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], game_object)  --add(to_draw, game_objects3d[i])
+    end
+
+    for i=#depth_buffer, 0, -1 do 
+        for z=1,#depth_buffer[i] do
+            depth_buffer[i][z]:draw()
+        end
     end
 
     --print(#to_draw,40,20, 6)
-    if (#to_draw>0) ce_heap_sort(to_draw) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
+    --if (#to_draw>0) ce_heap_sort(to_draw) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
 
-    to_draw = {}
+    clear_depth_buffer()
 end
 
 function update_view()
@@ -549,7 +528,6 @@ function create_sprite3d(x,y,z,vx,vy,vz,draw_func,update_func,start_func,life_sp
     return sprite3d
 end
 function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz,no_shadow,is_terrain)
-
     local object3d = {
         x = x,
         y = y,
@@ -576,14 +554,14 @@ function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz,n
     local no_shadow = no_shadow or false
 
     if(is_terrain) then
-        add(to_draw, object3d)
+        add(depth_buffer[abs(object3d.z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], object3d)
     else
         add(game_objects3d, object3d)
         if(not no_shadow) then
             --shadow is the next obj in obj_data
             object3d.shadow = create_object3d(
                                 obj_id + 1, 0,0,-0.1,0,0,0,
-                                function(shadow) shadow.x = object3d.x shadow.z = object3d.z + 1 shadow.y = get_height_pos(object3d.x,object3d.z) shadow.ay = object3d.ay end,
+                                function(shadow) shadow.x = object3d.x shadow.z = object3d.z + 1 shadow.y=get_height_smooth(object3d) shadow.ay = object3d.ay end,
                                 nil,nil,nil,nil,true,false)  
              
         end 
