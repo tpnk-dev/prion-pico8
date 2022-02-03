@@ -9,7 +9,7 @@ lasttime=time()
 TERRAIN_NUMVERTS=241 -- HAS TO BE AN ODD NUMBER
 terrain_size = 0
 -- MESH SETTINGS
-mesh_leftmost_x,mesh_rightmost_x,mesh_upmost_z,mesh_downmost_z=-33,33,33,-33
+mesh_leftmost_x,mesh_rightmost_x,mesh_upmost_z,mesh_downmost_z=-33,33,1000,0
 mesh_numfaces=12
 mesh_numverts=mesh_numfaces + 1
 -- SECTOR SETTINGS
@@ -281,7 +281,7 @@ function render_terrain()
 
             local vert_camera_x,vert_camera_y,vert_camera_z=mat_rotate_cam_point(vert_camera_x,vert_camera_y,vert_camera_z)
             local vert_proj_x,vert_proj_y=project_point(vert_camera_x,vert_camera_y,vert_camera_z)
-            local trans_proj_vert=add(trans_proj_verts,{vert_camera_x,vert_camera_y,vert_camera_z,vert_proj_x,vert_proj_y,vert_x_id,vert_z_id})
+            local trans_proj_vert=add(trans_proj_verts,{vert_camera_x,vert_camera_y,vert_world_z,vert_proj_x,vert_proj_y,vert_x_id,vert_z_id})
 
             if(v%mesh_numverts!=0 and v%mesh_numverts<mesh_numverts-1 and v\mesh_numverts!=0)then 
                 local type_object3d=get_type_id(vert_x_id,vert_z_id)
@@ -326,8 +326,8 @@ function render_terrain()
                 local color = get_color_id(p1[6],p1[7], true)
 
                 --x[[
-                if(((s1x-s2x)*(s4y-s2y)-(s1y-s2y)*(s4x-s2x)) < 0) trifill(s1x,s1y,s2x,s2y,s4x,s4y,color)
-                if(((s4x-s3x)*(s1y-s3y)-(s4y-s3y)*(s1x-s3x)) < 0) trifill(s4x,s4y,s3x,s3y,s1x,s1y,color)
+                if(((s1x-s2x)*(s4y-s2y)-(s1y-s2y)*(s4x-s2x)) < 0) trifill(s1x,s1y,s2x,s2y,s4x,s4y,color) 
+                if(((s4x-s3x)*(s1y-s3y)-(s4y-s3y)*(s1x-s3x)) < 0) trifill(s4x,s4y,s3x,s3y,s1x,s1y,color) 
                 --]]
                 fillp()
 
@@ -377,7 +377,7 @@ function render_objects()
     end
 
     --print(#to_draw,40,20, 6)
-    --if (#to_draw>0) ce_heap_sort(to_draw) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
+    --if (#game_objects3d>0) ce_heap_sort(game_objects3d) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
 
     clear_depth_buffer()
 end
@@ -557,11 +557,14 @@ function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz,n
         add(depth_buffer[abs(object3d.z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], object3d)
     else
         add(game_objects3d, object3d)
+
+        object3d:start_func()
+
         if(not no_shadow) then
             --shadow is the next obj in obj_data
             object3d.shadow = create_object3d(
                                 obj_id + 1, 0,0,-0.1,0,0,0,
-                                function(shadow) shadow.x = object3d.x shadow.z = object3d.z + 1 shadow.y=get_height_smooth(object3d) shadow.ay = object3d.ay end,
+                                function(shadow) shadow.x = object3d.x shadow.z = object3d.z shadow.y=get_height_smooth(object3d) shadow.ay = object3d.ay end,
                                 nil,nil,nil,nil,true,false)  
              
         end 
@@ -574,7 +577,6 @@ function create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,vx,vy,vz,n
         end
     end
 
-    object3d:start_func()
     object3d:transform()
     
     return object3d
