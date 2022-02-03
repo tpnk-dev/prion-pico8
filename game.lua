@@ -32,7 +32,7 @@ end
 waves = {spawn_wave_1}
 
 -- these are the object ids in the scene, use return_model with the correct memory position to add new models
-OBJS_DATA = {decode_model(0), decode_model(45), decode_model(114), decode_model(147),decode_model(114)}
+OBJS_DATA = {decode_model(0), decode_model(45), decode_model(114), decode_model(147),decode_model(247)}
 
 colors_explosion = {2,4,10,3,5}
 
@@ -165,23 +165,26 @@ end
 
 function thrust(ship) 
     --ship.y += ship.vy ship.x += ship.vx ship.z += ship.vz
-    player.vy += 0.2*cos(player.ax)*cos(player.az)
-    player.vx += 0.2*sin(player.ay)*-sin(player.ax)
-    player.vz += 0.2*-cos(player.ay)*sin(player.ax)
+    if(fuel > 0) then
+        fuel-=0.1
+        player.vy += 0.2*cos(player.ax)*cos(player.az)
+        player.vx += 0.2*sin(player.ay)*-sin(player.ax)
+        player.vz += 0.2*-cos(player.ay)*sin(player.ax)
 
-    local dy = cos(player.ax)*cos(player.az)
-    local dx = sin(player.ay)*-sin(player.ax) 
-    local dz = -cos(player.ay)*sin(player.ax) 
+        local dy = cos(player.ax)*cos(player.az)
+        local dx = sin(player.ay)*-sin(player.ax) 
+        local dz = -cos(player.ay)*sin(player.ax) 
 
-    srand(time())
-    local thrust_part = create_sprite3d(
-            ship.x+rnd(2)-1,ship.y,ship.z+ rnd(2)+1,
-            -dx*3+rnd(1)-.5,-dy*3+ rnd(1)-.5,-dz*3+rnd(1)-.5,
-            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, max(min(10, sprite.life_span+9)-rnd(3), 7+rnd(1)) ) end,
-            function(sprite) gravity(sprite, true,.05) end,
-            function(sprite) sprite.y=ship.y+0.001  end,
-            0.8
-    )
+        srand(time())
+        local thrust_part = create_sprite3d(
+                ship.x+rnd(2)-1,ship.y,ship.z+ rnd(2)+1,
+                -dx*3+rnd(1)-.5,-dy*3+ rnd(1)-.5,-dz*3+rnd(1)-.5,
+                function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, max(min(10, sprite.life_span+9)-rnd(3), 7+rnd(1)) ) end,
+                function(sprite) gravity(sprite, true,.05) end,
+                function(sprite) sprite.y=ship.y+0.001  end,
+                0.8
+        )
+    end
 end
 
 function shoot(ship) 
@@ -247,13 +250,20 @@ function spawn_seeder(x,y,z)
     local new_seeder = create_object3d(4,x,y,z,0,0,0,
         function(object3d) 
             local current_height = get_height_pos(object3d.x,object3d.z)
+            local current_height_smooth = get_height_smooth(object3d)
     
             object3d.ay +=  0.01
 
             if(object3d.landed)then
-                if(object3d.y - 1 > current_height + 15) object3d.y -=  1
+                if(object3d.y - 1 > current_height_smooth + 20) object3d.y -=  1
 
-                if(object3d.seed_count>30) object3d.landed = false object3d.dir={flr(rnd(2)-1),flr(rnd(2)-1)}
+                if(object3d.seed_count>30) then
+                    for i=0,3 do
+                        object3d.landing_gears[i].draw = NOP 
+                    end
+                
+                    object3d.landed = false object3d.dir={rnd(2)-1,rnd(2)-1}
+                end
             else
                 if(abs(current_height+50-object3d.y) > 1) object3d.y+=sgn(current_height+50-object3d.y)*.5
 
@@ -264,6 +274,10 @@ function spawn_seeder(x,y,z)
                     if(current_height > 20) then
                         object3d.landed=true
                         object3d.seed_count = 0
+
+                        for i=0,3 do
+                            object3d.landing_gears[i].draw = function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) line(sx, sy, sx+sgn(i-2)*3, sy+5, 10) end
+                        end
                     end
                 end
             end
@@ -300,13 +314,27 @@ function spawn_seeder(x,y,z)
 
 
         end,
-        function(object3d) object3d.landed=false object3d.seed_count=0 object3d.dir={flr(rnd(2)-1),flr(rnd(2)-1)} end)  
+        function(object3d) 
+            object3d.landing_gears={} 
+            for i=0,3 do
+                local landing_gear = create_sprite3d(
+                    object3d.x,object3d.y,object3d.z,
+                    0,0,0,
+                    NOP,
+                    function(sprite) sprite.x=object3d.x + sgn(i-2)*10 sprite.y=object3d.y-8 sprite.z=object3d.z+((i%2) - 1)*10 end,
+                    NOP
+                )
+
+                object3d.landing_gears[i] = landing_gear
+            end 
+            
+            object3d.landed=false object3d.seed_count=0 object3d.dir={rnd(2)-1,rnd(2)-1} end)  
     
     add(enemies, new_seeder)
 end
 
 function reset_player()
-    player = create_object3d(2, 120*TILE_SIZE,0,120*TILE_SIZE,0,0,0,
+    player = create_object3d(2, 120*TILE_SIZE,0,50*TILE_SIZE,0,0,0,
             function(object3d) 
                 gravity(object3d, false,0.05)  
 
@@ -323,9 +351,10 @@ function reset_player()
                                     object3d.x+rnd(200)-100,object3d.y+rnd(200)-50,object3d.z+rnd(200)-100,
                                     0,0,0,
                                     function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 7 ) end,
-                                    function(sprite) gravity(sprite, true,0.05) end,
+                                    function(sprite) gravity(sprite, true,0.001) end,
                                     NOP,
-                                3
+                                    3,
+                                    true
                             )
                         end
                     end
@@ -371,7 +400,11 @@ function logic_update()
 
     cam_x = player.x
     cam_z = player.z - CAM_DIST_TERRAIN
-    cam_y = 25 + player.y
+    if(player.y > t_height_player_smooth + 50) then
+        cam_y = player.y - 20
+    else
+        cam_y = t_height_player_smooth + 30
+    end
 end
 
 function render_gamegui()
@@ -390,12 +423,14 @@ function render_gamegui()
 
     print("best",NUMSECTS+1+78,1,7)
     print(best,NUMSECTS+1+78,7,7)
-
-    print(tostr(infectable_areas, 0x2), 31, 15,7)
-    print(tostr(infected_area, 0x2), 80, 15,7)
-    print(stat(1),90,15,7)
     --]]
 
+    --x[[
+    print(tostr(infectable_areas, 0x2), 31, 15,7)
+    print(tostr(infected_area, 0x2), 60, 15,7)
+    print(stat(1),90,15,7)
+    --]]
+    rectfill(NUMSECTS,13,fuel+NUMSECTS,13,10)
     
 end
 
@@ -404,11 +439,10 @@ function draw_update()
     -- must call to render terrain + objects
     render_terrain()
 
-    -- must call to render map
-    render_minimap()
 
     render_gamegui()
-
+    -- must call to render map
+    render_minimap()
     --print(stat(1).."   "..stat(0),40,1,6)
 end
 
