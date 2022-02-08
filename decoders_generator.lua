@@ -41,10 +41,11 @@ function generate_terrain()
         end
     end
 
-    for j=0,10 do 
-        for i=0, 10 do
-           terrainmesh[i+115][j+115] = 0x8033.0000
-          -- print((0x8033&0x8000)>>15)
+    -- base
+    for j=0,8 do 
+        for i=0, 8 do
+           terrainmesh[i+114][j+114] = 0x8044.0000
+           --print((0x8033&0x8000)>>15)
            --stop()
         end
     end
@@ -54,6 +55,12 @@ function generate_terrain()
         for i=0, TERRAIN_NUMVERTS-1 do
             srand(i*j)
             if(flr(rnd(22)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0x100
+        end
+    end
+
+    for j=24,(TERRAIN_NUMVERTS-1)-24,48 do 
+        for i=24,(TERRAIN_NUMVERTS-1)-24,48 do
+           terrainmesh[i][j] |= 0x900
         end
     end
     
