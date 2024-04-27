@@ -6,6 +6,7 @@ function generate_terrain()
         cls()
         terrainmesh[y] = {}
         for x=0,TERRAIN_NUMVERTS-1 do
+            terrainmesh[y][x] = 0
             local dx = 1
             local dy = 1
  
@@ -33,20 +34,18 @@ function generate_terrain()
             noise -= 145
             if(noise <= 0)  then
                 noise = 0 
+
+
+                -- generate fish in water
+                srand(x*y)
+                if(flr(rnd(100)) == 10) then
+                    terrainmesh[y][x] |= 0xC00--0xB00
+                end
             else 
                 infectable_areas += 0x0.0001
             end
 
-            terrainmesh[y][x] =  noise&0x00ff.ffff
-        end
-    end
-
-    -- base
-    for j=0,8 do 
-        for i=0, 8 do
-           terrainmesh[i+114][j+114] = 0x8044.0000
-           --print((0x8033&0x8000)>>15)
-           --stop()
+            terrainmesh[y][x] |=  noise&0x00ff.ffff
         end
     end
 
@@ -54,10 +53,22 @@ function generate_terrain()
     for j=0,TERRAIN_NUMVERTS-1 do 
         for i=0, TERRAIN_NUMVERTS-1 do
             srand(i*j)
-            if(flr(rnd(22)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0x100
+            if(flr(rnd(44)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0x100 --0xD00 0x100
+            if(flr(rnd(200)) == 2 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0xD00 --0xD00 0x100
         end
     end
 
+    -- base
+    for j=0,8 do 
+        for i=0, 8 do
+           terrainmesh[i+114][j+114] = 0x0044.0000
+           infectable_areas -= 0x0.0001
+           --print((0x8033&0x8000)>>15)
+           --stop()
+        end
+    end
+
+    -- generate radio towers
     for j=24,(TERRAIN_NUMVERTS-1)-24,48 do 
         for i=24,(TERRAIN_NUMVERTS-1)-24,48 do
            terrainmesh[i][j] |= 0x900

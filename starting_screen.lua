@@ -21,13 +21,18 @@ end
 
 function draw_starting_screen()
     rectfill(0,0,128,128,0)
-    render_objects()
+
+    order_objects()
+    render_all_objects()
+    clear_depth_buffer()
 
     rectfill( 0, 0, 128, 8, 6 ) 
     print('prion',12,2,8) 
     print('marcospiv 2021',47,2,7) 
-    print('🅾️ to thrust and ❎ to shoot',8,100,8) 
+    print('🅾️thrust',20,100,8) 
+    print('❎ cannon',56,97,8) 
+    print('❎+❎ missile',56,103,8) 
     print('<press ❎ to continue>',20,110,7)
 
-    if(loading) rectfill( 0, 100, 128, 128, 0 ) print('loading terrain...',30,110,7)
+    if(loading) rectfill( 0, 80, 128, 128, 0 ) print('loading terrain...',30,110,7)
 end

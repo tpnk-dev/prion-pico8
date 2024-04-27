@@ -97,8 +97,8 @@ end
 
 function get_type_id(idx,idz)
     --cls()
-   -- print((terrainmesh[idx][idz]&0x0f00)>>8,0,0,8)
-    return (terrainmesh[idx][idz]&0x0f00)>>8
+   -- print((terrainmesh[idx][idz]&0x3f00)>>8,0,0,8)
+    return (terrainmesh[idx][idz]&0x3f00)>>>8
 end
 
 function get_height_pos(posx,posz)
@@ -289,6 +289,7 @@ end
 
 -- @TRANSFORM AND DRAW TERRAIN
 function render_terrain()
+    order_objects()
     update_view()
     rectfill(0,0,128,128,0)
     if(is_inside_cam_cone_y((terrainmesh[1][1])&0x00ff.ffff)) then
@@ -311,10 +312,10 @@ function render_terrain()
 
             if(v%mesh_numverts!=0 and v%mesh_numverts<mesh_numverts-1 and v\mesh_numverts!=0)then 
                 local type_object3d=get_type_id(vert_x_id,vert_z_id)
-                srand(vert_x_id)
+                srand(vert_x_id * vert_z_id)
                 if(type_object3d > 0) add(envir, create_object3d(get_type_id(vert_x_id, vert_z_id), vert_world_x, vert_world_y, vert_world_z,nil,nil,nil,nil,ENV_FUNC[type_object3d],nil,nil,nil,true,true))
             end
-
+            
             --[[ DEBUG PRINT VERTEX DATA
                 if(v%mesh_numverts == 0)then 
                     print(tostr(vert_z_id), trans_proj_vert[4]-13, trans_proj_vert[5]-2, 11)
@@ -326,9 +327,10 @@ function render_terrain()
             --]]
 
             --[[ DEBUG PRINT . 
-                rect( trans_proj_vert[4], trans_proj_vert[5],trans_proj_vert[4], trans_proj_vert[5], ((terrainmesh[vert_x_id][vert_z_id]&0x0f00)>>4) + 2 )
+                rect( trans_proj_vert[4], trans_proj_vert[5],trans_proj_vert[4], trans_proj_vert[5], ((terrainmesh[vert_x_id][vert_z_id]&0x3f00)>>4) + 2 )
             --]]
-            
+
+            --print(get_virus_level_id(vert_x_id,vert_z_id), trans_proj_vert[4], trans_proj_vert[5]+3, 5)
             --[[ DEBUG PRINT VERTEX DATA
                 print(vert_world_x, trans_proj_vert[4], trans_proj_vert[5]+3, 5)
             --]]
@@ -374,8 +376,8 @@ function render_terrain()
                 --]]
             else
                 if(v%mesh_numverts == 0) then
-                    local a = abs((v-13)\mesh_numverts - 13)
-                    if(a<12) then
+                    local a = abs((v-(mesh_numfaces+1))\mesh_numverts - (mesh_numfaces+1))
+                    if(a<mesh_numfaces) then
                         for z=#depth_buffer[a],1,-1 do
                             depth_buffer[a][z]:draw()
                         end
@@ -392,7 +394,6 @@ function render_terrain()
     --]]
 
     clear_depth_buffer()
-    order_objects()
 
     --for i=#depth_buffer, 0, -1 do 
     --    for z=1,#depth_buffer[i] do
@@ -419,7 +420,7 @@ function order_objects()
     for i=#game_objects3d,1,-1 do
         local game_object = game_objects3d[i]
         game_object:transform()
-        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y)) game_object.is_visible=true add(depth_buffer[abs(game_object.d_z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], game_object)  --add(to_draw, game_objects3d[i])
+        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y)) then game_object.is_visible=true add(depth_buffer[abs(game_object.d_z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], game_object) else game_object.is_visible=false end  --add(to_draw, game_objects3d[i])
     end
     --print(#to_draw,40,20, 6)
     --if (#game_objects3d>0) ce_heap_sort(game_objects3d) for i=#to_draw, 1, -1 do to_draw[i]:draw() end
@@ -576,17 +577,17 @@ function create_sprite3d(x,y,z,vx,vy,vz,draw_func,update_func,start_func,life_sp
 
     local no_shadow = no_shadow or false
 
-    trunc_terrain(sprite3d)
-
     sprite3d:start_func()
     add(game_objects3d, sprite3d)
+
+    trunc_terrain(sprite3d)
 
     --n#um_sprites += 1
 
     --create shadow particle
     if(not no_shadow)then
         sprite3d.shadow = create_sprite3d(
-            x,get_height_pos(sprite3d.x, sprite3d.z),z,
+            sprite3d.x,get_height_pos(sprite3d.x, sprite3d.z),sprite3d.z,
             nil,nil,nil,
             function(sprite_shadow) local sx,sy=project_point(sprite_shadow.t_x,sprite_shadow.t_y,sprite_shadow.t_z) circfill(sx, sy, 0, 0 ) end,
             function(sprite_shadow) sprite_shadow.x=sprite3d.x sprite_shadow.z=sprite3d.z+0.05 sprite_shadow.y=get_height_pos(sprite3d.x, sprite3d.z) if(sprite3d.y <= sprite_shadow.y)then sprite_shadow.remove=true end end,
