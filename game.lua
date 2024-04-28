@@ -60,13 +60,13 @@ waves = {spawn_wave_1}
 -- 14: bush destroyed
 -- 15: infected tree 1
 
-OBJS_DATA = {decode_model(0), decode_model(45), decode_model(114), decode_model(147),decode_model(247), decode_model(312), decode_model(401), decode_model(452), decode_model(478), decode_model(540), decode_model(566), decode_model(592),decode_model(628),decode_model(668),decode_model(694)}
-ENV_FUNC = {NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
+OBJS_DATA = {[0]={{{0,0,0}},{}}, decode_model(0), decode_model(45), decode_model(114), decode_model(147),decode_model(247), decode_model(312), decode_model(401), decode_model(452), decode_model(478), decode_model(540), decode_model(566), decode_model(592),decode_model(628),decode_model(668),decode_model(694)}
+ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     function(object) 
         if(time()%3 == 0) then
-            create_sprite3d(
+            create_sprite(
                 object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
-                nil,nil,nil,
+                0,0,0,
                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 5) end,
                 function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
                 NOP, 
@@ -100,15 +100,13 @@ ENV_FUNC = {NOP, NOP, NOP, NOP, NOP, NOP, NOP,
 
                 local color = 12 - flr(rnd(2))*5
 
-                create_sprite3d(
+                create_sprite(
                         object.x,1,object.z,
                         rnd(2)-1,rnd(2),rnd(2)-1,
                         function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
                         function(sprite) gravity(sprite, true,0.1) end,
                         NOP, 
-                        1,
-                        false,
-                        false
+                        1
                 )
             end
         end
@@ -245,9 +243,9 @@ function explode(object)
     sfx(3, 3)
     for i=0,7 do
         srand(i)
-        create_sprite3d(
+        create_sprite(
                 object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
-                nil,nil,nil,
+                0,0,0,
                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd(5)-4, sy+rnd(5)-4, 0, 5) end end,
                 function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
                 NOP, 
@@ -263,7 +261,7 @@ function explode(object)
         local color = colors_explosion[flr(rnd(5))+1]
         if(h == 0 and object.y <= 1) color = 12 - flr(rnd(2))*5
 
-        create_sprite3d(object.x,object.y,object.z+5,
+        create_sprite(object.x,object.y,object.z+5,
                 rnd(2)-1,rnd(4)+2,rnd(2)-1,
                 function(sprite)
                     local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) 
@@ -316,7 +314,7 @@ function thrust(ship,intensity,is_player)
             srand(time())
             for i=0,1 do
                 srand(i * time())
-                local thrust_part = create_sprite3d(
+                local thrust_part = create_sprite(
                         ship.x+rnd(8)-4,ship.y+rnd(8)-4,ship.z+rnd(8)+4 + 20,
                         -dx*4+rnd(2)-1+ship.vx,-dy*4+ship.vy+ rnd(2)-1,-dz*4+rnd(2)-1+ship.vz,
                         function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd(1)*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
@@ -339,7 +337,7 @@ function shoot(ship, is_inverted)
     if(is_inverted) speed = -9
 
     play_audio_vicinity(ship, 1, 2)
-    local projectile = create_sprite3d(
+    local projectile = create_sprite(
             ship.x,ship.y,ship.z,
             speed*-dx+ship.vx,speed*-dy+ship.vy,speed*-dz+ship.vz,       
             function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0,7) end,
@@ -370,7 +368,7 @@ function shoot(ship, is_inverted)
             local color = 12 - flr(rnd(2))*5
             if(h > 0) color = colors_explosion[flr(rnd(5))+1]
 
-            create_sprite3d(
+            create_sprite(
                     sprite.x,sprite.y,sprite.z,
                     rnd(2)-1,rnd(2),rnd(2)-1,
                     function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
@@ -388,12 +386,9 @@ end
 function spawn_seeder(x,y,z)
     local landing_gears={} 
     for i=0,3 do
-        landing_gears[i] = create_sprite3d(
+        landing_gears[i] = create_sprite(
             x,y,z,
-            0,0,0,
-            NOP,
-            NOP,
-            NOP
+            0,0,0
         )
     end
 
@@ -441,7 +436,7 @@ function spawn_seeder(x,y,z)
                     if(object3d.is_visible) then
                         for i=0,7 do
                             srand(i*time())
-                            local virus = create_sprite3d(
+                            local virus = create_sprite(
                                 object3d.x,object3d.y,object3d.z,
                                 rnd(4)-2,rnd(4),rnd(4)-2,
                                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 8 ) end,
@@ -472,7 +467,7 @@ function spawn_seeder(x,y,z)
             object3d.return_death_score=function() for i=0,3 do destroy(object3d.landing_gears[i]) end if(object3d.landed) then return 50 end return 100 end
             object3d.landing_gears=landing_gears
             for i=0,3 do
-                --local landing_gear = create_sprite3d(
+                --local landing_gear = create_sprite(
                 --    object3d.x,object3d.y,object3d.z,
                 --    0,0,0,
                 --    NOP,
@@ -602,8 +597,8 @@ function collide_enemies(object, emitter)
                 if(i > 0) then
                     death_score = enemies[i].return_death_score()
                     score+=death_score>>16
-                    create_sprite3d(enemies[i].x,enemies[i].y,enemies[i].z,
-                            nil,nil,nil,
+                    create_sprite(enemies[i].x,enemies[i].y,enemies[i].z,
+                            0,0,0,
                             function(object) local sx,sy=project_point(object.t_x,object.t_y,object.t_z) print(death_score,sx,sy,7) end,
                             function(object) object.y += 0.1 end,
                             NOP,
@@ -638,8 +633,8 @@ function collide_env(object)
                 explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
                 if(env_type==15) then
                     score+=40>>16
-                    create_sprite3d(object.x,object.y,object.z,
-                            nil,nil,nil,
+                    create_sprite(object.x,object.y,object.z,
+                            0,0,0,
                             function(object) local sx,sy=project_point(object.t_x,object.t_y,object.t_z) print(40,sx,sy,7) end,
                             function(object) object.y += 0.1 end,
                             NOP,
@@ -684,7 +679,7 @@ function reset_player()
                 if(time()%0x0000.0001 == 0) then
                     if(object3d.y > 200)then
                         srand(time())
-                        create_sprite3d(
+                        create_sprite(
                                 object3d.x+rnd(200)-100,object3d.y+rnd(200)-50,object3d.z+rnd(200)-100,
                                 0,0,0,
                                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 7 ) end,
@@ -820,5 +815,4 @@ function draw_update()
     render_minimap()
     --print(stat(1).."   "..stat(0),40,1,6)
 end
-
 
