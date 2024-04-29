@@ -34,7 +34,7 @@ function spawn_wave_1()
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
-    spawn_drone(118*TILE_SIZE, 120, 123*TILE_SIZE) 
+    spawn_drone(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
 end
 
 waves = {spawn_wave_1}
@@ -59,8 +59,31 @@ waves = {spawn_wave_1}
 -- 13: bush
 -- 14: bush destroyed
 -- 15: infected tree 1
+-- 16: mutated drone
+-- 17: mutated drone shadow
+-- 18: infected bush
 
-OBJS_DATA = {[0]={{{0,0,0}},{}}, decode_model(0), decode_model(45), decode_model(114), decode_model(147),decode_model(247), decode_model(312), decode_model(401), decode_model(452), decode_model(478), decode_model(540), decode_model(566), decode_model(592),decode_model(628),decode_model(668),decode_model(694)}
+OBJS_DATA = {
+            [0]={{{0,0,0}},{}}, 
+            decode_model(0),     -- 1: tree 1
+            decode_model(45),    -- 2: player
+            decode_model(114),   -- 3: player shadow
+            decode_model(147),   -- 4: seeder
+            decode_model(247),   -- 5: seeder shadow
+            decode_model(312),   -- 6: drone
+            decode_model(401),   -- 7: drone shadow
+            decode_model(452),   -- 8: tree destroyed
+            decode_model(478),   -- 9: radar
+            decode_model(540),   -- 10: radar shadow
+            decode_model(566),   -- 11: radar tower
+            decode_model(592),   -- 12: fish
+            decode_model(628),   -- 13: bush
+            decode_model(668),   -- 14: bush destroyed
+            decode_model(694),   -- 15: infected tree 1
+            decode_model(739),   -- 16: mutated drone
+            decode_model(401),   -- 17: mutated drone shadow
+            decode_model(828),   -- 18: infected bush
+        }
 ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     function(object) 
         if(time()%3 == 0) then
@@ -101,12 +124,12 @@ ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP,
                 local color = 12 - flr(rnd(2))*5
 
                 create_sprite(
-                        object.x,1,object.z,
-                        rnd(2)-1,rnd(2),rnd(2)-1,
-                        function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
-                        function(sprite) gravity(sprite, true,0.1) end,
-                        NOP, 
-                        1
+                    object.x,1,object.z,
+                    rnd(2)-1,rnd(2),rnd(2)-1,
+                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
+                    function(sprite) gravity(sprite, true,0.1) end,
+                    NOP, 
+                    1
                 )
             end
         end
@@ -125,6 +148,17 @@ pal(2, 131,1)
 
 -- 16 colors
 -- needed colors 3,4,5,7,8,10,11,12,14,131,134,138,140
+
+function acos(x)
+    return atan2(x,-sqrt(1-x*x))
+end
+   
+function v_len(x,y,z)
+    local ax=atan2(x,y)
+    local d2=x*cos(ax)+y*sin(ax)
+    local az=atan2(d2,z)
+    return d2*cos(az)+z*sin(az)
+end
 
 
 function game_init()
@@ -193,6 +227,7 @@ function add_virus_level_pos(posx,posz)
 
         local env_type = get_type_id(idx, idz)
         if(env_type==1) then terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0F00 end
+        if(env_type==13) then terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x1200 end
 
         infected_area += 0x0.0001
     end
@@ -388,7 +423,8 @@ function spawn_seeder(x,y,z)
     for i=0,3 do
         landing_gears[i] = create_sprite(
             x,y,z,
-            0,0,0
+            0,0,0,
+            NOP
         )
     end
 
@@ -490,88 +526,70 @@ function spawn_seeder(x,y,z)
     add(enemies, new_seeder)
 end
 
-function acos(x)
- return atan2(x,-sqrt(1-x*x))
-end
-
-destination_angle = 0
-
-
--- FIX DRONE Z AXIS, INVERTED
 function spawn_drone(x,y,z)
     local new_drone = create_object3d(6,x,y,z,.25,0,0,
-        function(object3d) 
-            gravity(object3d, false,0.05)  
-            
+        function(object3d)             
             local current_height = get_height_pos(object3d.x%terrain_size,object3d.z%terrain_size)
+            local is_mutated = false
+            local shooting_interval = 0.7
 
             srand(time())
 
-            if(not object3d.is_visible) then    
-                local posx, posz = object3d.x%terrain_size, object3d.z%terrain_size
-                local idx, idz = posx\TILE_SIZE, posz\TILE_SIZE
+            local distance_to_player = v_len(player.x - object3d.x, player.y - object3d.y, player.z - object3d.z)
 
-                for i=(idx-8)%TERRAIN_NUMVERTS, (idx+8)%TERRAIN_NUMVERTS do 
-                    for z=(idz-8)%TERRAIN_NUMVERTS,(idz+8)%TERRAIN_NUMVERTS do 
-                        local env_type = get_type_id(i, z)
-                        if (env_type == 13) then 
-                            if(time() - object3d.shooting_cooldown > .7) then 
-                                if(rnd(10) == 1) then explode(object3d) object3d.remove=true end
-                            end object3d.shooting_cooldown=time()  
+            if(abs(distance_to_player) < 600 or object3d.is_mutated) then    
+                gravity(object3d, false,0.05)     
+
+                -- move towards player when within distance
+                local destination_angle_y = -atan2(player.x - object3d.x, player.z - object3d.z)
+                local destination_angle_x = -atan2(distance_to_player, player.y - object3d.y)
+
+                if(object3d.y - player.y < 0) then 
+                    thrust(object3d,0.4) destination_angle_x=-0.1  
+                elseif(object3d.y - current_height < 50) then
+                    thrust(object3d,0.2) destination_angle_x=-0.1 
+                else
+                    if(time() - object3d.shooting_cooldown > shooting_interval) shoot(object3d) object3d.shooting_cooldown=time()
+                end
+
+                srand(time())
+                object3d.ay += (destination_angle_y+.25-object3d.ay)*0.1
+                object3d.ax += (destination_angle_x-object3d.ax)*0.1            
+            else
+                -- only search for mutated bushes if not mutated
+                -- if on virused square, become mutated 1/5 times
+                if (not object3d.is_mutated) then
+                    if(time() - object3d.shooting_cooldown > .7) then 
+                        local posx, posz = object3d.x%terrain_size, object3d.z%terrain_size
+                        local v_level = sget(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)))
+                        if(v_level == 4) then
+                            if flr(rnd(10)) == 1 then
+                                object3d.tris = OBJS_DATA[16][2]
+                                shooting_interval = 0.14
+                                object3d.is_mutated = true
+                            end
                         end
                     end
                 end
 
-                if(object3d.y < 100 or object3d.vy < -0) thrust(object3d,0.1)
-                object3d.ax += (0.1-object3d.ax)*0.1
+                -- move to random direction
                 object3d.ay += (object3d.dir-object3d.ay)*0.02 +rnd(0.01)-0.02
-
+                object3d.x -= sin(object3d.ay) * 3
+                object3d.z -= cos(object3d.ay) * 3
                 if(time()%10 == 0) then
                     object3d.dir=rnd(1)
                 end
-
-                clamp_speed(object3d, 2)
-            else
-
-                --local angle_1 = {x= player.x-object3d.x, z= player.z-object3d.z}
-                --local angle_2 = {x=1,z=0}
-                --destination_angle = acos((angle_1.x*angle_2.x + angle_1.z*angle_2.z) / 
-                --                        ( (sqrt(angle_1.x^2 + angle_1.z^2) ) * (sqrt(angle_2.x^2 + angle_2.z^2))))
-                local destination_angle_y = -atan2(player.x - object3d.x, player.z - object3d.z)
-                local destination_angle_x = -atan2(sqrt((player.x-object3d.x)^2 + (player.y-object3d.y)^2 + (player.z-object3d.z)^2), player.y - object3d.y)
-                destination_angle = destination_angle_x
-
-                --if(object3d.y - player.y > 0) thrust(object3d,0.2) 
-                if(object3d.y - player.y < 0)then 
-                    thrust(object3d,0.4) destination_angle_x=0.1  
-                elseif(object3d.y - current_height < 50) then
-                    thrust(object3d,0.2) destination_angle_x=0.1 
-                else
-                    if(time() - object3d.shooting_cooldown > .7) shoot(object3d, true) object3d.shooting_cooldown=time()
-
-                end
-
-                srand(time())
-                --object3d.ay = destination_angle_y - .25
-                object3d.ay += (destination_angle_y-.25-object3d.ay)*0.1+rnd(0.1)-0.05
-                object3d.ax += (abs(destination_angle_x)-object3d.ax)*0.1
-
-                --object3d.ax = abs(destination_angle_x)
-                --object3d.ay += (object3d.dir-object3d.ay)*0.02 +rnd(0.01)-0.02
-                clamp_speed(object3d, 4)
             end
             poke(0x5f44, orig_srand)
-
+            clamp_speed(object3d, 4)
 
         end,
         function(object3d) 
-            object3d.return_death_score=function() return 500 end
-            object3d.return_blip_color=function() return 9 end 
+            object3d.return_death_score=function() if(object3d.is_mutated) return 500 else return 300 end 
+            object3d.return_blip_color=function() if(object3d.is_mutated) if(time()%0.5 == 0) return 8 else return 9 else return 9 end 
             object3d.shooting_cooldown = time()
-            
+        
             object3d.dir=rnd(1)
-            --poke(0x5f44, orig_srand)
-            --object3d.dir={rnd(2)-1,rnd(2)-1} end)  
         end
     )
     new_drone.is_crash = function(object3d) 
@@ -791,7 +809,7 @@ function render_gamegui()
     print(wave,NUMSECTS+1+58,7,7)
 
     print("best",NUMSECTS+1+78,1,7)
-    print(player.x,NUMSECTS+1+78,7,7)
+    print(best,NUMSECTS+1+78,7,7)
     --]]
 
     --x[[
