@@ -13,7 +13,7 @@
 - Enemies
   - [x] seeder
   - [x] drone
-  - [] mutated drone (1)
+  - [x] mutated drone (1)
   - [] bomber (2)
   - [] pest (4)
   - [] fighter (3)
