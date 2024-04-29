@@ -14,17 +14,17 @@
   - [x] seeder
   - [x] drone
   - [x] mutated drone (1)
-  - [] bomber (2)
-  - [] pest (4)
-  - [] fighter (3)
-  - [] attractor (5)
-  - [] mystery spacecraft
+  - [ ] bomber (2)
+  - [ ] pest (4)
+  - [ ] fighter (3)
+  - [ ] attractor (5)
+  - [ ] mystery spacecraft
 - Projectiles
   - [x] Machine gun
-  - [] Homing missile
+  - [ ] Homing missile
 - Levels (1-16)
-  - [] Clearing terrain (levels 5 and 10) (2)
-  - [] Increased gravity (levels 3, 5 and 7) (1)
+  - [ ] Clearing terrain (levels 5 and 10) (2)
+  - [ ] Increased gravity (levels 3, 5 and 7) (1)
 
 ## Levels
 
