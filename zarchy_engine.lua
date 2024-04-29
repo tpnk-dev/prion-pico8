@@ -93,13 +93,11 @@ function get_height_smooth(object)
 end
 
 function get_type_id(idx,idz)
-    --cls()
-   -- print((terrainmesh[idx][idz]&0x3f00)>>8,0,0,8)
     return (terrainmesh[idx][idz]&0x3f00)>>>8
 end
 
 function get_height_pos(posx,posz)
-    return (terrainmesh[posx\TILE_SIZE][posz\TILE_SIZE]&0x00ff)--/HEIGHTMULTIPLIER
+    return (terrainmesh[(posx%terrain_size)\TILE_SIZE][(posz%terrain_size)\TILE_SIZE]&0x00ff.ffff)--/HEIGHTMULTIPLIER
 end
 
 function get_height_id(idx,idz)
@@ -569,8 +567,6 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
     
     is_terrain = is_terrain
 
-    object3d:start_func()
-
     if obj_id==0  then
         object3d.transform=transform_sprite3d
         object3d.draw = function(sprite) draw_func(sprite) end
@@ -625,6 +621,7 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
         end
     end
 
+    object3d:start_func()
     object3d:transform()
     
     return object3d
