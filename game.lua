@@ -1,4 +1,6 @@
---player {x,y,z} is the target for zarchy_engine
+-- 3738 tokens
+-- tpnk_dev
+
 orig_srand = peek(0x5f44)
 
 test_ay = 0
