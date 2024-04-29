@@ -53,10 +53,11 @@ function generate_terrain()
     for j=0,TERRAIN_NUMVERTS-1 do 
         for i=0, TERRAIN_NUMVERTS-1 do
             srand(i*j)
-            if(flr(rnd(44)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0x100 --0xD00 0x100
-            if(flr(rnd(200)) == 2 and terrainmesh[i][j] > 4) terrainmesh[i][j] |= 0xD00 --0xD00 0x100
+            if(flr(rnd(22)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] = (terrainmesh[i][j] & ~0x3f00) | 0x0100
+            if(flr(rnd(44)) == 2 and terrainmesh[i][j] > 4) terrainmesh[i][j] = (terrainmesh[i][j] & ~0x3f00) | 0x0d00
         end
     end
+    
 
     -- base
     for j=0,8 do 
