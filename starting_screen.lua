@@ -2,7 +2,7 @@ mov_starting = 10
 function starting_screen_init()
     cam_y = 0
     player = create_object3d(2, 0,0,500,0,0,0)   
-
+    cam_target = player
     --game_objects3d = {player}
 end
 

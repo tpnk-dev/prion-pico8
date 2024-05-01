@@ -29,8 +29,6 @@ infected_area = 0
 rnd_dirt = {11,4,15,10}
 rnd_cement = {6,7}
 
-test_object = nil
-
 function spawn_wave_1() 
     srand(7)
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
@@ -38,6 +36,7 @@ function spawn_wave_1()
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
     spawn_drone(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
     spawn_bomber(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
+    spawn_fighter(flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
 end
 
 waves = {spawn_wave_1}
@@ -89,6 +88,9 @@ OBJS_DATA = {
             decode_model(828),   -- 18: infected bush
             decode_model(868),   -- 19: bomber
             decode_model(924),   -- 20: bomber shadow
+            decode_model(950),   -- 21: fighter
+            decode_model(1028),  -- 22: fighter shadow,
+            decode_model(1068),  -- 23: fighter weak
         }
 ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     function(object) 
@@ -148,7 +150,7 @@ colors_explosion = {2,4,10,3,5}
 --COLORS
 pal(1, 140, 1)
 pal(13, 134,1)
-pal(15, 139,1)
+pal(15, 138,1)
 pal(2, 131,1)
 -- 192 = 12 and 0 checkerboard - 0xc0
 
@@ -174,7 +176,6 @@ function game_init()
     main_update = logic_update
 
     reset_player()
-
     waves[1]()
 end
 
@@ -374,8 +375,8 @@ function shoot(ship, is_inverted)
     local dy = sin(ship.ax)
     local dx = sin(ship.ay)*cos(ship.ax)
     local dz = cos(ship.ay)*cos(ship.ax)
-    local speed = 9
-    if(is_inverted) speed = -9
+    local speed = 10
+    if(is_inverted) speed = -10
 
     play_audio_vicinity(ship, 1, 2)
     local projectile = create_sprite(
@@ -422,6 +423,28 @@ function shoot(ship, is_inverted)
         end
     end
 
+end
+
+function attack_player(object3d, current_height, x_z_distance_to_player)
+    local x_z_distance_to_player = x_z_distance_to_player or v_len(player.x - object3d.x, 0, player.z - object3d.z)
+    dvx = player.vx - object3d.vx
+    dvy = player.vy - object3d.vy
+    gravity(object3d, false,0.05)     
+
+    -- move towards player when within distance
+    local destination_angle_y = -atan2(player.x - object3d.x, player.z - object3d.z)
+    local destination_angle_x = -atan2(x_z_distance_to_player, player.y - object3d.y)
+
+    if(x_z_distance_to_player > 100) then
+        thrust(object3d,0.4)
+        if(object3d.y - player.y < 20 or current_height < 40)  destination_angle_x=-0.15 else destination_angle_x=-0.25
+    else
+        if(object3d.y - player.y < 20) thrust(object3d,0.2)
+        if(time() - object3d.shooting_cooldown > object3d.shooting_interval) shoot(object3d) object3d.shooting_cooldown=time()
+    end
+
+    object3d.ay += (destination_angle_y+.25-object3d.ay)*0.3
+    object3d.ax += (destination_angle_x-object3d.ax)*0.5
 end
 
 function spawn_seeder(x,y,z)
@@ -536,44 +559,24 @@ function spawn_drone(x,y,z)
     local new_drone = create_object3d(6,x,y,z,.25,0,0,
         function(object3d)             
             local current_height = get_height_pos(object3d.x%terrain_size,object3d.z%terrain_size)
-            local is_mutated = false
-            local shooting_interval = 0.7
 
             srand(time())
 
-            local distance_to_player = v_len(player.x - object3d.x, player.y - object3d.y, player.z - object3d.z)
+            local x_z_distance_to_player = v_len(player.x - object3d.x, 0, player.z - object3d.z)
 
-            if(abs(distance_to_player) < 600 or object3d.is_mutated) then    
-                gravity(object3d, false,0.05)     
-
-                -- move towards player when within distance
-                local destination_angle_y = -atan2(player.x - object3d.x, player.z - object3d.z)
-                local destination_angle_x = -atan2(distance_to_player, player.y - object3d.y)
-
-                if(object3d.y - player.y < 0) then 
-                    thrust(object3d,0.4) destination_angle_x=-0.1  
-                elseif(object3d.y - current_height < 50) then
-                    thrust(object3d,0.2) destination_angle_x=-0.1 
-                else
-                    if(time() - object3d.shooting_cooldown > shooting_interval) shoot(object3d) object3d.shooting_cooldown=time()
-                end
-
-                srand(time())
-                object3d.ay += (destination_angle_y+.25-object3d.ay)*0.1
-                object3d.ax += (destination_angle_x-object3d.ax)*0.1            
+            if(x_z_distance_to_player < 600 or object3d.is_mutated) then    
+                attack_player(object3d, current_height, x_z_distance_to_player)                
             else
                 -- only search for mutated bushes if not mutated
                 -- if on virused square, become mutated 1/5 times
-                if (not object3d.is_mutated) then
-                    if(time() - object3d.shooting_cooldown > .7) then 
-                        local posx, posz = object3d.x%terrain_size, object3d.z%terrain_size
-                        local v_level = sget(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)))
-                        if(v_level == 4) then
-                            if flr(rnd(10)) == 1 then
-                                object3d.tris = OBJS_DATA[16][2]
-                                shooting_interval = 0.14
-                                object3d.is_mutated = true
-                            end
+                if(time() - object3d.shooting_cooldown > .7) then 
+                    local posx, posz = object3d.x%terrain_size, object3d.z%terrain_size
+                    local v_level = sget(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)))
+                    if(v_level == 4) then
+                        if flr(rnd(10)) == 1 then
+                            object3d.tris = OBJS_DATA[16][2]
+                            shooting_interval = 0.14
+                            object3d.is_mutated = true
                         end
                     end
                 end
@@ -591,6 +594,8 @@ function spawn_drone(x,y,z)
 
         end,
         function(object3d) 
+            object3d.is_mutated = false
+            object3d.shooting_interval = 0.7
             object3d.return_death_score=function() if(object3d.is_mutated) return 500 else return 300 end 
             object3d.return_blip_color=function() if(object3d.is_mutated) if(time()%0.5 == 0) return 8 else return 9 else return 9 end 
             object3d.shooting_cooldown = time()
@@ -644,7 +649,6 @@ function spawn_bomber(x,y,z)
         function(object3d) 
             object3d.return_death_score=function() return 800 end 
             object3d.return_blip_color=function() if(time()%0.5 == 0) return 12 else return 0 end
-            object3d.shooting_cooldown = time()
         
             object3d.dir=rnd(1)
         end
@@ -654,6 +658,34 @@ function spawn_bomber(x,y,z)
     end
 
     add(enemies, new_bomber)
+end
+
+function spawn_fighter(x,y,z)
+    local new_fighter = create_object3d(21,x,y,z,.25,0,0,
+        function(object3d)             
+            local current_height = object3d.y - get_height_pos(object3d.x, object3d.z)
+            local shooting_interval = 0.3
+
+            test_var = current_height
+            attack_player(object3d, current_height)
+
+            clamp_speed(object3d, 4)
+        end,
+        function(object3d) 
+            object3d.shooting_interval = 0.3
+            object3d.hit_points = 2
+            object3d.return_death_score=function() object3d.hit_points-=1 if (object3d.hit_points==0) return 700 else object3d.tris = OBJS_DATA[23][2] object3d.shooting_interval = 0.6 return 200 end 
+            object3d.return_blip_color=function() if(time()%1 < .5) return 10 else return 0 end
+            object3d.shooting_cooldown = time()
+        
+            object3d.dir=rnd(1)
+        end
+    )
+    new_fighter.is_crash = function(object3d) 
+        explode(new_fighter)     
+    end
+
+    add(enemies, new_fighter)
 end
 
 
@@ -679,8 +711,10 @@ function collide_enemies(object, emitter)
                             false,
                             true
                     )
-                    explode(enemies[i])
-                    deli(enemies,i)
+                    if(not enemies[i].hit_points or enemies[i].hit_points == 0) then
+                        explode(enemies[i])
+                        deli(enemies,i)
+                    end
                 else
                     fuel-=20
                 end
@@ -743,7 +777,7 @@ function reset_player()
                 damage_player() 
             end 
 
-            if(object3d.y > t_height_player)then
+            if(object3d.y > t_height_cam_target)then
                 if(btn(0)) object3d.ay += 0.03
                 if(btn(1)) object3d.ay -= 0.03
                 if(btn(2)) then if(abs(object3d.ax-0.02) < 0.2) then object3d.ax -= 0.02 end end
@@ -765,11 +799,11 @@ function reset_player()
                     end
                 end
             else
-                if(t_height_player == 68) fuel=100
+                if(t_height_cam_target == 68) fuel=100
             end
 
 
-            if(object3d.y < 686) then
+            if(object3d.y < 1200) then
                 if(btn(4))then
                     thrust(object3d, 0.5, true)
                 end
@@ -804,6 +838,7 @@ function reset_player()
                 damage_player() 
             end        
         end
+        cam_target = player
 end
 
 function clamp_speed(object3d, max_speed)
@@ -840,12 +875,12 @@ function logic_update()
 
     envir={}
 
-    cam_x = player.x
-    cam_z = player.z - CAM_DIST_TERRAIN
-    if(player.y > t_height_player_smooth + 50) then
-        cam_y = player.y - 20
+    cam_x = cam_target.x
+    cam_z = cam_target.z - CAM_DIST_TERRAIN
+    if(cam_target.y > t_height_cam_target_smooth + 50) then
+        cam_y = cam_target.y - 20
     else
-        cam_y = t_height_player_smooth + 30
+        cam_y = t_height_cam_target_smooth + 30
     end
 end
 
@@ -877,7 +912,6 @@ function render_gamegui()
     rectfill(NUMSECTS,16,(player.y)/7+NUMSECTS,16,11)
     
 end
-
 
 function draw_update()
     -- must call to render terrain + objects

@@ -23,8 +23,8 @@ K_SCREEN_SCALE,K_X_CENTER,K_Y_CENTER,Z_CLIP,Z_MAX=80,63,63,-3,-300
 -- CAMERA SETTINGS
 cam_x,cam_y,cam_z, CAM_DIST_TERRAIN=0,0,0,125
 cam_ax,cam_ay,cam_az = 0,0.5,0
--- PLAYER GLOBAL PARAMS
-player, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_player,t_height_player_smooth=nil,0,0,0,0,0,0
+-- cam_target GLOBAL PARAMS
+cam_target, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_cam_target,t_height_cam_target_smooth=nil,0,0,0,0,0,0
 -- RENDER STUFF
 depth_buffer, game_objects3d, disposables, disposables_index, disposables_size={},{},{},0,50
 -- cam_matrix_transform
@@ -324,7 +324,7 @@ function render_terrain()
         end
 
         --[[ DEBUG PRINT POS&COORDS
-            print("player_pos: "..player.x..","..player.z,40,10, 6)
+            print("cam_target_pos: "..cam_target.x..","..cam_target.z,40,10, 6)
             print("mov_tiles: "..mov_tiles_x..","..mov_tiles_z,40,20, 6)
             print("tile_type: "..((terrainmesh[mov_tiles_x][mov_tiles_z]&0x00ff)),40,30, 6)
         --]]
@@ -411,10 +411,10 @@ function order_objects()
 end
 
 function update_view()
-    mov_tiles_x,mov_tiles_z=get_tileid(player.x),get_tileid(player.z)
-    sub_mov_x,sub_mov_z=(player.x/TILE_SIZE)%1,(player.z/TILE_SIZE)%1 
-    t_height_player=get_height_id(mov_tiles_x,mov_tiles_z)
-    t_height_player_smooth = get_height_smooth(player)
+    mov_tiles_x,mov_tiles_z=get_tileid(cam_target.x),get_tileid(cam_target.z)
+    sub_mov_x,sub_mov_z=(cam_target.x/TILE_SIZE)%1,(cam_target.z/TILE_SIZE)%1 
+    t_height_cam_target=get_height_id(mov_tiles_x,mov_tiles_z)
+    t_height_cam_target_smooth = get_height_smooth(cam_target)
     mesh_leftmost_x,mesh_rightmost_x,mesh_downmost_z,mesh_upmost_z=mov_tiles_x-(mesh_numverts\2-1),mesh_numverts+mesh_leftmost_x-1,mov_tiles_z-(mesh_numverts\2-1),mesh_numverts+mesh_downmost_z-1
 end
 --

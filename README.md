@@ -14,9 +14,9 @@
   - [x] seeder
   - [x] drone
   - [x] mutated drone (1)
-  - [] bomber (2)
+  - [x] bomber (2)
   - [] pest (4)
-  - [] fighter (3)
+  - [x] fighter (3)
   - [] attractor (5)
   - [] mystery spacecraft
 - Projectiles
