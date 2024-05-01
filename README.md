@@ -21,10 +21,10 @@
   - [] mystery spacecraft
 - Projectiles
   - [x] Machine gun
-  - [] Homing missile
+  - [ ] Homing missile
 - Levels (1-16)
-  - [] Clearing terrain (levels 5 and 10) (2)
-  - [] Increased gravity (levels 3, 5 and 7) (1)
+  - [ ] Clearing terrain (levels 5 and 10) (2)
+  - [ ] Increased gravity (levels 3, 5 and 7) (1)
 
 ## Levels
 
