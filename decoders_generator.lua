@@ -24,7 +24,7 @@ function generate_terrain()
             v = nx*cos(0.15) - ny*sin(0.15)
 
             noise =   abs(sin(nx/4 + sin(nz/15)))  * 55
-            noise +=   abs(sin(nw/4 + sin(nz/15)))  * 45
+            noise +=  abs(sin(nw/4 + sin(nz/15)))  * 45
             noise +=  abs(sin(u/4 + sin(ny/30))) * 35
             noise +=  abs(sin(v/4 + sin(nz/30))) * 55
             noise +=  abs(sin(v/4 + sin(nx/30))) * 35
@@ -34,7 +34,6 @@ function generate_terrain()
             noise -= 145
             if(noise <= 0)  then
                 noise = 0 
-
 
                 -- generate fish in water
                 srand(x*y)

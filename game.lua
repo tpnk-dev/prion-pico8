@@ -37,6 +37,7 @@ function spawn_wave_1()
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
     spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
     spawn_drone(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
+    spawn_bomber(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
 end
 
 waves = {spawn_wave_1}
@@ -64,6 +65,7 @@ waves = {spawn_wave_1}
 -- 16: mutated drone
 -- 17: mutated drone shadow
 -- 18: infected bush
+-- 19: bomber
 
 OBJS_DATA = {
             [0]={{{0,0,0}},{}}, 
@@ -85,6 +87,8 @@ OBJS_DATA = {
             decode_model(739),   -- 16: mutated drone
             decode_model(401),   -- 17: mutated drone shadow
             decode_model(828),   -- 18: infected bush
+            decode_model(868),   -- 19: bomber
+            decode_model(924),   -- 20: bomber shadow
         }
 ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     function(object) 
@@ -604,6 +608,55 @@ function spawn_drone(x,y,z)
     --player = new_drone
 end
 
+function spawn_bomber(x,y,z)
+    local new_bomber = create_object3d(19,x,y,z,.25,0,0,
+        function(object3d)             
+            local current_height = get_height_smooth(object3d)
+            local shooting_interval = 0.7
+
+            object3d.ay += (object3d.dir-object3d.ay)*0.02
+            object3d.y = current_height + 100
+            object3d.x -= sin(object3d.ay) * 3
+            object3d.z -= cos(object3d.ay) * 3
+
+            if(time()%1 == 0) then
+                local bomb = create_sprite(
+                    object3d.x,object3d.y,object3d.z,
+                    0,0,0,
+                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) spr(67, sx, sy) end,
+                    function(sprite) gravity(sprite, true,0.2) end,
+                    NOP
+                )
+                bomb.is_crash = function(sprite) 
+                    sprite.remove=true 
+                    local radius_in_tiles = 3
+                    local num_viruses_per_side = radius_in_tiles * 2 
+                    for i=-radius_in_tiles,radius_in_tiles do  
+                        for j=-radius_in_tiles,radius_in_tiles do
+                            local dx = i * TILE_SIZE 
+                            local dz = j * TILE_SIZE 
+                            add_virus_level_pos(bomb.x + dx, bomb.z + dz)
+                        end
+                    end
+                end
+            end
+        end,
+        function(object3d) 
+            object3d.return_death_score=function() return 800 end 
+            object3d.return_blip_color=function() if(time()%0.5 == 0) return 12 else return 0 end
+            object3d.shooting_cooldown = time()
+        
+            object3d.dir=rnd(1)
+        end
+    )
+    new_bomber.is_crash = function(object3d) 
+        explode(new_bomber)     
+    end
+
+    add(enemies, new_bomber)
+end
+
+
 function collide_enemies(object, emitter)
     emitter = emitter or object 
     local all_ships = enemies
@@ -817,7 +870,7 @@ function render_gamegui()
     --x[[
     print(tostr(infectable_areas, 0x2), 31, 18,7)
     print(tostr(infected_area, 0x2), 60, 18,7)
-    print(time()%4,90,18,7)
+    print(stat(1),90,18,7)
     --]]
     rectfill(NUMSECTS,14,fuel+NUMSECTS,14,10)
 
