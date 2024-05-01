@@ -648,7 +648,7 @@ function spawn_bomber(x,y,z)
         end,
         function(object3d) 
             object3d.return_death_score=function() return 800 end 
-            object3d.return_blip_color=function() if(time()%0.5 == 0) return 12 else return 0 end
+            object3d.return_blip_color=function() if(time()%.5 < 0.25) return 12 else return 0 end
         
             object3d.dir=rnd(1)
         end
@@ -675,7 +675,7 @@ function spawn_fighter(x,y,z)
             object3d.shooting_interval = 0.3
             object3d.hit_points = 2
             object3d.return_death_score=function() object3d.hit_points-=1 if (object3d.hit_points==0) return 700 else object3d.tris = OBJS_DATA[23][2] object3d.shooting_interval = 0.6 return 200 end 
-            object3d.return_blip_color=function() if(time()%1 < .5) return 10 else return 0 end
+            object3d.return_blip_color=function() if(time()%.5 < 0.25) return 10 else return 0 end
             object3d.shooting_cooldown = time()
         
             object3d.dir=rnd(1)
