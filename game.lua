@@ -10,6 +10,7 @@ enemies = {}
 envir={}
 
 wave=1
+fivek_counter = 1
 score = 0
 fuel = 100
 best = 0
@@ -91,6 +92,8 @@ OBJS_DATA = {
             decode_model(950),   -- 21: fighter
             decode_model(1028),  -- 22: fighter shadow,
             decode_model(1068),  -- 23: fighter weak
+            decode_model(1146),  -- 24: homing missile
+            decode_model(1247),  -- 24: homing missile shadow
         }
 ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     function(object) 
@@ -278,7 +281,7 @@ function check_wave_end()
     end  
 end
 
-function explode(object)
+function explode(object, idx_enemy)
     local h = get_height_pos(object.x,object.z)
 
     --smoke
@@ -322,8 +325,9 @@ function explode(object)
                 true
         )
     end 
-
     destroy(object)
+    deli(enemies, idx_enemy)
+    check_wave_end()
 end
 
 function play_audio_vicinity(emitter, n, channel)
@@ -387,7 +391,6 @@ function shoot(ship, is_inverted)
                 gravity(sprite, false,0) 
 
                 if(collide_enemies(sprite, ship)) then
-                    check_wave_end()
                     sprite.life_span=-1
                 end  
 
@@ -427,8 +430,6 @@ end
 
 function attack_player(object3d, current_height, x_z_distance_to_player)
     local x_z_distance_to_player = x_z_distance_to_player or v_len(player.x - object3d.x, 0, player.z - object3d.z)
-    dvx = player.vx - object3d.vx
-    dvy = player.vy - object3d.vy
     gravity(object3d, false,0.05)     
 
     -- move towards player when within distance
@@ -603,13 +604,13 @@ function spawn_drone(x,y,z)
             object3d.dir=rnd(1)
         end
     )
-    new_drone.is_crash = function(object3d) 
-        explode(new_drone)     
-    end
-
-    --player = new_drone
 
     add(enemies, new_drone)
+
+    new_drone.is_crash = function(object3d) 
+        explode(new_drone, #enemies)     
+    end
+    --player = new_drone
     --player = new_drone
 end
 
@@ -653,11 +654,12 @@ function spawn_bomber(x,y,z)
             object3d.dir=rnd(1)
         end
     )
-    new_bomber.is_crash = function(object3d) 
-        explode(new_bomber)     
-    end
 
     add(enemies, new_bomber)
+
+    new_bomber.is_crash = function(object3d) 
+        explode(new_bomber, #enemies)     
+    end
 end
 
 function spawn_fighter(x,y,z)
@@ -674,22 +676,24 @@ function spawn_fighter(x,y,z)
         function(object3d) 
             object3d.shooting_interval = 0.3
             object3d.hit_points = 2
-            object3d.return_death_score=function() object3d.hit_points-=1 if (object3d.hit_points==0) return 700 else object3d.tris = OBJS_DATA[23][2] object3d.shooting_interval = 0.6 return 200 end 
+            object3d.return_death_score=function() if (object3d.hit_points==0) return 700 else object3d.tris = OBJS_DATA[23][2] object3d.shooting_interval = 0.6 return 200 end 
             object3d.return_blip_color=function() if(time()%.5 < 0.25) return 10 else return 0 end
             object3d.shooting_cooldown = time()
         
             object3d.dir=rnd(1)
         end
     )
-    new_fighter.is_crash = function(object3d) 
-        explode(new_fighter)     
-    end
 
     add(enemies, new_fighter)
+
+    new_fighter.is_crash = function(object3d) 
+        explode(object3d, #enemies)    
+    end
 end
 
 
-function collide_enemies(object, emitter)
+function collide_enemies(object, emitter, damage)
+    damage = damage or 1
     emitter = emitter or object 
     local all_ships = enemies
     all_ships[0] = player
@@ -700,8 +704,9 @@ function collide_enemies(object, emitter)
                 --all_ships[i].vx = object.vx  all_ships[i].vz = object.vz all_ships[i].vy = object.vy
                 
                 if(i > 0) then
+                    if(enemies[i].hit_points) enemies[i].hit_points -= damage
                     death_score = enemies[i].return_death_score()
-                    score+=death_score>>16
+                    add_score(death_score>>16)
                     create_sprite(enemies[i].x,enemies[i].y,enemies[i].z,
                             0,0,0,
                             function(object) local sx,sy=project_point(object.t_x,object.t_y,object.t_z) print(death_score,sx,sy,7) end,
@@ -711,9 +716,8 @@ function collide_enemies(object, emitter)
                             false,
                             true
                     )
-                    if(not enemies[i].hit_points or enemies[i].hit_points == 0) then
-                        explode(enemies[i])
-                        deli(enemies,i)
+                    if(not enemies[i].hit_points or enemies[i].hit_points <= 0) then
+                        explode(enemies[i], i)
                     end
                 else
                     fuel-=20
@@ -739,7 +743,7 @@ function collide_env(object)
             if(env_type==1 or env_type==15) then 
                 explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
                 if(env_type==15) then
-                    score+=40>>16
+                    add_score(40>>16)
                     create_sprite(object.x,object.y,object.z,
                             0,0,0,
                             function(object) local sx,sy=project_point(object.t_x,object.t_y,object.t_z) print(40,sx,sy,7) end,
@@ -752,7 +756,7 @@ function collide_env(object)
                 end
                 
             end
-            if(env_type==6) then score += 0x0.0028 explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 end
+            if(env_type==6) then add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 end
             if(env_type==9) then explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0b00 end 
             if(env_type==13) then explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0E00 end 
 
@@ -763,13 +767,22 @@ function collide_env(object)
     return false
 end
 
+function add_score(amount)
+    score += amount
+    -- 0x0000.1388 = 5000
+    if(score > (fivek_counter * 0x0000.1388)) then
+        fivek_counter += 1
+        lives += 1
+        missiles += 1
+    end
+end
+
 function reset_player()
     player = create_object3d(2, 118*TILE_SIZE,0,118.5*TILE_SIZE,.25,0,0,
         function(object3d) 
             gravity(object3d, false,0.12)  
 
             if(collide_enemies(object3d)) then
-                check_wave_end()
                 damage_player() 
             end 
 
@@ -815,13 +828,67 @@ function reset_player()
             poke(0x5f5d,5)
 
             if(btn(5))then
-
-                if(time() - shooting_cooldown > .1) shoot(object3d) score -= 0x0.0001 shooting_cooldown=time()
-
+                if(time() - shooting_cooldown > .1) shoot(object3d) add_score(-0x0.0001) shooting_cooldown=time()
                 if(not shoot_btn_last) then
 
                     if(time() - time_last_shot < .2) then
-                        fuel = 0
+                        -- double click x
+                        missiles-=1
+                        if(missiles >= 0) then
+                            local new_missile = create_object3d(
+                                24,
+                                object3d.x,object3d.y,object3d.z,
+                                .25,0,0,
+                                function(missile3d)  
+                                    gravity(missile3d, false,0)  
+                                    local x_z_distance_to_target = v_len(missile3d.d_x - missile3d.target.d_x, 0, missile3d.d_z - missile3d.target.d_z)
+
+                                    local destination_angle_y = -atan2(missile3d.d_x - missile3d.target.d_x, missile3d.d_z - missile3d.target.d_z)
+                                    local destination_angle_x = atan2(x_z_distance_to_target, missile3d.y - missile3d.target.y)
+
+                                    missile3d.ay += (destination_angle_y-.25-missile3d.ay)
+                                    missile3d.ax += (destination_angle_x-missile3d.ax)
+
+                                    missile3d.vx -= sin(missile3d.ay) 
+                                    missile3d.vy -= sin(missile3d.ax) * 10
+                                    missile3d.vz -= cos(missile3d.ay)
+
+                                    -- add later
+                                    -- create_sprite(
+                                    --    missile3d.x+rnd(10)-4,missile3d.y+10+rnd(8),missile3d.z+rnd(10)-4,
+                                    --    0,0,0,
+                                    --    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd(5)-4, sy+rnd(5)-4, 0, 5) end end,
+                                    --    function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
+                                    --    NOP, 
+                                    --    4,
+                                    --    false,
+                                    --    true
+                                    --)
+
+                                    if(collide_enemies(missile3d, object3d, 2)) then
+                                        explode(missile3d)     
+                                    end  
+                                    clamp_speed(missile3d,10)
+                                end,
+                                function(missile3d) 
+                                    missile3d.life_span = 10
+                                    local closest_enemy_id = 0
+                                    local closest_enemy_distance = 32767
+                                    for i=1, #enemies do
+                                        
+                                        local x_z_distance_to_player = v_len(missile3d.x - enemies[i].x, 0, missile3d.z - enemies[i].z)
+                                        
+                                        if(x_z_distance_to_player < closest_enemy_distance) closest_enemy_id=i closest_enemy_distance=x_z_distance_to_player
+                                    end
+
+                                    missile3d.target = enemies[closest_enemy_id]
+                                end,
+                                object3d.vx - sin(object3d.ay) * 5, object3d.vy - sin(object3d.ax) * 5, object3d.vz - cos(object3d.ay) * 5
+                            )
+                            new_missile.is_crash = function(object3d) 
+                                explode(new_missile)     
+                            end
+                        end
                     end
 
                     time_last_shot = time()
@@ -842,6 +909,7 @@ function reset_player()
 end
 
 function clamp_speed(object3d, max_speed)
+    
     local n = length_vec({x=object3d.vx, y=object3d.vy,z=object3d.vz})
     if n > max_speed then
         f = max_speed / n
@@ -905,7 +973,7 @@ function render_gamegui()
     --x[[
     print(tostr(infectable_areas, 0x2), 31, 18,7)
     print(tostr(infected_area, 0x2), 60, 18,7)
-    print(stat(1),90,18,7)
+    print(stat(),90,18,7)
     --]]
     rectfill(NUMSECTS,14,fuel+NUMSECTS,14,10)
 
