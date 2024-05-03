@@ -5,6 +5,7 @@
 - Terrain
   - [x] Terrain rendering
   - [x] Trees (mutated and not)
+  - [ ] Create house
 - Map
   - [x] On-screen map
   - [x] Radar quadrants
@@ -15,16 +16,19 @@
   - [x] drone
   - [x] mutated drone (1)
   - [x] bomber (2)
-  - [] pest (4)
+  - [ ] pest (4)
   - [x] fighter (3)
-  - [] attractor (5)
-  - [] mystery spacecraft
+  - [ ] attractor (5)
+  - [ ] mystery spacecraft
 - Projectiles
   - [x] Machine gun
   - [ ] Homing missile
 - Levels (1-16)
+  - [ ] Enemy spawn logic
   - [ ] Clearing terrain (levels 5 and 10) (2)
   - [ ] Increased gravity (levels 3, 5 and 7) (1)
+- Sound 
+  - [ ] Add sound to objects
 
 ## Levels
 
