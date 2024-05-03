@@ -47,7 +47,8 @@ def get_positions(positions):
 def get_funcs():
              #s,d,b,f,p,a,m
     levels = [[3,1,0,0,0,0,0],
-             [4,1,1,0,0,0,0]]
+             [4,1,1,0,0,0,0],
+             [5,4,1,1,0,0,0]]
     
     output = ''
     for level in levels:
