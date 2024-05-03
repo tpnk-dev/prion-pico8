@@ -648,8 +648,7 @@ add(spawn_funcs,function (x,y,z)
     end
 end)
 
-local counts_lvl = {}
-for i=1387, 1400, 7 do -- 1401 = 1387+7*2
+for i=1387, 1407, 7 do -- 1401 = 1387+7*2
     local counts_lvl = {}
     for z = 0, 7 do
         counts_lvl[z+1] = @(i+z)
@@ -658,7 +657,7 @@ for i=1387, 1400, 7 do -- 1401 = 1387+7*2
     add(waves,
         function()
             srand(7)
-            for z = 1, 5 do
+            for z = 1, 4 do
                 for amount = 1, counts_lvl[z] do
                     spawn_funcs[z](flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
                 end
