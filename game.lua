@@ -235,6 +235,7 @@ function check_wave_end()
     if(#enemies == 0) then
         bonus_score = max(0,(infectable_areas-infected_area - infected_area)/(max(32/wave, 4)))
         score += bonus_score
+        dset(0, max(dget(i), score))
         main_update_draw = wave_completed_draw
         main_update = wave_completed_update
         wave_completed_timer = time()
@@ -921,7 +922,7 @@ function render_gamegui()
     print(wave,NUMSECTS+1+58,7,7)
 
     print("best",NUMSECTS+1+78,1,7)
-    print(best,NUMSECTS+1+78,7,7)
+    print(tostr(dget(i),0x2),NUMSECTS+1+78,7,7)
     --]]
 
     --x[[
