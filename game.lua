@@ -522,6 +522,7 @@ add(spawn_funcs,function (x,y,z)
             local x_z_distance_to_player = v_len(player, object3d)
 
             if(x_z_distance_to_player < 600 or object3d.is_mutated) then    
+                play_audio_vicinity(object3d, 4, -1)
                 attack_player(object3d, current_height, x_z_distance_to_player)                
             else
                 -- only search for mutated bushes if not mutated
@@ -573,7 +574,8 @@ end)
 --bomber
 add(spawn_funcs,function (x,y,z)
     local new_bomber = create_object3d(19,x,y,z,.25,0,0,
-        function(object3d)             
+        function(object3d)   
+            play_audio_vicinity(object3d, 4, -1)          
             local current_height = get_height_pos(object3d.x, object3d.z)
             local shooting_interval = 0.7
 
@@ -621,7 +623,8 @@ end)
 -- fighter
 add(spawn_funcs,function (x,y,z)
     local new_fighter = create_object3d(21,x,y,z,.25,0,0,
-        function(object3d)             
+        function(object3d)   
+            play_audio_vicinity(object3d, 4, -1)          
             local current_height = object3d.y - get_height_pos(object3d.x, object3d.z)
             local shooting_interval = 0.3
 
