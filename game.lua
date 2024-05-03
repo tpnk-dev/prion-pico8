@@ -1,46 +1,21 @@
--- 3738 tokens
+-- 4317 tokens
 -- tpnk_dev
 
 orig_srand = peek(0x5f44)
 
-test_ay = 0
-test_ax = 0
-player = {}
-enemies = {}
-envir={}
+test_ay, test_ax, player, enemies, envir = 0, 0, {}, {}, {}
 
-wave=1
-fivek_counter = 1
-score = 0
-fuel = 100
-best = 0
-lives = 3
-missiles = 3
+wave, fivek_counter, score, bonus_score, fuel, best, lives, missiles=1,1,0,0,100,0,3,3
 
-shooting_cooldown,time_last_shot = time(),time()
-shoot_btn_last, shoot_btn_current = false,false
+shooting_cooldown,time_last_shot,shoot_btn_last,shoot_btn_current = time(),time(),false,false
 
-wave_completed_timer = 0
-damaged_counter = 0
-damaged = false
+wave_completed_timer, damaged_counter, damaged = 0,0,false
 
-infectable_areas = 0
-infected_area = 0
+infectable_areas, infected_area = 0, 0
 
-rnd_dirt = {11,4,15,10}
-rnd_cement = {6,7}
+rnd_dirt, rnd_cement, colors_explosion = {11,4,15,10}, {6,7}, {2,4,10,3,5}
 
-function spawn_wave_1() 
-    srand(7)
-    spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
-    spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
-    spawn_seeder(flr(rnd(terrain_size)), 30, flr(rnd(terrain_size))) 
-    spawn_drone(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
-    spawn_bomber(flr(rnd(terrain_size)), 50, flr(rnd(terrain_size))) 
-    spawn_fighter(flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
-end
-
-waves = {spawn_wave_1}
+spawn_funcs, waves = {}, {}
 
 -- vertex data (s=nusign, v=virus level, t=type of object, h=height)
 -- vvvttttthhhhhhhh hhhhhhhhhhhhhhhh
@@ -66,37 +41,21 @@ waves = {spawn_wave_1}
 -- 17: mutated drone shadow
 -- 18: infected bush
 -- 19: bomber
+-- 20: bomber shadow
+-- 21: fighter
+-- 22: fighter shadow,
+-- 23: fighter weak
+-- 24: homing missile
+-- 24: homing missile shadow
 
-OBJS_DATA = {
-            [0]={{{0,0,0}},{}}, 
-            decode_model(0),     -- 1: tree 1
-            decode_model(45),    -- 2: player
-            decode_model(114),   -- 3: player shadow
-            decode_model(147),   -- 4: seeder
-            decode_model(247),   -- 5: seeder shadow
-            decode_model(312),   -- 6: drone
-            decode_model(401),   -- 7: drone shadow
-            decode_model(452),   -- 8: tree destroyed
-            decode_model(478),   -- 9: radar
-            decode_model(540),   -- 10: radar shadow
-            decode_model(566),   -- 11: radar tower
-            decode_model(592),   -- 12: fish
-            decode_model(628),   -- 13: bush
-            decode_model(668),   -- 14: bush destroyed
-            decode_model(694),   -- 15: infected tree 1
-            decode_model(739),   -- 16: mutated drone
-            decode_model(401),   -- 17: mutated drone shadow
-            decode_model(828),   -- 18: infected bush
-            decode_model(868),   -- 19: bomber
-            decode_model(924),   -- 20: bomber shadow
-            decode_model(950),   -- 21: fighter
-            decode_model(1028),  -- 22: fighter shadow,
-            decode_model(1068),  -- 23: fighter weak
-            decode_model(1146),  -- 24: homing missile
-            decode_model(1247),  -- 24: homing missile shadow
-        }
-ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
-    function(object) 
+-- load object data 1386 = 1337 + 47-> num_models*2-1
+OBJS_DATA = {[0]={{{0,0,0}},{}}}
+for i=1337, 1386, 2 do  
+    add(OBJS_DATA, decode_model(%i))
+end
+
+ENV_FUNC = {
+    [8] = function(object) 
         if(time()%3 == 0) then
             create_sprite(
                 object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
@@ -111,14 +70,12 @@ ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP,
         end
     end
     , 
-    function(object) 
+    [9] = function(object) 
         object.lock_verts={1,2,3,4} 
         object.ay = time() 
         create_object3d(10, object.x, object.y, object.z,object.ay,nil,nil,nil,nil,nil,nil,nil,true,true)
     end,
-    NOP,
-    NOP,
-    function(object) 
+    [12] = function(object) 
         --object.lock_verts={1,2,3,4} 
         --gravity(object, true,0.2)
         srand(object.x * object.z)
@@ -144,11 +101,11 @@ ENV_FUNC = {[0]=NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP,
                 )
             end
         end
+        reset_srand()
         --object.z += (time()%10)* 50
         --create_object3d(10, object.x, object.y, object.z,object.ay,nil,nil,nil,nil,nil,nil,nil,true,true)
-    end}
-
-colors_explosion = {2,4,10,3,5}
+    end
+}
 
 --COLORS
 pal(1, 140, 1)
@@ -160,17 +117,17 @@ pal(2, 131,1)
 -- 16 colors
 -- needed colors 3,4,5,7,8,10,11,12,14,131,134,138,140
 
-function acos(x)
-    return atan2(x,-sqrt(1-x*x))
-end
+function reset_srand() poke(0x5f44, orig_srand) end
    
-function v_len(x,y,z)
+function v_len(obj1, obj2, y_not_zeroed)
+    -- y_not_zeroed usually false, because most of the times only the the 2d dist
+    local x,y,z = obj1.x-obj2.x, 0, obj1.z-obj2.z
+    if (y_not_zeroed) y = obj1.y-obj2.y 
     local ax=atan2(x,y)
     local d2=x*cos(ax)+y*sin(ax)
     local az=atan2(d2,z)
     return d2*cos(az)+z*sin(az)
 end
-
 
 function game_init()
     init_terrain()
@@ -217,7 +174,7 @@ function get_color_id(idx,idz,flip)
 
     --local flip = flip or false
     --if(flip) then if(virus_level > 0) then fillp(0b1010010110100101) else fillp() end end
-
+    reset_srand()
     return color
 end
 
@@ -255,9 +212,10 @@ function destroy(object)
 end
 
 function wave_completed_draw()
-    print("attack Wave  "..wave.." completed",18,60,7)
-    print("area infected  . . .     "..tostr(infected_area, 0x2),7,80,7)
-    print("area uninfected  . . .   "..tostr(infectable_areas, 0x2),7,90,7)
+    print("Attack Wave  "..wave.." completed",18,60,7)
+    print("Area infected  . . .     "..tostr(infected_area, 0x2),7,80,7)
+    print("Area uninfected  . . .   "..tostr(infectable_areas, 0x2),7,90,7)
+    print("Bonus uninfected area .  "..tostr(bonus_score, 0x2),7,105,7)
 end
 
 function wave_completed_update()
@@ -269,12 +227,14 @@ function wave_completed_update()
         wave += 1 
         destroy(player)
         reset_player()
-        waves[(wave%#waves)+1]()
+        waves[wave%(#waves+1)]()
     end
 end
 
 function check_wave_end()
     if(#enemies == 0) then
+        bonus_score = max(0,(infectable_areas-infected_area - infected_area)/(max(32/wave, 4)))
+        score += bonus_score
         main_update_draw = wave_completed_draw
         main_update = wave_completed_update
         wave_completed_timer = time()
@@ -289,14 +249,14 @@ function explode(object, idx_enemy)
     for i=0,7 do
         srand(i)
         create_sprite(
-                object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
-                0,0,0,
-                function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd(5)-4, sy+rnd(5)-4, 0, 5) end end,
-                function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
-                NOP, 
-                4,
-                false,
-                true
+            object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
+            0,0,0,
+            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd(5)-4, sy+rnd(5)-4, 0, 5) end end,
+            function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
+            NOP, 
+            4,
+            false,
+            true
         )
     end 
 
@@ -325,6 +285,7 @@ function explode(object, idx_enemy)
                 true
         )
     end 
+    reset_srand()
     destroy(object)
     deli(enemies, idx_enemy)
     check_wave_end()
@@ -337,13 +298,9 @@ end
 
 function thrust(ship,intensity,is_player) 
     local is_player = is_player or false
-    --ship.y += ship.vy ship.x += ship.vx ship.z += ship.vz
     local intensity = intensity or 0.2
 
-
-
     if((fuel > 0 and is_player) or not is_player) then 
-    
         if (fuel > 0 and is_player) then fuel-=0.05 end
 
         ship.vy += intensity*cos(ship.ax)*cos(ship.az)
@@ -361,43 +318,43 @@ function thrust(ship,intensity,is_player)
             for i=0,1 do
                 srand(i * time())
                 local thrust_part = create_sprite(
-                        ship.x+rnd(8)-4,ship.y+rnd(8)-4,ship.z+rnd(8)+4 + 20,
-                        -dx*4+rnd(2)-1+ship.vx,-dy*4+ship.vy+ rnd(2)-1,-dz*4+rnd(2)-1+ship.vz,
-                        function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd(1)*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
-                        function(sprite) gravity(sprite, true,0.1) end,
-                        function(sprite) sprite.y=ship.y+0.001  end,
-                        0.4
+                    ship.x+rnd(8)-4,ship.y+rnd(8)-4,ship.z+rnd(8)+4 + 20,
+                    -dx*4+rnd(2)-1+ship.vx,-dy*4+ship.vy+ rnd(2)-1,-dz*4+rnd(2)-1+ship.vz,
+                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd(1)*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
+                    function(sprite) gravity(sprite, true,0.1) end,
+                    function(sprite) sprite.y=ship.y+0.001  end,
+                    0.4
                 )
             end
+            reset_srand()
         end
     end
 end
 
 --is inverted is temporary fix
-function shoot(ship, is_inverted) 
+function shoot(ship) 
     local is_inverted = is_inverted or false
     local dy = sin(ship.ax)
     local dx = sin(ship.ay)*cos(ship.ax)
     local dz = cos(ship.ay)*cos(ship.ax)
     local speed = 10
-    if(is_inverted) speed = -10
 
     play_audio_vicinity(ship, 1, 2)
     local projectile = create_sprite(
-            ship.x,ship.y,ship.z,
-            speed*-dx+ship.vx,speed*-dy+ship.vy,speed*-dz+ship.vz,       
-            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0,7) end,
-            function(sprite) 
-                gravity(sprite, false,0) 
+        ship.x,ship.y,ship.z,
+        speed*-dx+ship.vx,speed*-dy+ship.vy,speed*-dz+ship.vz,       
+        function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0,7) end,
+        function(sprite) 
+            gravity(sprite, false,0) 
 
-                if(collide_enemies(sprite, ship)) then
-                    sprite.life_span=-1
-                end  
+            if(collide_enemies(sprite, ship)) then
+                sprite.life_span=-1
+            end  
 
-                collide_env(sprite)
-            end,
-            NOP,
-            1
+            collide_env(sprite)
+        end,
+        NOP,
+        1
     )
 
     projectile.is_crash = function(sprite)
@@ -406,7 +363,6 @@ function shoot(ship, is_inverted)
         
         local h = get_height_pos(sprite.x,sprite.z)
 
-
         for i=0, 5 do
             srand(i* time())
 
@@ -414,22 +370,23 @@ function shoot(ship, is_inverted)
             if(h > 0) color = colors_explosion[flr(rnd(5))+1]
 
             create_sprite(
-                    sprite.x,sprite.y,sprite.z,
-                    rnd(2)-1,rnd(2),rnd(2)-1,
-                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
-                    function(sprite) gravity(sprite, true,0.1) end,
-                    NOP, 
-                    1,
-                    false,
-                    true
+                sprite.x,sprite.y,sprite.z,
+                rnd(2)-1,rnd(2),rnd(2)-1,
+                function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
+                function(sprite) gravity(sprite, true,0.1) end,
+                NOP, 
+                1,
+                false,
+                true
             )
         end
+        reset_srand()
     end
 
 end
 
 function attack_player(object3d, current_height, x_z_distance_to_player)
-    local x_z_distance_to_player = x_z_distance_to_player or v_len(player.x - object3d.x, 0, player.z - object3d.z)
+    local x_z_distance_to_player = x_z_distance_to_player or v_len(player, object3d)
     gravity(object3d, false,0.05)     
 
     -- move towards player when within distance
@@ -448,32 +405,30 @@ function attack_player(object3d, current_height, x_z_distance_to_player)
     object3d.ax += (destination_angle_x-object3d.ax)*0.5
 end
 
-function spawn_seeder(x,y,z)
+--seeder
+add(spawn_funcs, function (x,y,z)
     local landing_gears={} 
     for i=0,3 do
         landing_gears[i] = create_sprite(
             x,y,z,
-            0,0,0,
-            NOP
+            0,0,0
         )
     end
 
     local new_seeder = create_object3d(4,x,y,z,0,0,0,
         function(object3d) 
             local current_height = get_height_pos(object3d.x,object3d.z)
-            local current_height_smooth = get_height_smooth(object3d)
     
             object3d.ay +=  0.01
 
             if(object3d.landed)then
-                if(object3d.y - 1 > current_height_smooth + 20) object3d.y -=  1
+                if(object3d.y - 1 > current_height + 20) object3d.y -=  1
 
                 if(object3d.seed_count>30) then
                     for i=0,3 do
                         object3d.landing_gears[i].draw = NOP 
                     end
                 
-                    poke(0x5f44, orig_srand)
                     object3d.landed = false object3d.dir={rnd(2)-1,rnd(2)-1}
                 end
             else
@@ -525,8 +480,7 @@ function spawn_seeder(x,y,z)
                     end
                 end
             end
-
-
+            reset_srand()
         end,
         function(object3d) 
             object3d.return_blip_color=function() return 12 end 
@@ -550,20 +504,21 @@ function spawn_seeder(x,y,z)
                 --object3d.landing_gears[i] = landing_gear
             end 
             
-            poke(0x5f44, orig_srand)
-            object3d.landed=false object3d.seed_count=0 object3d.dir={rnd(2)-1,rnd(2)-1} end)  
+            object3d.landed=false object3d.seed_count=0 object3d.dir={rnd(2)-1,rnd(2)-1} 
+        end)  
     
     add(enemies, new_seeder)
-end
+end)
 
-function spawn_drone(x,y,z)
+--drone
+add(spawn_funcs,function (x,y,z)
     local new_drone = create_object3d(6,x,y,z,.25,0,0,
         function(object3d)             
             local current_height = get_height_pos(object3d.x%terrain_size,object3d.z%terrain_size)
 
             srand(time())
 
-            local x_z_distance_to_player = v_len(player.x - object3d.x, 0, player.z - object3d.z)
+            local x_z_distance_to_player = v_len(player, object3d)
 
             if(x_z_distance_to_player < 600 or object3d.is_mutated) then    
                 attack_player(object3d, current_height, x_z_distance_to_player)                
@@ -590,7 +545,7 @@ function spawn_drone(x,y,z)
                     object3d.dir=rnd(1)
                 end
             end
-            poke(0x5f44, orig_srand)
+            reset_srand()
             clamp_speed(object3d, 4)
 
         end,
@@ -612,12 +567,13 @@ function spawn_drone(x,y,z)
     end
     --player = new_drone
     --player = new_drone
-end
+end)
 
-function spawn_bomber(x,y,z)
+--bomber
+add(spawn_funcs,function (x,y,z)
     local new_bomber = create_object3d(19,x,y,z,.25,0,0,
         function(object3d)             
-            local current_height = get_height_smooth(object3d)
+            local current_height = get_height_pos(object3d.x, object3d.z)
             local shooting_interval = 0.7
 
             object3d.ay += (object3d.dir-object3d.ay)*0.02
@@ -630,8 +586,7 @@ function spawn_bomber(x,y,z)
                     object3d.x,object3d.y,object3d.z,
                     0,0,0,
                     function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) spr(67, sx, sy) end,
-                    function(sprite) gravity(sprite, true,0.2) end,
-                    NOP
+                    function(sprite) gravity(sprite, true,0.2) end
                 )
                 bomb.is_crash = function(sprite) 
                     sprite.remove=true 
@@ -660,9 +615,10 @@ function spawn_bomber(x,y,z)
     new_bomber.is_crash = function(object3d) 
         explode(new_bomber, #enemies)     
     end
-end
+end)
 
-function spawn_fighter(x,y,z)
+-- fighter
+add(spawn_funcs,function (x,y,z)
     local new_fighter = create_object3d(21,x,y,z,.25,0,0,
         function(object3d)             
             local current_height = object3d.y - get_height_pos(object3d.x, object3d.z)
@@ -689,6 +645,25 @@ function spawn_fighter(x,y,z)
     new_fighter.is_crash = function(object3d) 
         explode(object3d, #enemies)    
     end
+end)
+
+local counts_lvl = {}
+for i=1387, 1400, 7 do -- 1401 = 1387+7*2
+    local counts_lvl = {}
+    for z = 0, 7 do
+        counts_lvl[z+1] = @(i+z)
+    end
+
+    add(waves,
+        function()
+            srand(7)
+            for z = 1, 5 do
+                for amount = 1, counts_lvl[z] do
+                    spawn_funcs[z](flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
+                end
+            end   
+        end
+    )
 end
 
 
@@ -700,9 +675,8 @@ function collide_enemies(object, emitter, damage)
 
     for i=#all_ships,0,-1 do 
         if(all_ships[i].y != emitter.y and all_ships[i].x != emitter.x) then
-            if(sqrt(abs(object.d_x-all_ships[i].d_x)+abs(object.y-all_ships[i].y)+abs(object.d_z-all_ships[i].d_z)) < 5) then
+            if(v_len(object,all_ships[i],true) < 20) then
                 --all_ships[i].vx = object.vx  all_ships[i].vz = object.vz all_ships[i].vy = object.vy
-                
                 if(i > 0) then
                     if(enemies[i].hit_points) enemies[i].hit_points -= damage
                     death_score = enemies[i].return_death_score()
@@ -824,7 +798,6 @@ function reset_player()
 
             clamp_speed(object3d, 8)
 
-
             poke(0x5f5d,5)
 
             if(btn(5))then
@@ -841,7 +814,7 @@ function reset_player()
                                 .25,0,0,
                                 function(missile3d)  
                                     gravity(missile3d, false,0)  
-                                    local x_z_distance_to_target = v_len(missile3d.d_x - missile3d.target.d_x, 0, missile3d.d_z - missile3d.target.d_z)
+                                    local x_z_distance_to_target = v_len(missile3d, missile3d.target)
 
                                     local destination_angle_y = -atan2(missile3d.d_x - missile3d.target.d_x, missile3d.d_z - missile3d.target.d_z)
                                     local destination_angle_x = atan2(x_z_distance_to_target, missile3d.y - missile3d.target.y)
@@ -850,7 +823,7 @@ function reset_player()
                                     missile3d.ax += (destination_angle_x-missile3d.ax)
 
                                     missile3d.vx -= sin(missile3d.ay) 
-                                    missile3d.vy -= sin(missile3d.ax) * 10
+                                    missile3d.vy -= sin(missile3d.ax) * 5
                                     missile3d.vz -= cos(missile3d.ay)
 
                                     -- add later
@@ -865,18 +838,15 @@ function reset_player()
                                     --    true
                                     --)
 
-                                    if(collide_enemies(missile3d, object3d, 2)) then
-                                        explode(missile3d)     
-                                    end  
+                                    if(collide_enemies(missile3d, object3d, 2)) explode(missile3d)     
                                     clamp_speed(missile3d,10)
                                 end,
                                 function(missile3d) 
                                     missile3d.life_span = 10
-                                    local closest_enemy_id = 0
-                                    local closest_enemy_distance = 32767
+                                    local closest_enemy_id, closest_enemy_distance = 0, 32767
                                     for i=1, #enemies do
                                         
-                                        local x_z_distance_to_player = v_len(missile3d.x - enemies[i].x, 0, missile3d.z - enemies[i].z)
+                                        local x_z_distance_to_player = v_len(missile3d, enemies[i])
                                         
                                         if(x_z_distance_to_player < closest_enemy_distance) closest_enemy_id=i closest_enemy_distance=x_z_distance_to_player
                                     end
@@ -891,31 +861,23 @@ function reset_player()
                         end
                     end
 
-                    time_last_shot = time()
-                    shoot_btn_last = true
+                    time_last_shot, shoot_btn_last = time(), true
                 end
             else
-                if(shoot_btn_last) then
-                    shoot_btn_last = false
-                end
+                if(shoot_btn_last) shoot_btn_last = false
             end
+            reset_srand()
         end)   
         player.is_crash = function(object3d) 
-            if(sqrt(object3d.vx^2+object3d.vy^2+object3d.vz^2) > 3 or abs(object3d.ax) > 0.03) then
-                damage_player() 
-            end        
+            if(sqrt(object3d.vx^2+object3d.vy^2+object3d.vz^2) > 3 or abs(object3d.ax) > 0.03) damage_player()    
         end
         cam_target = player
 end
 
 function clamp_speed(object3d, max_speed)
+    local n = sqrt(object3d.vx^2+ object3d.vy^2 + object3d.vz^2)
+    local f = (n > max_speed) and max_speed / n or 1
     
-    local n = length_vec({x=object3d.vx, y=object3d.vy,z=object3d.vz})
-    if n > max_speed then
-        f = max_speed / n
-    else
-        f = 1
-    end
     object3d.vx, object3d.vy, object3d.vz = f*object3d.vx, f*object3d.vy, f*object3d.vz
 end
 
@@ -932,10 +894,7 @@ function logic_update()
 
     for i=#enemies,1,-1 do
         local enemy = enemies[i]
-        if(enemy.remove) then
-            deli(enemies, i)
-            deleted=true
-        end
+        if(enemy.remove) deli(enemies, i) deleted=true
     end
 
     update_terrain()
@@ -943,13 +902,8 @@ function logic_update()
 
     envir={}
 
-    cam_x = cam_target.x
-    cam_z = cam_target.z - CAM_DIST_TERRAIN
-    if(cam_target.y > t_height_cam_target_smooth + 50) then
-        cam_y = cam_target.y - 20
-    else
-        cam_y = t_height_cam_target_smooth + 30
-    end
+    cam_x, cam_z = cam_target.x, cam_target.z - CAM_DIST_TERRAIN
+    if(cam_target.y > t_height_cam_target + 50) cam_y = cam_target.y - 20 else cam_y = t_height_cam_target + 30
 end
 
 function render_gamegui()
@@ -990,4 +944,3 @@ function draw_update()
     render_minimap()
     --print(stat(1).."   "..stat(0),40,1,6)
 end
-

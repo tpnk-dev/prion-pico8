@@ -1,5 +1,5 @@
 -- Based on @marcospiv's 'ZARCHY' engine 3.0.1 - 2023
--- 3023 tokens
+-- 2859 tokens
 -- tpnk_dev
 -- UPPER CASE ARE CONSTANTS. ONLY MODIFY THEM, UNLESS YOU KNOW WHAT YOU ARE DOING. REPLACE WITH FINAL VALUE IN PRODUCTION CODE.
 
@@ -24,7 +24,7 @@ K_SCREEN_SCALE,K_X_CENTER,K_Y_CENTER,Z_CLIP,Z_MAX=80,63,63,-3,-300
 cam_x,cam_y,cam_z, CAM_DIST_TERRAIN=0,0,0,125
 cam_ax,cam_ay,cam_az = 0,0.5,0
 -- cam_target GLOBAL PARAMS
-cam_target, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_cam_target,t_height_cam_target_smooth=nil,0,0,0,0,0,0
+cam_target, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_cam_target=nil,0,0,0,0,0
 -- RENDER STUFF
 depth_buffer, game_objects3d, disposables, disposables_index, disposables_size={},{},{},0,50
 -- cam_matrix_transform
@@ -67,37 +67,16 @@ function sub_vec(vec1,vec2)
     return vec1.x-vec2.x, vec1.y-vec2.y, vec1.z-vec2.z
 end
 
-function length_vec(vec)
-    return sqrt(vec.x^2 + vec.y^2 + vec.z^2)
-end 
+---function length_vec(vec)
+--    return sqrt(vec.x^2 + vec.y^2 + vec.z^2)
+--end 
 
-function get_height_smooth(object)
-    sub_mov_x,sub_mov_z =(object.x/TILE_SIZE)%1, (object.z/TILE_SIZE)%1 
-
-    local p1_x,p1_z=((object.x\TILE_SIZE)*TILE_SIZE)%terrain_size,((object.z\TILE_SIZE)*TILE_SIZE)%terrain_size
-    local p1_y=get_height_pos(p1_x,p1_z)
-
-    local p2_x,p2_z=(p1_x+TILE_SIZE)%terrain_size,p1_z
-    local p2_y=get_height_pos(p2_x,p2_z)
-
-    local p3_x,p3_z=p1_x,(p1_z+TILE_SIZE)%terrain_size
-    local p3_y=get_height_pos(p3_x,p3_z)
-
-    local p4_x,p4_z=(p1_x+TILE_SIZE)%terrain_size,(p1_z+TILE_SIZE)%terrain_size
-    local p4_y=get_height_pos(p4_x,p4_z)
-
-    local yleft = p1_y + (p2_y - p1_y) * sub_mov_x;
-    local yright = p3_y + (p4_y - p3_y) * sub_mov_x;
-
-    return yleft + (yright - yleft) * sub_mov_z;
+function get_height_pos(posx,posz)
+    return (terrainmesh[(posx%terrain_size)\TILE_SIZE][(posz%terrain_size)\TILE_SIZE]&0x00ff.ffff)--/HEIGHTMULTIPLIER
 end
 
 function get_type_id(idx,idz)
     return (terrainmesh[idx][idz]&0x3f00)>>>8
-end
-
-function get_height_pos(posx,posz)
-    return (terrainmesh[(posx%terrain_size)\TILE_SIZE][(posz%terrain_size)\TILE_SIZE]&0x00ff.ffff)--/HEIGHTMULTIPLIER
 end
 
 function get_height_id(idx,idz)
@@ -414,7 +393,6 @@ function update_view()
     mov_tiles_x,mov_tiles_z=get_tileid(cam_target.x),get_tileid(cam_target.z)
     sub_mov_x,sub_mov_z=(cam_target.x/TILE_SIZE)%1,(cam_target.z/TILE_SIZE)%1 
     t_height_cam_target=get_height_id(mov_tiles_x,mov_tiles_z)
-    t_height_cam_target_smooth = get_height_smooth(cam_target)
     mesh_leftmost_x,mesh_rightmost_x,mesh_downmost_z,mesh_upmost_z=mov_tiles_x-(mesh_numverts\2-1),mesh_numverts+mesh_leftmost_x-1,mov_tiles_z-(mesh_numverts\2-1),mesh_numverts+mesh_downmost_z-1
 end
 --
@@ -561,7 +539,7 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
         d_x = 0,
         d_z = 0,
         t_verts={},
-        draw=draw_object3d,
+        draw=draw_func or draw_object3d,
         no_shadow = no_shadow
     }
     
@@ -569,7 +547,6 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
 
     if obj_id==0  then
         object3d.transform=transform_sprite3d
-        object3d.draw = function(sprite) draw_func(sprite) end
 
         if disposable then
             if(disposables[disposables_index] != nil) disposables[disposables_index].remove=true 
@@ -599,7 +576,7 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
                 function(shadow) 
                     shadow.x = object3d.x 
                     shadow.z = object3d.z 
-                    shadow.y=get_height_smooth(object3d) 
+                    shadow.y=get_height_pos(object3d.x, object3d.z) 
                     shadow.ay = object3d.ay 
                 end,
                 NOP,0,0,0,true
