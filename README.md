@@ -22,7 +22,7 @@
   - [ ] mystery spacecraft
 - Projectiles
   - [x] Machine gun
-  - [ ] Homing missile
+  - [x] Homing missile
 - Levels (1-16)
   - [ ] Enemy spawn logic
   - [ ] Clearing terrain (levels 5 and 10) (2)
