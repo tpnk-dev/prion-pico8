@@ -6,7 +6,7 @@ __lua__
 
 #include decoders_generator.lua
 #include starting_screen.lua
---#include zarchy_engine.lua
+#include zarchy_engine.lua
 #include game.lua
 
 main_update = update_starting_screen
