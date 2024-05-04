@@ -24,9 +24,9 @@
   - [x] Machine gun
   - [x] Homing missile
 - Levels (1-16)
-  - [ ] Enemy spawn logic
-  - [ ] Clearing terrain (levels 5 and 10) (2)
-  - [ ] Increased gravity (levels 3, 5 and 7) (1)
+  - [x] Enemy spawn logic
+  - [x] Clearing terrain (levels 5 and 10) (2)
+  - [x] Increased gravity (levels 3, 5 and 7) (1)
 - Sound 
   - [ ] Add sound to objects
 
