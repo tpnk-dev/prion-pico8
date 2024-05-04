@@ -486,7 +486,7 @@ end
 function gravity(object3d, bouncy, strength) 
     local current_height = get_height_pos(object3d.x, object3d.z)
     if object3d.y+object3d.vy>current_height then 
-        object3d.y+=object3d.vy object3d.x+=object3d.vx object3d.z+=object3d.vz  object3d.vy-=strength
+        object3d.y+=object3d.vy object3d.x+=object3d.vx object3d.z+=object3d.vz  object3d.vy-=strength*(gravities[gravity_idx])
     else 
         if (object3d.is_crash!=nil and object3d:is_crash()) return true 
         if bouncy then
