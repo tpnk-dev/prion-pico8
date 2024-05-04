@@ -48,11 +48,13 @@ gravities, gravity_idx = split "1, 1.5, 2", 1
 -- 22: fighter shadow,
 -- 23: fighter weak
 -- 24: homing missile
--- 24: homing missile shadow
+-- 25: homing missile shadow
+-- 26: pest
+-- 27: pest shadow
 
 -- load object data 1386 = 1337 + 47-> num_models*2-1
 OBJS_DATA = {[0]={{{0,0,0}},{}}}
-for i=1337, 1386, 2 do  
+for i=1419, 1472, 2 do  
     add(OBJS_DATA, decode_model(%i))
 end
 
@@ -138,7 +140,7 @@ function game_init()
     main_update = logic_update
 
     reset_player()
-    waves[3]()
+    waves[1]()
 end
 
 function get_color_id(idx,idz,flip)
@@ -298,6 +300,19 @@ function play_audio_vicinity(emitter, n, channel)
     if(emitter.is_visible) sfx(n,channel)
 end
 
+function smoke(object)
+    srand(object.x)
+    if(time()%.03125 == 0) then
+        create_sprite(
+            object.x+rnd"16"-8,object.y+rnd"16"-8,object.z+5,
+            0,0,0,
+            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 5) end,
+            NOP,
+            NOP,
+            3
+        )
+    end
+end
 
 function thrust(ship,intensity,is_player) 
     local is_player = is_player or false
@@ -651,7 +666,37 @@ add(spawn_funcs,function (x,y,z)
     end
 end)
 
-for i=1387, 1407, 7 do -- 1401 = 1387+7*2
+-- pest
+add(spawn_funcs,function (x,y,z)
+    local new_pest = create_object3d(26,x,y,z,.25,0,0,
+        function(object3d)   
+            gravity(object3d, false,0)     
+            play_audio_vicinity(object3d, 4, -1)       
+            
+            object3d.ay +=  0.03
+            object3d.ax +=  0.03
+
+            object3d.vx += (player.x - object3d.x) / v_len(player, object3d)*0.06
+            object3d.vy += (player.y - object3d.y) / v_len(player, object3d) *0.06
+            object3d.vz += (player.z - object3d.z) / v_len(player, object3d) *0.06
+            clamp_speed(object3d, 4)
+
+            smoke(object3d)
+        end,
+        function(object3d) 
+            object3d.return_death_score=function() return 400 end 
+            object3d.return_blip_color=function() return 14 end
+        end
+    )
+
+    add(enemies, new_pest)
+
+    new_pest.is_crash = function(object3d) 
+        explode(new_pest, #enemies)     
+    end
+end)
+
+for i=1473, 1487, 7 do -- 1401 = 1387+7*2
     local counts_lvl = {}
     for z = 0, 7 do
         counts_lvl[z+1] = @(i+z)
@@ -807,35 +852,23 @@ function reset_player()
                             local new_missile = create_object3d(
                                 24,
                                 object3d.x,object3d.y,object3d.z,
-                                .25,0,0,
+                                object3d.ay,object3d.ax,0,
                                 function(missile3d)  
                                     gravity(missile3d, false,0)  
                                     local x_z_distance_to_target = v_len(missile3d, missile3d.target)
 
                                     local destination_angle_y = -atan2(missile3d.d_x - missile3d.target.d_x, missile3d.d_z - missile3d.target.d_z)
-                                    local destination_angle_x = atan2(x_z_distance_to_target, missile3d.y - missile3d.target.y)
-
                                     missile3d.ay += (destination_angle_y-.25-missile3d.ay)
+                                    local destination_angle_x = atan2(x_z_distance_to_target, missile3d.y - missile3d.target.y)
                                     missile3d.ax += (destination_angle_x-missile3d.ax)
 
-                                    missile3d.vx -= sin(missile3d.ay) 
-                                    missile3d.vy -= sin(missile3d.ax) * 5
+                                    missile3d.vx -= sin(missile3d.ay)
+                                    missile3d.vy -= sin(missile3d.ax)
                                     missile3d.vz -= cos(missile3d.ay)
-
-                                    -- add later
-                                    -- create_sprite(
-                                    --    missile3d.x+rnd(10)-4,missile3d.y+10+rnd(8),missile3d.z+rnd(10)-4,
-                                    --    0,0,0,
-                                    --    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd(5)-4, sy+rnd(5)-4, 0, 5) end end,
-                                    --    function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
-                                    --    NOP, 
-                                    --    4,
-                                    --    false,
-                                    --    true
-                                    --)
 
                                     if(collide_enemies(missile3d, object3d, 2)) explode(missile3d)     
                                     clamp_speed(missile3d,10)
+                                    smoke(missile3d)
                                 end,
                                 function(missile3d) 
                                     missile3d.life_span = 10
@@ -849,7 +882,7 @@ function reset_player()
 
                                     missile3d.target = enemies[closest_enemy_id]
                                 end,
-                                object3d.vx - sin(object3d.ay) * 5, object3d.vy - sin(object3d.ax) * 5, object3d.vz - cos(object3d.ay) * 5
+                                object3d.vx - sin(object3d.ay) * 15, object3d.vy - sin(object3d.ax) * 15, object3d.vz - cos(object3d.ay) * 15
                             )
                             new_missile.is_crash = function(object3d) 
                                 explode(new_missile)     
