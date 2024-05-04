@@ -1,6 +1,8 @@
 -- terrain/models decoder
 -- 895 tokens
 
+local terrain_type, terrain_type_count, base_heights = split "50,35,85", 1, split "90,50,180"
+
 function generate_terrain()
     for y=0,TERRAIN_NUMVERTS-1 do
         cls()
@@ -23,12 +25,12 @@ function generate_terrain()
             u = nx*cos(0.15) - ny*sin(0.35)
             v = nx*cos(0.15) - ny*sin(0.15)
 
-            noise =   abs(sin(nx/4 + sin(nz/15)))  * 55
+            noise =   abs(sin(nx/4 + sin(nz/15)))  * terrain_type[terrain_type_count] -- 50, 25,85
             noise +=  abs(sin(nw/4 + sin(nz/15)))  * 45
             noise +=  abs(sin(u/4 + sin(ny/30))) * 35
-            noise +=  abs(sin(v/4 + sin(nz/30))) * 55
+            noise +=  abs(sin(v/4 + sin(nz/30))) * terrain_type[terrain_type_count]  -- 50,25,85
             noise +=  abs(sin(v/4 + sin(nx/30))) * 35
-            noise +=  abs(sin(v/4 + sin(nw/30))) * 35
+            noise +=  abs(sin(v/4 + sin(nw/30))) * terrain_type[terrain_type_count]
             --noise +=  abs(sin(v/4 + sin(w/30))) * 40
 
             noise -= 145
@@ -61,7 +63,7 @@ function generate_terrain()
     -- base
     for j=0,8 do 
         for i=0, 8 do
-           terrainmesh[i+114][j+114] = 0x0044.0000
+           terrainmesh[i+114][j+114] = base_heights[terrain_type_count]
            infectable_areas -= 0x0.0001
            --print((0x8033&0x8000)>>15)
            --stop()
