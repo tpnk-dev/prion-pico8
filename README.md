@@ -16,7 +16,7 @@
   - [x] drone
   - [x] mutated drone (1)
   - [x] bomber (2)
-  - [ ] pest (4)
+  - [x] pest (4)
   - [x] fighter (3)
   - [ ] attractor (5)
   - [ ] mystery spacecraft
