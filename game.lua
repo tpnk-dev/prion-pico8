@@ -570,7 +570,7 @@ add(spawn_funcs,function (x,y,z)
             object3d.is_mutated = false
             object3d.shooting_interval = 0.7
             object3d.return_death_score=function() if(object3d.is_mutated) return 500 else return 300 end 
-            object3d.return_blip_color=function() if(object3d.is_mutated) if(time()%0.5 == 0) return 8 else return 9 else return 9 end 
+            object3d.return_blip_color=function() if(object3d.is_mutated) if(time()%.5 < 0.25) return 8 else return 9 else return 9 end 
             object3d.shooting_cooldown = time()
         
             object3d.dir=rnd"1"
@@ -696,7 +696,51 @@ add(spawn_funcs,function (x,y,z)
     end
 end)
 
-for i=1473, 1487, 7 do -- 1401 = 1387+7*2
+--attractor
+add(spawn_funcs, function (x,y,z)
+    local new_attractor = create_object3d(4,x,y,z,0,0,0,
+        function(object3d) 
+            play_audio_vicinity(object3d, 4, -1)
+            local current_height = get_height_pos(object3d.x,object3d.z)
+            object3d.y = current_height + 100
+            object3d.ay+=.01
+
+            object3d.z += object3d.dir[1]
+            object3d.x += object3d.dir[2]
+
+            object3d.bean.x,object3d.bean.y, object3d.bean.z=object3d.x,object3d.y,object3d.z
+        end,
+        function(object3d) 
+            object3d.return_blip_color=function() if(time()%.5 < 0.25) return 8 else return 0 end 
+            object3d.hit_points = 5
+            object3d.bean = create_sprite(0,0,0,0,0,0,
+                function(sprite) 
+                    local x_z_distance_to_player = v_len(sprite, player, true)
+
+                    if(x_z_distance_to_player < 100) then
+                        local sx1,sy1=project_point(sprite.t_x,sprite.t_y,sprite.t_z) 
+                        local sx3,sy3=project_point(player.t_verts[1][1],player.t_verts[1][2],player.t_verts[1][3]) 
+                        srand(time()%2)
+                        local sx2,sy2=(sx1+sx3)/2 + rnd(16)-8, (sy1+sy3)/2
+                        line(sx1,sy1, sx2,sy2, 7) 
+                        line(sx2,sy2, sx3,sy3) 
+                        
+                        local dx, dy = sprite.x - player.x, sprite.y - player.y
+                        local distance = sqrt(dx*dx + dy*dy)
+                        local force = 1 / distance *.2
+                        player.vx += force * dx
+                        player.vy += force * dy
+                    end
+                end
+            )
+            object3d.return_death_score=function() if(object3d.hit_points==0) object3d.bean.remove=true return 500 else return 0 end
+            object3d.dir={rnd"2"-1,rnd"2"-1} 
+        end)  
+    
+    add(enemies, new_attractor)
+end)
+
+for i=1473, 1507, 7 do -- 1401 = 1387+7*2
     local counts_lvl = {}
     for z = 0, 7 do
         counts_lvl[z+1] = @(i+z)
@@ -705,7 +749,7 @@ for i=1473, 1487, 7 do -- 1401 = 1387+7*2
     add(waves,
         function()
             srand"7"
-            for z = 1, 4 do
+            for z = 1, 8 do
                 for amount = 1, counts_lvl[z] do
                     spawn_funcs[z](flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
                 end
@@ -951,7 +995,7 @@ function render_gamegui()
     print(tostr(dget(i),0x2),NUMSECTS+1+78,7,7)
     --]]
 
-    --x[[
+    --[[
     print(tostr(infectable_areas, 0x2), 31, 18,7)
     print(tostr(infected_area, 0x2), 60, 18,7)
     print(stat(),90,18,7)
