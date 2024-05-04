@@ -13,9 +13,11 @@ wave_completed_timer, damaged_counter, damaged = 0,0,false
 
 infectable_areas, infected_area = 0, 0
 
-rnd_dirt, rnd_cement, colors_explosion = {11,4,15,10}, {6,7}, {2,4,10,3,5}
+rnd_dirt, rnd_cement, colors_explosion = split "11,4,15,10", split "6,7", split "2,4,10,3,5"
 
 spawn_funcs, waves = {}, {}
+
+gravities, gravity_idx = split "1, 1.5, 2", 1
 
 -- vertex data (s=nusign, v=virus level, t=type of object, h=height)
 -- vvvttttthhhhhhhh hhhhhhhhhhhhhhhh
@@ -58,10 +60,10 @@ ENV_FUNC = {
     [8] = function(object) 
         if(time()%3 == 0) then
             create_sprite(
-                object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
+                object.x+rnd"10"-4,object.y+10+rnd"8",object.z+rnd"10"-4,
                 0,0,0,
                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 5) end,
-                function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
+                function(sprite) sprite.y+=rnd"0.4" sprite.x+=rnd"0.4"-0.2 sprite.z+=rnd"0.4"-0.2 end,
                 NOP, 
                 4,
                 false,
@@ -71,7 +73,7 @@ ENV_FUNC = {
     end
     , 
     [9] = function(object) 
-        object.lock_verts={1,2,3,4} 
+        object.lock_verts=split "1,2,3,4"
         object.ay = time() 
         create_object3d(10, object.x, object.y, object.z,object.ay,nil,nil,nil,nil,nil,nil,nil,true,true)
     end,
@@ -79,21 +81,21 @@ ENV_FUNC = {
         --object.lock_verts={1,2,3,4} 
         --gravity(object, true,0.2)
         srand(object.x * object.z)
-        local x = (rnd(10)+time())%(2 + rnd(10) )
+        local x = (rnd"10"+time())%(2 + rnd"10" )
         object.y = (-5*(x^2) + 5*x)* 20
         if(x >= 1) object.y = -10
         --if(time()%flr(rnd(20) + 5) > 1) object.y = 0
-        object.x += (time()%10)* (rnd(500) - 250)
+        object.x += (time()%10)* (rnd"500" - 250)
 
         if(object.y <= 0) then
             if(time()%1==0) then
                 srand(time())
 
-                local color = 12 - flr(rnd(2))*5
+                local color = 12 - flr(rnd"2")*5
 
                 create_sprite(
                     object.x,1,object.z,
-                    rnd(2)-1,rnd(2),rnd(2)-1,
+                    rnd"2"-1,rnd"2",rnd"2"-1,
                     function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
                     function(sprite) gravity(sprite, true,0.1) end,
                     NOP, 
@@ -136,7 +138,7 @@ function game_init()
     main_update = logic_update
 
     reset_player()
-    waves[1]()
+    waves[3]()
 end
 
 function get_color_id(idx,idz,flip)
@@ -144,12 +146,12 @@ function get_color_id(idx,idz,flip)
     local virus_level = get_virus_level_id(idx,idz)
 
     srand(idz*idx)
-    local diversity = (idx%4+idz%4+flr((rnd(6))))%4 +1
+    local diversity = (idx%4+idz%4+flr((rnd"6")))%4 +1
 
     local color=1
     if(height>0) color=10
     if(height>15) color=rnd_dirt[diversity]
-    if(height==68) color = rnd_cement[(idx%2+idz%2+flr((rnd(2))))%2+1]
+    if(height==base_heights[terrain_type_count]) color = rnd_cement[(idx%2+idz%2+flr((rnd"2")))%2+1]
 
     if(virus_level >= 1) then
         fillp(0b1010010110100101)
@@ -157,11 +159,11 @@ function get_color_id(idx,idz,flip)
         --4 (brown) -> red
         --15 (dark green) -> (brown,gray,red) -> 0x44,0x55,0x88
         --10 (yellow) -> (yellow/red) -> 0x8a
-        local rdmn_light_green={0x46, 0x44, 0x66}
-        if(color==11) color=rdmn_light_green[flr(rnd(3))+1]
+        local rdmn_light_green= split "0x46, 0x44, 0x66"
+        if(color==11) color=rdmn_light_green[flr(rnd"3")+1]
         if(color==4) color=0x88
-        local rdmn_dark_green={0x44,0x66,0x88}
-        if(color==15) color=rdmn_dark_green[flr(rnd(3))+1]
+        local rdmn_dark_green= split "0x44,0x66,0x88"
+        if(color==15) color=rdmn_dark_green[flr(rnd"3")+1]
         if(color==10) color=0x8a
     else
         fillp()
@@ -193,8 +195,8 @@ function add_virus_level_pos(posx,posz)
         sset(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)),4)
 
         local env_type = get_type_id(idx, idz)
-        if(env_type==1) then terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0F00 end
-        if(env_type==13) then terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x1200 end
+        if(env_type==1) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0F00
+        if(env_type==13) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x1200
 
         infected_area += 0x0.0001
     end
@@ -250,10 +252,10 @@ function explode(object, idx_enemy)
     for i=0,7 do
         srand(i)
         create_sprite(
-            object.x+rnd(10)-4,object.y+10+rnd(8),object.z+rnd(10)-4,
+            object.x+rnd"10"-4,object.y+10+rnd"8",object.z+rnd"10"-4,
             0,0,0,
-            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd(5)-4, sy+rnd(5)-4, 0, 5) end end,
-            function(sprite) sprite.y+=rnd(0.4) sprite.x+=rnd(0.4)-0.2 sprite.z+=rnd(0.4)-0.2 end,
+            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd"5"-4, sy+rnd"5"-4, 0, 5) end end,
+            function(sprite) sprite.y+=rnd"0.4" sprite.x+=rnd"0.4"-0.2 sprite.z+=rnd"0.4"-0.2 end,
             NOP, 
             4,
             false,
@@ -264,11 +266,11 @@ function explode(object, idx_enemy)
     for i=0,15 do
         srand(i)
 
-        local color = colors_explosion[flr(rnd(5))+1]
-        if(h == 0 and object.y <= 1) color = 12 - flr(rnd(2))*5
+        local color = colors_explosion[flr(rnd"5")+1]
+        if(h == 0 and object.y <= 1) color = 12 - flr(rnd"2")*5
 
         create_sprite(object.x,object.y,object.z+5,
-                rnd(2)-1,rnd(4)+2,rnd(2)-1,
+                rnd"2"-1,rnd"4"+2,rnd"2"-1,
                 function(sprite)
                     local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) 
                     circfill(sx, sy, 0, color) 
@@ -293,7 +295,7 @@ function explode(object, idx_enemy)
 end
 
 function play_audio_vicinity(emitter, n, channel)
-    if(emitter.is_visible) then sfx(n,channel) end
+    if(emitter.is_visible) sfx(n,channel)
 end
 
 
@@ -319,9 +321,9 @@ function thrust(ship,intensity,is_player)
             for i=0,1 do
                 srand(i * time())
                 local thrust_part = create_sprite(
-                    ship.x+rnd(8)-4,ship.y+rnd(8)-4,ship.z+rnd(8)+4 + 20,
-                    -dx*4+rnd(2)-1+ship.vx,-dy*4+ship.vy+ rnd(2)-1,-dz*4+rnd(2)-1+ship.vz,
-                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd(1)*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
+                    ship.x+rnd"8"-4,ship.y+rnd"8"-4,ship.z+rnd"8"+4 + 20,
+                    -dx*4+rnd"2"-1+ship.vx,-dy*4+ship.vy+ rnd"2"-1,-dz*4+rnd"2"-1+ship.vz,
+                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd"1"*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
                     function(sprite) gravity(sprite, true,0.1) end,
                     function(sprite) sprite.y=ship.y+0.001  end,
                     0.4
@@ -348,9 +350,8 @@ function shoot(ship)
         function(sprite) 
             gravity(sprite, false,0) 
 
-            if(collide_enemies(sprite, ship)) then
-                sprite.life_span=-1
-            end  
+            if(collide_enemies(sprite, ship)) sprite.life_span=-1
+              
 
             collide_env(sprite)
         end,
@@ -367,12 +368,12 @@ function shoot(ship)
         for i=0, 5 do
             srand(i* time())
 
-            local color = 12 - flr(rnd(2))*5
-            if(h > 0) color = colors_explosion[flr(rnd(5))+1]
+            local color = 12 - flr(rnd"2")*5
+            if(h > 0) color = colors_explosion[flr(rnd"5")+1]
 
             create_sprite(
                 sprite.x,sprite.y,sprite.z,
-                rnd(2)-1,rnd(2),rnd(2)-1,
+                rnd"2"-1,rnd"2",rnd"2"-1,
                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
                 function(sprite) gravity(sprite, true,0.1) end,
                 NOP, 
@@ -398,7 +399,7 @@ function attack_player(object3d, current_height, x_z_distance_to_player)
         thrust(object3d,0.4)
         if(object3d.y - player.y < 20 or current_height < 40)  destination_angle_x=-0.15 else destination_angle_x=-0.25
     else
-        if(object3d.y - player.y < 20) thrust(object3d,0.2)
+        if(object3d.y - player.y < 3) thrust(object3d,0.2) destination_angle_x=-0
         if(time() - object3d.shooting_cooldown > object3d.shooting_interval) shoot(object3d) object3d.shooting_cooldown=time()
     end
 
@@ -430,7 +431,7 @@ add(spawn_funcs, function (x,y,z)
                         object3d.landing_gears[i].draw = NOP 
                     end
                 
-                    object3d.landed = false object3d.dir={rnd(2)-1,rnd(2)-1}
+                    object3d.landed = false object3d.dir={rnd"2"-1,rnd"2"-1}
                 end
             else
                 play_audio_vicinity(object3d, 4, -1)
@@ -460,7 +461,7 @@ add(spawn_funcs, function (x,y,z)
                             srand(i*time())
                             local virus = create_sprite(
                                 object3d.x,object3d.y,object3d.z,
-                                rnd(4)-2,rnd(4),rnd(4)-2,
+                                rnd"4"-2,rnd"4",rnd"4"-2,
                                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 8 ) end,
                                 function(sprite) gravity(sprite, true,0.1) end,
                                 NOP,
@@ -475,7 +476,7 @@ add(spawn_funcs, function (x,y,z)
                     else    
                         for i=0,7 do  
                             srand(i*time())  
-                            add_virus_level_pos(object3d.x+(rnd(14)-7)*TILE_SIZE,object3d.z+(rnd(14)-7)*TILE_SIZE)
+                            add_virus_level_pos(object3d.x+(rnd"14"-7)*TILE_SIZE,object3d.z+(rnd"14"-7)*TILE_SIZE)
                         end
                         -- 7 each direction
                     end
@@ -505,7 +506,7 @@ add(spawn_funcs, function (x,y,z)
                 --object3d.landing_gears[i] = landing_gear
             end 
             
-            object3d.landed=false object3d.seed_count=0 object3d.dir={rnd(2)-1,rnd(2)-1} 
+            object3d.landed=false object3d.seed_count=0 object3d.dir={rnd"2"-1,rnd"2"-1} 
         end)  
     
     add(enemies, new_seeder)
@@ -531,7 +532,7 @@ add(spawn_funcs,function (x,y,z)
                     local posx, posz = object3d.x%terrain_size, object3d.z%terrain_size
                     local v_level = sget(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)))
                     if(v_level == 4) then
-                        if flr(rnd(10)) == 1 then
+                        if flr(rnd"10") == 1 then
                             object3d.tris = OBJS_DATA[16][2]
                             shooting_interval = 0.14
                             object3d.is_mutated = true
@@ -540,12 +541,11 @@ add(spawn_funcs,function (x,y,z)
                 end
 
                 -- move to random direction
-                object3d.ay += (object3d.dir-object3d.ay)*0.02 +rnd(0.01)-0.02
+                object3d.ay += (object3d.dir-object3d.ay)*0.02 +rnd"0.01"-0.02
                 object3d.x -= sin(object3d.ay) * 3
                 object3d.z -= cos(object3d.ay) * 3
-                if(time()%10 == 0) then
-                    object3d.dir=rnd(1)
-                end
+                if(time()%10 == 0) object3d.dir=rnd"1"
+                
             end
             reset_srand()
             clamp_speed(object3d, 4)
@@ -558,7 +558,7 @@ add(spawn_funcs,function (x,y,z)
             object3d.return_blip_color=function() if(object3d.is_mutated) if(time()%0.5 == 0) return 8 else return 9 else return 9 end 
             object3d.shooting_cooldown = time()
         
-            object3d.dir=rnd(1)
+            object3d.dir=rnd"1"
         end
     )
 
@@ -609,7 +609,7 @@ add(spawn_funcs,function (x,y,z)
             object3d.return_death_score=function() return 800 end 
             object3d.return_blip_color=function() if(time()%.5 < 0.25) return 12 else return 0 end
         
-            object3d.dir=rnd(1)
+            object3d.dir=rnd"1"
         end
     )
 
@@ -640,7 +640,7 @@ add(spawn_funcs,function (x,y,z)
             object3d.return_blip_color=function() if(time()%.5 < 0.25) return 10 else return 0 end
             object3d.shooting_cooldown = time()
         
-            object3d.dir=rnd(1)
+            object3d.dir=rnd"1"
         end
     )
 
@@ -659,7 +659,7 @@ for i=1387, 1407, 7 do -- 1401 = 1387+7*2
 
     add(waves,
         function()
-            srand(7)
+            srand"7"
             for z = 1, 4 do
                 for amount = 1, counts_lvl[z] do
                     spawn_funcs[z](flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
@@ -693,9 +693,7 @@ function collide_enemies(object, emitter, damage)
                             false,
                             true
                     )
-                    if(not enemies[i].hit_points or enemies[i].hit_points <= 0) then
-                        explode(enemies[i], i)
-                    end
+                    if(not enemies[i].hit_points or enemies[i].hit_points <= 0) explode(enemies[i], i)
                 else
                     fuel-=20
                 end
@@ -733,9 +731,9 @@ function collide_env(object)
                 end
                 
             end
-            if(env_type==6) then add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 end
-            if(env_type==9) then explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0b00 end 
-            if(env_type==13) then explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0E00 end 
+            if(env_type==6) add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
+            if(env_type==9) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0b00  
+            if(env_type==13) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0E00  
 
             return true
         end
@@ -759,25 +757,22 @@ function reset_player()
         function(object3d) 
             gravity(object3d, false,0.12)  
 
-            if(collide_enemies(object3d)) then
-                damage_player() 
-            end 
+            if(collide_enemies(object3d)) damage_player() 
 
-            if(collide_env(object3d)) then
-                damage_player() 
-            end 
+            if(collide_env(object3d)) damage_player() 
+             
 
             if(object3d.y > t_height_cam_target)then
-                if(btn(0)) object3d.ay += 0.03
-                if(btn(1)) object3d.ay -= 0.03
-                if(btn(2)) then if(abs(object3d.ax-0.02) < 0.2) then object3d.ax -= 0.02 end end
-                if(btn(3)) then if(abs(object3d.ax+0.02) < 0.2) then object3d.ax += 0.02 end end
+                if(btn"0") object3d.ay += 0.03
+                if(btn"1") object3d.ay -= 0.03
+                if(btn"2") then if(abs(object3d.ax-0.02) < 0.2) then object3d.ax -= 0.02 end end
+                if(btn"3") then if(abs(object3d.ax+0.02) < 0.2) then object3d.ax += 0.02 end end
 
                 if(time()%0x0000.0001 == 0) then
                     if(object3d.y > 200)then
                         srand(time())
                         create_sprite(
-                                object3d.x+rnd(200)-100,object3d.y+rnd(200)-50,object3d.z+rnd(200)-100,
+                                object3d.x+rnd"200"-100,object3d.y+rnd"200"-50,object3d.z+rnd"200"-100,
                                 0,0,0,
                                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 7 ) end,
                                 NOP,
@@ -789,21 +784,19 @@ function reset_player()
                     end
                 end
             else
-                if(t_height_cam_target == 68) fuel=100
+                if(t_height_cam_target == base_heights[terrain_type_count]) fuel=100
             end
 
 
             if(object3d.y < 1200) then
-                if(btn(4))then
-                    thrust(object3d, 0.5, true)
-                end
+                if(btn"4") thrust(object3d, 0.5, true)
             end
 
             clamp_speed(object3d, 8)
 
             poke(0x5f5d,5)
 
-            if(btn(5))then
+            if(btn"5")then
                 if(time() - shooting_cooldown > .1) shoot(object3d) add_score(-0x0.0001) shooting_cooldown=time()
                 if(not shoot_btn_last) then
 
@@ -891,10 +884,8 @@ end
 
 function logic_update()
 
-    if(damaged) then
-        if(time() - damaged_counter > 5) damaged=false reset_player()
-    end
-
+    if(damaged) if(time() - damaged_counter > 5) damaged=false reset_player()
+    
     for i=#enemies,1,-1 do
         local enemy = enemies[i]
         if(enemy.remove) deli(enemies, i) deleted=true
