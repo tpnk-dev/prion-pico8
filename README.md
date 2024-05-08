@@ -18,7 +18,7 @@
   - [x] bomber (2)
   - [x] pest (4)
   - [x] fighter (3)
-  - [ ] attractor (5)
+  - [-] attractor (5)
   - [ ] mystery spacecraft
 - Projectiles
   - [x] Machine gun
@@ -137,7 +137,7 @@ mutate itself by selecting a suitable bush and shooting it while within its
   - A secret new alien spaceship is roumoured to have joined the invasion force,
   and may strike at any time. You will only recognise this craft because it does
   not fit the description of any of the known aliens. Beware, as it may have a
-  lethal new weapons system fitted.
+  lethal new weapons system fitted. Drops a pest like bomb every 4 seconds that scores 150 when killed
     - Score for a kill:		2000
     - Hits to kill: 25
     - Scanner Blip:	None
