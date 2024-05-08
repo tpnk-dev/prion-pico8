@@ -1,55 +1,150 @@
-# zarchy-engine
-An engine to simulate the visuals of the game zarch/virus, made for the pico-8!
+# prion-pico8
 
-![main_20](https://user-images.githubusercontent.com/67443565/143341982-fab1b6e7-0459-48ba-b92e-462b44c1f3da.gif)
+## Features
 
-## Docs
+- Terrain
+  - [x] Terrain rendering
+  - [x] Trees (mutated and not)
+  - [ ] Create house
+  - [ ] Add fishes :)
+- Map
+  - [x] On-screen map
+  - [x] Radar quadrants
+- Player
+  - [x] User control
+- Enemies
+  - [x] seeder
+  - [x] drone
+  - [x] mutated drone 
+  - [x] bomber 
+  - [x] pest 
+  - [x] fighter 
+  - [x] attractor
+  - [x] mystery spacecraft 
+- Projectiles
+  - [x] Machine gun
+  - [x] Homing missile
+- Levels (1-16)
+  - [x] Enemy spawn logic
+  - [x] Clearing terrain (levels 5 and 10) (2)
+  - [x] Increased gravity (levels 3, 5 and 7) (1)
+- Sound 
+  - [ ] Add sound to objects
+- Others
+  - [ ] Add cart figure
+  - [ ] Create manual
+- Fixes
+  - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
+  - [ ] Fix ship proportions
 
-Load main.p8. The sample "game" is in game.lua. What you need to know:
+## Levels
 
-### How to import - into pico-8 memory - terrain heightmap, terrain objects and polygons
+1. 3 seeders                      1 drones
+2. 4 seeders            1 bombers 3 drones
+3. 5 seeders 1 fighters 1 bombers 4 drones
+4. 3 seeders 4 fighters 2 bombers 4 drones 4 pest 1 attractor
+5. 1 seeders 4 fighters 2 bombers 4 drones 5 pest 2 attractors
+6. 1 seeders 4 fighters 3 bombers 2 drones 6 pest 2 attractor 1 mystery
+7. 2 seeder  3 fighter  3 bombers 1 drone  8 pest 3 attractor 1 mystery
 
-- Requirements:
-  - A square png image for the terrain heightmap. You can use only the three first pico-8 colors in this: #000000, #1d2b53, #7e2553. They represent: water, land, high land. See ```test.png``` for reference
-  - A square png image for the terrain objects. You can use all 16 pico-8 colors from standard pallete (meaning you can have up to 16 different terrain objects, like trees and houses). Color #000000 means "no objects in this position". See ```objs.png``` for reference.
-  - A txt file with vertices and faces data, 3 lines for each model. Follow the format:
-```
-(v1_x,v1_y,v1_z),(v2_x,v2_y,v2_z),(v3_x,v3_y,v3_z), ...
-(v1,v2,v3,color), ...
-(offset_x,offset_y,offset_z,scale)
+## Entities
 
-(v1_x,v1_y,v1_z),(v2_x,v2_y,v2_z),(v3_x,v3_y,v3_z), ...
-(v1,v2,v3,color), ...
-(offset_x,offset_y,offset_z,scale)
-```
+- Hoverplane 
+  - The player.
+    - Hits to kill: 5
+    - Scanner Blip: White
 
-- To get data to import into pico-8:
-  - Run ```get_gfx.bat``` to extract bytes from the sample images (test.png, objs.png and model.txt).
-  - Type the following command, with your custom images, in cmd:
-    ```py pico8rle.py [terrain_image].png --models [models_image].txt --objs [objects_image].png```
-- Finally
-  - Run the command above 
-  - Keep note of the numbers at the start (these are the memory positions of the terrain, terrain objects and polygons
-  - Copy everything from ```__gfx__``` on into main.p8.
+- SEEDER
+  - The seeder is a blue flying saucer whose function is to spread red virus across
+    the landscape, causing wide-spread pollution and mutation of trees. it does
+    this in four phases:
 
-### How to instantiate objects and particles
-- In game.lua, make sure you populate OBJS_DATA with {decode_model(memlocation_obj1), decode_model(memlocation_obj2)...}
-- Use ```create_object3d``` and add it to ```game_objects3d``` to instantiate 3D objects.
-  - Make sure you fill at least the first 4 parameters: ```obj_id,x,y,z```. ```obj_id``` is the array index of the polygon this object will instantiate. Aditionally, you can set a ```update_func``` (a function that updates the logic of the object every frame) or ```start_func``` (a function which only runs when the object is created).
-- Use ```create_sprite3d``` and add it to ```game_objects3d``` to instantiate sprites/particles.
-  - Sprites have many parameters, such as ```x```,```y```,```z```,```draw_func``` (the function that draws the shape, like rectfill), ```update_func``` (a function that updates the logic the object every frame), ```start_func``` (a function which only runs when sprite is created), ```vx```,```vy```,```vz```, ```life_span``` (how much the sprite will last on screen)
-- To simulate gravity, you can set ```update_func``` to ```gravity``` which is a helper function located in zarchy_engine.lua
+      1.	Flying, and spraying the virus when over land.
+      2.	Finding a suitable landing site, and then landing on the
+                    ground.
+      3.	Spraying the immediate vicinity with virus in order to create a
+                    higher density of mutant foliage.
+      4.	Re-launching to find a suitable new landing site.
 
-### Other parameters
-- zarchy_engine.lua
-  - HEIGHTMULTIPLIER
-  - TILE_SIZE
-  - NUMSECTS
-  - K_SCREEN_SCALE,K_X_CENTER,K_Y_CENTER,Z_CLIP,Z_MAX
-  - CAM_DIST_TERRAIN
-- decoders.lua
-  - NUM_PASSES 
-  - TERRAIN_MEMLOC_START 
-  - OBJS_MEMLOC_END
-- game.lua
-  - OBJS_DATA
+    When it is about to land, is landed, or is taking off, a yellow undercarriage
+    is clearly visible.
+
+    - Score for a kill:	100(in the air) 50(when landed)
+    - Scanner Blip:	Cyan
+
+- DRONE
+  - A red and brown spaceship with a yellow underside, the drone flies in a similar
+manner to the Hoverplane but it han a weaker thrust capability. Its role is to shoot the landscape and your Hoverplane, and to attempt to
+mutate itself by selecting a suitable bush and shooting it while within its
+"spray zone".
+    - Score for a kill:		300
+    - Hits to kill: 1
+    - Scanner Blip:     		Orange
+
+
+- MUTANT (MUTATED DRONE)
+  - The mutant is red and purple with a yellow underside. It flies in a similar way
+  to the Hoverplane. It has a weaker thrust capability then the Hoverplane, but
+  more powerful than a drone. Its objective is to annoy and ultimately kill you. It has a much higher firing
+  rate than a drone, and is also more accurate.
+    - Score for a kill:		500
+    - Hits to kill: 1
+    - Scanner Blip:			Flashing orange/red
+
+
+- BOMBER
+  - Bombers are cyan and blue ships with a yellow underside. They fly straight and
+  level at very high speed, dropping parachute bombs most of the time. They are
+  detectable from a distance by the whooshing sound they emit as they fly along. The bomber's role is basically to spread virus, but it does so at a much higher
+  rate than the seeder. The parachute bombs, which swing as they are dropped out of the bomber have two
+  functions:
+
+    1. Proximity detonation on the Hoverplane.
+    2. Explosion above the ground, spreading concentrated virus around
+                  the area of impact.
+
+    - Score for a kill:		800
+    - Hits to kill: 1
+    - Scanner Blip:			cyan/dark blue
+
+
+- PEST
+  - Pests are magneta and yellow octahedrons which always head towards your
+  Hoverplane. Their task is simple: to destroy you at all costs. A pest is
+  characterised by the distinctive twittering noises it produces and the smoke
+  trail that is left behind in its wake.
+    - Score for a kill:		400
+    - Hits to kill: 1
+    - Scanner Blip: Magneta
+
+
+- FIGHTER
+  - A fighter is a red,orange and yellow Chevron-shaped craft which flies in a
+  similar manner to a mutant, but has a higher rate-of-fire (the same as the
+  Hoverplane). However, a fighter has to be hit twice with the laser cannon or
+  once with a homing missile in order to destroy it. After it has been hit once,
+  its rate-of-fire is halved, and it turns a greenish color.
+    - Score for a kill:		200 (for first hit) 700 (for the kill)
+    - Hits to kill: 2
+    - Scanner Blip:			Flashing yellow/black
+
+- ATTRACTOR
+  - The Attractor is one of the rarest and most dangerous of the alien spacecraft.
+  It is distinguished by its square base and red and white markings, as well as
+  the deadly lightning bolts that it shoots at the landscape below. However, the
+  Attractor's most powerful attribute is its tractor beam which pulls the
+  Hoverplane towards it and drains the Hoverplane's energy. To destroy an
+  Attractor, you will have to hit it a number of times.
+    - Score for a kill:		1000
+    - Hits to kill: 5
+    - Scanner Blip:	Flashing red/black
+
+
+- MYSTERY SPACECRAFT
+  - A secret new alien spaceship is roumoured to have joined the invasion force,
+  and may strike at any time. You will only recognise this craft because it does
+  not fit the description of any of the known aliens. Beware, as it may have a
+  lethal new weapons system fitted. Drops a pest like bomb every 4 seconds that scores 150 when killed
+    - Score for a kill:		2000
+    - Hits to kill: 25
+    - Scanner Blip:	None

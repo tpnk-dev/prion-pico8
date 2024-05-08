@@ -18,6 +18,7 @@ def get_models():
     
     output = ''
     sizes = [8] * len(lines)
+    positions = []
 
     for obj in range(0,len(lines)):
         for comp in range(0,len(lines[obj])):
@@ -25,11 +26,39 @@ def get_models():
                 output += '{:02x}'.format(len(lines[obj][comp]))
                 sizes[obj] += len(lines[obj][comp])*2+2
             for num in range(len(lines[obj][comp])):
+                
                 output += '{:02x}'.format(int(lines[obj][comp][num]))
                 
     for i in range(0,len(sizes)):
         print('model {}:{}'.format(i, math.floor((sum(sizes[0:i]) + len(s))/2)   ))
+        positions.append(math.floor((sum(sizes[0:i]) + len(s))/2))
+
+    print('OBJ_DATA START {}'.format(math.floor((sum(sizes[0:len(sizes)+1]) + len(s))/2)   ))
     
+    return output, positions
+
+def get_positions(positions):
+    output = ''
+    for pos in range(0,len(positions)):
+        output += '{:04x}'.format(positions[pos])[2:] + '{:04x}'.format(positions[pos])[:2]
+    
+    return output
+
+def get_funcs():
+             #s,d,b,f,p,a,m
+    levels = [[3,1,0,0,0,0,0],
+             [4,1,1,0,0,0,0],
+             [5,4,1,1,0,0,0],
+             [1,4,2,4,5,1,0],
+             [1,4,2,4,5,2,0],
+             [1,2,3,4,6,2,1],
+             [2,1,3,3,8,3,1]]
+    
+    output = ''
+    for level in levels:
+        for i in range(0,len(level)):
+            output += '{:02x}'.format(level[i])
+
     return output
 
 
@@ -54,6 +83,13 @@ args = parser.parse_args()
 
 s=""
 
-s+=get_models()
+output, positions = get_models()
+s+=output
+
+output = get_positions(positions)
+s+=output
+
+output = get_funcs()
+s+=output
 
 print_pico_memory()
