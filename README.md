@@ -6,6 +6,7 @@
   - [x] Terrain rendering
   - [x] Trees (mutated and not)
   - [ ] Create house
+  - [ ] Add fishes :)
 - Map
   - [x] On-screen map
   - [x] Radar quadrants
@@ -14,12 +15,12 @@
 - Enemies
   - [x] seeder
   - [x] drone
-  - [x] mutated drone (1)
-  - [x] bomber (2)
-  - [x] pest (4)
-  - [x] fighter (3)
-  - [-] attractor (5)
-  - [ ] mystery spacecraft
+  - [x] mutated drone 
+  - [x] bomber 
+  - [x] pest 
+  - [x] fighter 
+  - [x] attractor
+  - [x] mystery spacecraft 
 - Projectiles
   - [x] Machine gun
   - [x] Homing missile
@@ -29,6 +30,12 @@
   - [x] Increased gravity (levels 3, 5 and 7) (1)
 - Sound 
   - [ ] Add sound to objects
+- Others
+  - [ ] Add cart figure
+  - [ ] Create manual
+- Fixes
+  - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
+  - [ ] Fix ship proportions
 
 ## Levels
 
