@@ -22,8 +22,8 @@ function generate_terrain()
 
             local noise = 0
 
-            u = nx*cos(0.15) - ny*sin(0.35)
-            v = nx*cos(0.15) - ny*sin(0.15)
+            local u = nx*cos(0.15) - ny*sin(0.35)
+            local v = nx*cos(0.15) - ny*sin(0.15)
 
             noise =   abs(sin(nx/4 + sin(nz/15)))  * terrain_type[terrain_type_count] -- 50, 25,85
             noise +=  abs(sin(nw/4 + sin(nz/15)))  * 45
@@ -75,19 +75,19 @@ end
 
 function decode_model(memloc)
     --verts
-    v_memloc = memloc + 1
-    size_v = peek(memloc)
-    size_f = peek(v_memloc+size_v)
-    f_memloc = v_memloc+size_v+1
-    x_memloc = f_memloc+ size_f
+    local v_memloc = memloc + 1
+    local size_v = peek(memloc)
+    local size_f = peek(v_memloc+size_v)
+    local f_memloc = v_memloc+size_v+1
+    local x_memloc = f_memloc+ size_f
 
-    verts = {}
+    local verts = {}
     for p=0, size_v-3, 3 do add(verts, {(peek(v_memloc+p) - peek(x_memloc)) *peek(x_memloc+3) , (peek(v_memloc+p+1) - peek(x_memloc+1)) *peek(x_memloc+3), (peek(v_memloc+p+2) - peek(x_memloc+2))*peek(x_memloc+3)}) end   
     
-    faces = {}
+    local faces = {}
     for p=0, size_f-4, 4 do add(faces, {peek(f_memloc+p), peek(f_memloc+p+1), peek(f_memloc+p+2), peek(f_memloc+p+3)}) end 
 
-    xtra = {peek(x_memloc), peek(x_memloc+1), peek(x_memloc+2), peek(x_memloc+3)}
+    local xtra = {peek(x_memloc), peek(x_memloc+1), peek(x_memloc+2), peek(x_memloc+3)}
     
     return {verts,faces,xtra}
 end

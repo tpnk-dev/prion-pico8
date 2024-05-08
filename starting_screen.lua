@@ -1,8 +1,6 @@
-mov_starting = 10
+mov_starting, cam_y,cam_target, loading = 10, 0, player
 function starting_screen_init()
-    cam_y = 0
     player = create_object3d(2, 0,0,500,0,0,0)   
-    cam_target = player
     --game_objects3d = {player}
 end
 
