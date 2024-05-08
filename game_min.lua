@@ -3,7 +3,7 @@ version 42
 __lua__
 orig_srand=peek(24388)
 test_ay,test_ax,player,enemies,envir=0,0,{},{},{}
-wave,fivek_counter,score,bonus_score,fuel,best,lives,missiles=5,1,0,0,100,0,3,3
+wave,fivek_counter,score,bonus_score,fuel,best,lives,missiles=1,1,0,0,100,0,3,3
 shooting_cooldown,time_last_shot,shoot_btn_last,shoot_btn_current=time(),time(),false,false
 wave_completed_timer,damaged_counter,damaged=0,0,false
 infectable_areas,infected_area=0,0
@@ -24,17 +24,6 @@ end
 object.lock_verts=split"1,2,3,4"
 object.ay=time()
 create_object3d(10,object.x,object.y,object.z,object.ay,nil,nil,nil,nil,nil,nil,nil,true,true)
-end,
-[12]=function(object)
-srand(object.x*object.z)
-local x=(rnd"10"+time())%(2+rnd"10")
-object.y=(-5*x^2+5*x)*20
-if(x>=1)object.y=-10
-object.x+=time()%10*(rnd"500"-250)
-if object.y<=0then
-if(time()%1==0)srand(time())local color=12-flr(rnd"2")*5create_sprite(object.x,1,object.z,rnd"2"-1,rnd"2",rnd"2"-1,function(sprite)local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z)circfill(sx,sy,0,color)end,function(sprite)gravity(sprite,true,.1)end,𝘯𝘰𝘱,1)
-end
-reset_srand()
 end
 }
 pal(1,140,1)
@@ -203,7 +192,7 @@ explode(new_pest,#enemies)
 end
 end)
 add(spawn_funcs,function(x,y,z)
-local new_attractor=create_object3d(4,x,y,z,0,0,0,
+local new_attractor=create_object3d(28,x,y,z,0,0,0,
 function(object3d)
 play_audio_vicinity(object3d,4,-1)
 local current_height=get_height_pos(object3d.x,object3d.z)

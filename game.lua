@@ -37,7 +37,7 @@ spawn_timer, spawn_index, spawn_timers = 0,1,split"40,200,200,200,200,200,200"
 -- 9: radar
 -- 10: radar shadow
 -- 11: radar tower
--- 12: fish
+-- 12: fish (extra)
 -- 13: bush
 -- 14: bush destroyed
 -- 15: infected tree 1
@@ -83,36 +83,6 @@ ENV_FUNC = {
         object.lock_verts=split "1,2,3,4"
         object.ay = time() 
         create_object3d(10, object.x, object.y, object.z,object.ay,nil,nil,nil,nil,nil,nil,nil,true,true)
-    end,
-    [12] = function(object) 
-        --object.lock_verts={1,2,3,4} 
-        --gravity(object, true,0.2)
-        srand(object.x * object.z)
-        local x = (rnd"10"+time())%(2 + rnd"10" )
-        object.y = (-5*(x^2) + 5*x)* 20
-        if(x >= 1) object.y = -10
-        --if(time()%flr(rnd(20) + 5) > 1) object.y = 0
-        object.x += (time()%10)* (rnd"500" - 250)
-
-        if(object.y <= 0) then
-            if(time()%1==0) then
-                srand(time())
-
-                local color = 12 - flr(rnd"2")*5
-
-                create_sprite(
-                    object.x,1,object.z,
-                    rnd"2"-1,rnd"2",rnd"2"-1,
-                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, color) end,
-                    function(sprite) gravity(sprite, true,0.1) end,
-                    NOP, 
-                    1
-                )
-            end
-        end
-        reset_srand()
-        --object.z += (time()%10)* 50
-        --create_object3d(10, object.x, object.y, object.z,object.ay,nil,nil,nil,nil,nil,nil,nil,true,true)
     end
 }
 

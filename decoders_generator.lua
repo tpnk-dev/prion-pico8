@@ -36,12 +36,6 @@ function generate_terrain()
             noise -= 145
             if(noise <= 0)  then
                 noise = 0 
-
-                -- generate fish in water
-                srand(x*y)
-                if(flr(rnd(100)) == 10) then
-                    terrainmesh[y][x] |= 0xC00--0xB00
-                end
             else 
                 infectable_areas += 0x0.0001
             end
