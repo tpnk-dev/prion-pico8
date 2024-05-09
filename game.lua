@@ -144,6 +144,7 @@ function create_pest_like(x,y,z, is_mini)
 end
 
 function game_init()
+    --x[[
     -- seeder
     add(spawn_funcs, function (x,y,z)
         local landing_gears={} 
@@ -253,15 +254,13 @@ function game_init()
     add(spawn_funcs,function (x,y,z)
         local new_drone = create_object3d(6,x,y,z,.25,0,0,
             function(object3d)             
-                local current_height = get_height_pos(object3d.x%terrain_size,object3d.z%terrain_size)
-
                 srand(time())
 
                 local x_z_distance_to_player = v_len(player, object3d)
 
                 if(x_z_distance_to_player < 600 or object3d.is_mutated) then    
                     play_audio_vicinity(object3d, 4, -1)
-                    attack_player(object3d, current_height, x_z_distance_to_player)                
+                    attack_player(object3d, object3d.y - get_height_pos(object3d.x, object3d.z), x_z_distance_to_player)                
                 else
                     -- only search for mutated bushes if not mutated
                     -- if on virused square, become mutated 1/5 times
@@ -313,10 +312,9 @@ function game_init()
         local new_bomber = create_object3d(19,x,y,z,.25,0,0,
             function(object3d)   
                 play_audio_vicinity(object3d, 4, -1)          
-                local current_height = get_height_pos(object3d.x, object3d.z)
 
                 object3d.ay += (object3d.dir-object3d.ay)*0.02
-                object3d.y = current_height + 100
+                object3d.y = get_height_pos(object3d.x, object3d.z) + 100
                 object3d.x -= sin(object3d.ay) * 3
                 object3d.z -= cos(object3d.ay) * 3
 
@@ -360,9 +358,8 @@ function game_init()
         local new_fighter = create_object3d(21,x,y,z,.25,0,0,
             function(object3d)   
                 play_audio_vicinity(object3d, 4, -1)          
-                local current_height = object3d.y - get_height_pos(object3d.x, object3d.z)
 
-                attack_player(object3d, current_height)
+                attack_player(object3d, object3d.y - get_height_pos(object3d.x, object3d.z))
 
                 clamp_speed(object3d, 4)
             end,
@@ -392,8 +389,7 @@ function game_init()
         local new_attractor = create_object3d(28,x,y,z,0,0,0,
             function(object3d) 
                 play_audio_vicinity(object3d, 4, -1)
-                local current_height = get_height_pos(object3d.x,object3d.z)
-                object3d.y = current_height + 100
+                object3d.y = get_height_pos(object3d.x,object3d.z) + 100
                 object3d.ay+=.01
 
                 object3d.z += object3d.dir[1]
@@ -436,10 +432,9 @@ function game_init()
         local new_mystery = create_object3d(30,x,y,z,.25,0,0,
             function(object3d)   
                 play_audio_vicinity(object3d, 4, -1)          
-                local current_height = get_height_pos(object3d.x, object3d.z)
 
                 object3d.ay += (object3d.dir-object3d.ay)*0.02
-                object3d.y = current_height + 300
+                object3d.y = get_height_pos(object3d.x, object3d.z) + 300
                 object3d.x -= sin(object3d.ay) * 3
                 object3d.z -= cos(object3d.ay) * 3
 
@@ -461,6 +456,7 @@ function game_init()
             explode(new_mystery, #enemies)     
         end
     end)
+    --]]
 
     local lvl = 1
     for i=1808, 1850, 7 do -- 1401 = 1387+7*2
