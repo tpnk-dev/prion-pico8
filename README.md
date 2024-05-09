@@ -148,3 +148,7 @@ mutate itself by selecting a suitable bush and shooting it while within its
     - Score for a kill:		2000
     - Hits to kill: 25
     - Scanner Blip:	None
+
+
+import -l cover.png
+export -l cover.png
