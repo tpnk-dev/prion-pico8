@@ -26,7 +26,7 @@ function draw_starting_screen()
 
     rectfill( 0, 0, 128, 8, 6 ) 
     print('prion',12,2,8) 
-    print('marcospiv 2021',47,2,7) 
+    print('marcospiv 2023',47,2,7) 
     print('🅾️thrust',20,100,8) 
     print('❎ cannon',56,97,8) 
     print('❎+❎ missile',56,103,8) 

@@ -471,7 +471,7 @@ function game_init()
                     {
                         spawn_timers[z+1],
                         function() 
-                            srand(spawn_index)
+                            srand(spawn_index+wave)
                             spawn_funcs[z+1](flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
                         end
                     }
@@ -555,6 +555,7 @@ function damage_player()
     explode(player)
     damaged = true
     lives -=1
+    if(lives < 0) extcmd("reset")
     damaged_counter = time()
 end
 
@@ -573,7 +574,7 @@ function wave_completed_update()
     if(time()-wave_completed_timer > 5) then
         spawn_index = 1
         wave += 1 
-        if(wave > 7) reload()
+        if(wave > 7) extcmd("reset")
         main_update_draw = draw_update
         main_update = logic_update
 
@@ -762,9 +763,9 @@ function attack_player(object3d, current_height, x_z_distance_to_player)
 
     if(x_z_distance_to_player > 100) then
         thrust(object3d,0.4)
-        if(object3d.y - player.y < 20 or current_height < 40)  destination_angle_x=-0.15 else destination_angle_x=-0.25
+        if(object3d.y - player.y < 20 or current_height < 60)  destination_angle_x=-0.15 else destination_angle_x=-0.25
     else
-        if(object3d.y - player.y < 3) thrust(object3d,0.2) destination_angle_x=-0
+        if(object3d.y - player.y < 3 or current_height < 60) thrust(object3d,0.2) destination_angle_x=-0
         if(time() - object3d.shooting_cooldown > object3d.shooting_interval) shoot(object3d) object3d.shooting_cooldown=time()
     end
 
