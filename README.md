@@ -1,5 +1,17 @@
 # prion-pico8
 
+## Changelog 
+- v1.1
+  - add starting screen music
+  - first refinement of sound effects
+  - add levels 8,9,10
+  - add gravity and map change logic
+  - fix score when enemy hits the ground
+  - make missile have very high damage
+  - add label image, banner and screenshots
+  - add a cool_starting_screen for "3d scan effect"
+  - fix current_height considered by attack_player 
+
 ## Features
 
 - Terrain

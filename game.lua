@@ -1,6 +1,3 @@
--- 4317 tokens
--- tpnk_dev
-
 orig_srand = peek(0x5f44)
 
 test_ay, test_ax, player, enemies, envir = 0, 0, {}, {}, {}

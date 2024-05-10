@@ -1,4 +1,3 @@
-
 mov_starting, cam_y,cam_target,ship_index,ships, loading = 10, 0, player, 1
 timer=time()
 
