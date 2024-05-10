@@ -453,15 +453,17 @@ function game_init()
     --]]
 
     local lvl = 1
-    for i=1808, 1878, 7 do -- 1401 = 1387+7*2
+    for i=1808, 1878, 7 do -- 1401 = 1387+7*2 
         counts_lvl[lvl] = {}
         for z = 0, 6 do
             for amount = 1, @(i+z) do
+                local rand = 20*lvl*(z+1)*amount
+
                 add(counts_lvl[lvl], 
                     {
                         spawn_timers[z+1],
                         function() 
-                            srand(spawn_index+wave)
+                            srand(rand)
                             spawn_funcs[z+1](flr(rnd(terrain_size)),300,flr(rnd(terrain_size))) 
                         end
                     }
