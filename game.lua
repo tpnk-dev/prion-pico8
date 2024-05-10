@@ -1,6 +1,3 @@
--- 4317 tokens
--- tpnk_dev
-
 orig_srand = peek(0x5f44)
 
 test_ay, test_ax, player, enemies, envir = 0, 0, {}, {}, {}
@@ -117,8 +114,8 @@ function create_pest_like(x,y,z, is_mini)
     local obj_id = is_mini and 32 or 26
     local new_pest = create_object3d(obj_id,x,y,z,.25,0,0,
         function(object3d)   
-            gravity(object3d, false,0)     
-            play_audio_vicinity(object3d, 4, -1)       
+            gravity(object3d, false, 0)     
+            play_audio_vicinity(object3d, 6, -1)       
             
             object3d.ay +=  0.03
             object3d.ax +=  0.03
@@ -139,11 +136,13 @@ function create_pest_like(x,y,z, is_mini)
     add(enemies, new_pest)
 
     new_pest.is_crash = function() 
-        explode(new_pest, #enemies)     
+        score_hit_death(new_pest, 1000) 
     end
 end
 
 function game_init()
+    music(-1,500)
+    --x[[
     -- seeder
     add(spawn_funcs, function (x,y,z)
         local landing_gears={} 
@@ -253,15 +252,12 @@ function game_init()
     add(spawn_funcs,function (x,y,z)
         local new_drone = create_object3d(6,x,y,z,.25,0,0,
             function(object3d)             
-                local current_height = get_height_pos(object3d.x%terrain_size,object3d.z%terrain_size)
-
                 srand(time())
 
                 local x_z_distance_to_player = v_len(player, object3d)
 
                 if(x_z_distance_to_player < 600 or object3d.is_mutated) then    
-                    play_audio_vicinity(object3d, 4, -1)
-                    attack_player(object3d, current_height, x_z_distance_to_player)                
+                    attack_player(object3d, object3d.y - get_height_pos(object3d.x, object3d.z), x_z_distance_to_player)                
                 else
                     -- only search for mutated bushes if not mutated
                     -- if on virused square, become mutated 1/5 times
@@ -302,7 +298,7 @@ function game_init()
         add(enemies, new_drone)
 
         new_drone.is_crash = function() 
-            explode(new_drone, #enemies)     
+            score_hit_death(new_drone, 1000) 
         end
         --player = new_drone
         --player = new_drone
@@ -312,11 +308,10 @@ function game_init()
     add(spawn_funcs,function (x,y,z)
         local new_bomber = create_object3d(19,x,y,z,.25,0,0,
             function(object3d)   
-                play_audio_vicinity(object3d, 4, -1)          
-                local current_height = get_height_pos(object3d.x, object3d.z)
+                play_audio_vicinity(object3d, 5, -1)          
 
                 object3d.ay += (object3d.dir-object3d.ay)*0.02
-                object3d.y = current_height + 100
+                object3d.y = get_height_pos(object3d.x, object3d.z) + 100
                 object3d.x -= sin(object3d.ay) * 3
                 object3d.z -= cos(object3d.ay) * 3
 
@@ -351,7 +346,7 @@ function game_init()
         add(enemies, new_bomber)
 
         new_bomber.is_crash = function() 
-            explode(new_bomber, #enemies)     
+            score_hit_death(new_bomber, 1000) 
         end
     end)
 
@@ -359,10 +354,7 @@ function game_init()
     add(spawn_funcs,function (x,y,z)
         local new_fighter = create_object3d(21,x,y,z,.25,0,0,
             function(object3d)   
-                play_audio_vicinity(object3d, 4, -1)          
-                local current_height = object3d.y - get_height_pos(object3d.x, object3d.z)
-
-                attack_player(object3d, current_height)
+                attack_player(object3d, object3d.y - get_height_pos(object3d.x, object3d.z))
 
                 clamp_speed(object3d, 4)
             end,
@@ -379,8 +371,8 @@ function game_init()
 
         add(enemies, new_fighter)
 
-        new_fighter.is_crash = function(object3d) 
-            explode(object3d, #enemies)    
+        new_fighter.is_crash = function() 
+            score_hit_death(new_fighter, 1000) 
         end
     end)
 
@@ -391,9 +383,8 @@ function game_init()
     add(spawn_funcs, function (x,y,z)
         local new_attractor = create_object3d(28,x,y,z,0,0,0,
             function(object3d) 
-                play_audio_vicinity(object3d, 4, -1)
-                local current_height = get_height_pos(object3d.x,object3d.z)
-                object3d.y = current_height + 100
+                play_audio_vicinity(object3d, 8, -1)
+                object3d.y = get_height_pos(object3d.x,object3d.z) + 100
                 object3d.ay+=.01
 
                 object3d.z += object3d.dir[1]
@@ -409,6 +400,7 @@ function game_init()
                         local x_z_distance_to_player = v_len(sprite, player, true)
 
                         if(x_z_distance_to_player < 100) then
+                            play_audio_vicinity(sprite, 9, 1)
                             local sx1,sy1=project_point(sprite.t_x,sprite.t_y,sprite.t_z) 
                             local sx3,sy3=project_point(player.t_verts[1][1],player.t_verts[1][2],player.t_verts[1][3]) 
                             srand(time()%2)
@@ -424,7 +416,7 @@ function game_init()
                         end
                     end
                 )
-                object3d.return_death_score=function() if(object3d.hit_points==0) object3d.bean.remove=true return 500 else return 0 end
+                object3d.return_death_score=function() if(object3d.hit_points==0) object3d.bean.remove=true return 1000 else return 0 end
                 object3d.dir={rnd"2"-1,rnd"2"-1} 
             end)  
         
@@ -435,14 +427,11 @@ function game_init()
     add(spawn_funcs,function (x,y,z)
         local new_mystery = create_object3d(30,x,y,z,.25,0,0,
             function(object3d)   
-                play_audio_vicinity(object3d, 4, -1)          
-                local current_height = get_height_pos(object3d.x, object3d.z)
-
                 object3d.ay += (object3d.dir-object3d.ay)*0.02
-                object3d.y = current_height + 300
+                object3d.y = get_height_pos(object3d.x, object3d.z) + 300
                 object3d.x -= sin(object3d.ay) * 3
                 object3d.z -= cos(object3d.ay) * 3
-
+    
                 if(time()%8 == 0) then
                     if(v_len(object3d, player) < 150) create_pest_like(object3d.x, object3d.y, object3d.z, true)
                 end
@@ -454,16 +443,17 @@ function game_init()
                 object3d.dir=rnd"1"
             end
         )
-
+    
         add(enemies, new_mystery)
-
-        new_mystery.is_crash = function() 
-            explode(new_mystery, #enemies)     
+    
+        new_mystery.is_crash = function(object3d) 
+            score_hit_death(object3d, 1000) 
         end
     end)
+    --]]
 
     local lvl = 1
-    for i=1808, 1850, 7 do -- 1401 = 1387+7*2
+    for i=1808, 1878, 7 do -- 1401 = 1387+7*2
         counts_lvl[lvl] = {}
         for z = 0, 6 do
             for amount = 1, @(i+z) do
@@ -472,7 +462,7 @@ function game_init()
                         spawn_timers[z+1],
                         function() 
                             srand(spawn_index+wave)
-                            spawn_funcs[z+1](flr(rnd(terrain_size)),100,flr(rnd(terrain_size))) 
+                            spawn_funcs[z+1](flr(rnd(terrain_size)),300,flr(rnd(terrain_size))) 
                         end
                     }
                 )
@@ -539,7 +529,7 @@ function add_virus_level_pos(posx,posz)
     local height = get_height_pos(posx_trunc,posz_trunc) 
 
     local virus_level = get_virus_level_id(idx,idz)
-    if(virus_level == 0 and height > 0 and height != 0x0044) then
+    if(virus_level == 0 and height > 0 and height != base_heights[terrain_type_count]) then
         terrainmesh[idx][idz] += 0x4000
         sset(minimap_memory_start+(posx_trunc\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz_trunc\(sector_numfaces*TILE_SIZE)),4)
 
@@ -574,7 +564,8 @@ function wave_completed_update()
     if(time()-wave_completed_timer > 5) then
         spawn_index = 1
         wave += 1 
-        if(wave > 7) extcmd("reset")
+        if(wave > 10) extcmd("reset")
+        if(wave == 5 or wave==7) terrain_type_count+=1 gravity_idx+=1 init_terrain()
         main_update_draw = draw_update
         main_update = logic_update
 
@@ -592,30 +583,31 @@ function check_wave_end()
         bonus_score = max(0,(infectable_areas-infected_area - infected_area)/(max(32/wave, 4)))
         score += bonus_score
         dset(0, max(dget(0), score))
+        sfx(7, 3)
         main_update_draw = wave_completed_draw
         main_update = wave_completed_update
         wave_completed_timer = time()
     end  
 end
 
-function explode(object, idx_enemy)
+function explode(object)
     local h = get_height_pos(object.x,object.z)
 
     --smoke
-    sfx(3, 3)
-    --for i=0,7 do
-    --    srand(i)
-    --    create_sprite(
-    --        object.x+rnd"10"-4,object.y+10+rnd"8",object.z+rnd"10"-4,
-    --        0,0,0,
-    --        function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd"5"-4, sy+rnd"5"-4, 0, 5) end end,
-    --        function(sprite) sprite.y+=rnd"0.4" sprite.x+=rnd"0.4"-0.2 sprite.z+=rnd"0.4"-0.2 end,
-    --        NOP, 
-    --        4,
-    --        false,
-    --        true
-    --    )
-    --end 
+    sfx(3, 2)
+    for i=0,7 do
+        srand(i)
+        create_sprite(
+            object.x+rnd"10"-4,object.y+10+rnd"8",object.z+rnd"10"-4,
+            0,0,0,
+            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) for z=0,5 do srand(z * i) circfill(sx+rnd"5"-4, sy+rnd"5"-4, 0, 5) end end,
+            function(sprite) sprite.y+=rnd"0.4" sprite.x+=rnd"0.4"-0.2 sprite.z+=rnd"0.4"-0.2 end,
+            NOP, 
+            4,
+            false,
+            true
+        )
+    end 
 
     for i=0,15 do
         srand(i)
@@ -644,7 +636,7 @@ function explode(object, idx_enemy)
     end 
     reset_srand()
     destroy(object)
-    deli(enemies, idx_enemy)
+    del(enemies, object)
     check_wave_end()
 end
 
@@ -773,6 +765,15 @@ function attack_player(object3d, current_height, x_z_distance_to_player)
     object3d.ax += (destination_angle_x-object3d.ax)*0.5
 end
 
+function score_hit_death(object3d, damage)
+    if(object3d.hit_points) object3d.hit_points -= damage
+    local death_score = object3d.return_death_score()
+    add_score(death_score>>16)
+    flying_text(object3d, death_score)
+    sfx(10, 3)
+    if(not object3d.hit_points or object3d.hit_points <= 0) explode(object3d)
+end
+
 function collide_enemies(object, emitter, damage)
     damage = damage or 1
     emitter = emitter or object 
@@ -784,12 +785,7 @@ function collide_enemies(object, emitter, damage)
             if(v_len(object,all_ships[i],true) < 20) then
                 --all_ships[i].vx = object.vx  all_ships[i].vz = object.vz all_ships[i].vy = object.vy
                 if(i > 0) then
-                    if(enemies[i].hit_points) enemies[i].hit_points -= damage
-                    local death_score = enemies[i].return_death_score()
-                    add_score(death_score>>16)
-                    flying_text(enemies[i], death_score)
-                    sfx(3, 3)
-                    if(not enemies[i].hit_points or enemies[i].hit_points <= 0) explode(enemies[i], i)
+                    score_hit_death(enemies[i], damage)
                 else
                     fuel-=20
                 end
@@ -922,7 +918,7 @@ function reset_player()
                                     missile3d.vy -= sin(missile3d.ax)
                                     missile3d.vz -= cos(missile3d.ay)
 
-                                    if(collide_enemies(missile3d, object3d, 2)) explode(missile3d)     
+                                    if(collide_enemies(missile3d, object3d, 100)) explode(missile3d)     
                                     clamp_speed(missile3d,10)
                                     smoke(missile3d)
                                 end,
