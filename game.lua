@@ -14,7 +14,7 @@ rnd_dirt, rnd_cement, colors_explosion = split "11,4,15,10", split "6,7", split 
 
 spawn_funcs, waves, counts_lvl = {}, {}, {}
 
-gravities, gravity_idx = split "1, 1.5, 2", 1
+gravities, gravity_idx = split "1, 1.3, 1.7", 1
 
 spawn_timer, spawn_index, spawn_timers = 0,1,split"40,200,200,200,200,200,200"
 
