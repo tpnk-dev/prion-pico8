@@ -11,7 +11,7 @@ main_update = update_starting_screen
 main_update_draw = draw_starting_screen
 
 function _init()
-    cartdata("marcospiv_prion_v1.1.1")
+    cartdata("marcospiv_prion_v1_1_1")
     starting_screen_init()
 end
 
