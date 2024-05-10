@@ -2,8 +2,6 @@ pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
 
--- V1
-
 #include decoders_generator.lua
 #include starting_screen.lua
 #include zarchy_engine.lua
