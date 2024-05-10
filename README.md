@@ -29,9 +29,9 @@
   - [x] Clearing terrain (levels 5 and 10) (2)
   - [x] Increased gravity (levels 3, 5 and 7) (1)
 - Sound 
-  - [ ] Add sound to objects
+  - [x] Add sound to objects
 - Others
-  - [ ] Add cart figure
+  - [x] Add cart figure
   - [ ] Create manual
 - Fixes
   - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
@@ -46,6 +46,9 @@
 5. 1 seeders 4 fighters 2 bombers 4 drones 5 pest 2 attractors
 6. 1 seeders 4 fighters 3 bombers 2 drones 6 pest 2 attractor 1 mystery
 7. 2 seeder  3 fighter  3 bombers 1 drone  8 pest 3 attractor 1 mystery
+8. 1 seeder  5 fighter  4 bombers 1 drone  9 pest 3 attractor 2 mystery
+9. 1 seeder  6 fighter  4 bombers 1 drone  9 pest 3 attractor 2 mystery
+10. 1 seeder  5 fighter  4 bombers 1 drone  9 pest 3 attractor 2 mystery
 
 ## Entities
 
