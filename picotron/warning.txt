@@ -1,0 +1,23 @@
+--[[pod_format="raw",created="2024-05-11 22:13:43",modified="2024-05-11 22:16:21",revision=3]]
+WARN(3): 0.lua#1656 (p8:1659) poke: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#734 (p8:737) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#78 (p8:81) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#79 (p8:82) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#834 (p8:837) poke: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#84 (p8:87) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#87 (p8:90) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#87 (p8:90) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#87 (p8:90) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#87 (p8:90) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#89 (p8:92) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#89 (p8:92) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#89 (p8:92) peek: PICO-8 memory layout is not emulated; this might not work
+WARN(3): 0.lua#89 (p8:92) peek: PICO-8 memory layout is not emulated; this might not work
