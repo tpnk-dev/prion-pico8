@@ -1,6 +1,12 @@
 # prion-pico8
 
 ## Changelog 
+- v1.1.5
+  - fix suicidal pests (hitting the ground)
+  - fix player losing multiple lives as once
+  - give 5k rewards when wave ends
+  - player now dies when it has no fuel and gets shot
+  - pest doesnt count to finish wave
 - v1.1.4
   - fix shadow flickering (thx @krispykrouton)
 - v1.1.3
@@ -65,6 +71,8 @@
 - Fixes
   - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
   - [ ] Fix ship proportions
+  - [ ] Fix suicidal pests
+  - [ ] Change size of terrain 3, too much uninfected land and a lot of points
 
 ## Levels
 

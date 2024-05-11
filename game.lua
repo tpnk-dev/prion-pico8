@@ -132,10 +132,10 @@ function create_pest_like(x,y,z, is_mini)
             object3d.ax +=  0.03
 
             local dx,dz = correct_for_wrap(player, object3d)
-            local dist_player = v_len(player, object3d)
+            local dist_player = v_len(player, object3d, true)
 
             object3d.vx += dx / dist_player*.06
-            object3d.vy += (player.y - object3d.y) / dist_player *.06
+            object3d.vy += (max(get_height_pos(object3d.x,object3d.z)+200, player.y) - object3d.y) / dist_player *.06
             object3d.vz += dz / dist_player *.06
             clamp_speed(object3d, 4)
 
@@ -570,11 +570,13 @@ function add_virus_level_pos(posx,posz)
 end
 
 function damage_player() 
-    explode(player)
-    damaged = true
-    lives -=1
-    if(lives < 0) extcmd("reset")
-    damaged_counter = time()
+    if(not damaged) then
+        explode(player)
+        damaged = true
+        lives -=1
+        if(lives < 0) extcmd("reset")
+        damaged_counter = time()
+    end
 end
 
 function destroy(object)
@@ -610,7 +612,7 @@ end
 function check_wave_end()
     if(kill_count_lvl >= #counts_lvl[wave]) then
         bonus_score = max(0,(infectable_areas-infected_area - infected_area)/(max(32/wave, 4)))
-        score += bonus_score
+        add_score(bonus_score)
         dset(0, max(dget(0), score))
         sfx(7, 3)
         main_update_draw = wave_completed_draw
@@ -691,34 +693,30 @@ function thrust(ship,intensity,is_player)
     local is_player = is_player or false
     local intensity = intensity or 0.2
 
-    if((fuel > 0 and is_player) or not is_player) then 
-        if (fuel > 0 and is_player) then fuel-=0.05 end
+    ship.vy += intensity*cos(ship.ax)*cos(ship.az)
+    ship.vx += intensity*sin(ship.ay)*-sin(ship.ax)
+    ship.vz += intensity*-cos(ship.ay)*sin(ship.ax)
 
-        ship.vy += intensity*cos(ship.ax)*cos(ship.az)
-        ship.vx += intensity*sin(ship.ay)*-sin(ship.ax)
-        ship.vz += intensity*-cos(ship.ay)*sin(ship.ax)
+    local dy = cos(ship.ax)*cos(ship.az)
+    local dx = sin(ship.ay)*-sin(ship.ax) 
+    local dz = -cos(ship.ay)*sin(ship.ax) 
 
-        local dy = cos(ship.ax)*cos(ship.az)
-        local dx = sin(ship.ay)*-sin(ship.ax) 
-        local dz = -cos(ship.ay)*sin(ship.ax) 
+    play_audio_vicinity(ship, 0, 1)
 
-        play_audio_vicinity(ship, 0, 1)
-
-        if(ship.is_visible) then
-            srand(time())
-            for i=0,1 do
-                srand(i * time())
-                create_sprite(
-                    ship.x+rnd"8"-4,ship.y+rnd"8"-4,ship.z+rnd"8"+4 + 20,
-                    -dx*4+rnd"2"-1+ship.vx,-dy*4+ship.vy+ rnd"2"-1,-dz*4+rnd"2"-1+ship.vz,
-                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd"1"*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
-                    function(sprite) gravity(sprite, true,0.1) end,
-                    function(sprite) sprite.y=ship.y+0.001  end,
-                    0.4
-                )
-            end
-            reset_srand()
+    if(ship.is_visible) then
+        srand(time())
+        for i=0,1 do
+            srand(i * time())
+            create_sprite(
+                ship.x+rnd"8"-4,ship.y+rnd"8"-4,ship.z+rnd"8"+4 + 20,
+                -dx*4+rnd"2"-1+ship.vx,-dy*4+ship.vy+ rnd"2"-1,-dz*4+rnd"2"-1+ship.vz,
+                function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd"1"*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
+                function(sprite) gravity(sprite, true,0.1) end,
+                function(sprite) sprite.y=ship.y+0.001  end,
+                0.4
+            )
         end
+        reset_srand()
     end
 end
 
@@ -801,7 +799,7 @@ function score_hit_death(object3d, damage)
     add_score(death_score>>16)
     flying_text(object3d, death_score)
     sfx(10, 3)
-    if(not object3d.hit_points or object3d.hit_points <= 0) kill_count_lvl += 1 explode(object3d)
+    if(not object3d.hit_points or object3d.hit_points <= 0) explode(object3d) if(death_score != 150) kill_count_lvl += 1
 end
 
 function collide_enemies(object, emitter, damage)
@@ -818,6 +816,7 @@ function collide_enemies(object, emitter, damage)
                     score_hit_death(enemies[i], damage)
                 else
                     fuel-=20
+                    if(fuel < 0) damage_player()
                 end
 
                 return true
@@ -883,22 +882,22 @@ end
 function reset_player()
     player = create_object3d(2, 118*TILE_SIZE,0,118.5*TILE_SIZE,.25,0,0,
         function(object3d) 
-            gravity(object3d, false,0.12)  
+            if(not damaged) then
+                gravity(object3d, false,0.12)  
 
-            if(collide_enemies(object3d)) damage_player() 
+                if(collide_enemies(object3d)) damage_player() 
+                if(collide_env(object3d)) damage_player() 
+                
+                if(object3d.y > t_height_cam_target)then
+                    if(btn"0") object3d.ay += 0.03
+                    if(btn"1") object3d.ay -= 0.03
+                    if(btn"2") then if(abs(object3d.ax-0.02) < 0.2) then object3d.ax -= 0.02 end end
+                    if(btn"3") then if(abs(object3d.ax+0.02) < 0.2) then object3d.ax += 0.02 end end
 
-            if(collide_env(object3d)) damage_player() 
-             
-            if(object3d.y > t_height_cam_target)then
-                if(btn"0") object3d.ay += 0.03
-                if(btn"1") object3d.ay -= 0.03
-                if(btn"2") then if(abs(object3d.ax-0.02) < 0.2) then object3d.ax -= 0.02 end end
-                if(btn"3") then if(abs(object3d.ax+0.02) < 0.2) then object3d.ax += 0.02 end end
-
-                if(time()%0x0000.0001 == 0) then
-                    if(object3d.y > 200)then
-                        srand(time())
-                        create_sprite(
+                    if(time()%0x0000.0001 == 0) then
+                        if(object3d.y > 200)then
+                            srand(time())
+                            create_sprite(
                                 object3d.x+rnd"200"-100,object3d.y+rnd"200"-50,object3d.z+rnd"200"-100,
                                 0,0,0,
                                 function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 7 ) end,
@@ -907,79 +906,80 @@ function reset_player()
                                 3,
                                 true,
                                 true
-                        )
-                    end
-                end
-            else
-                if(t_height_cam_target == base_heights[terrain_type_count]) fuel=100
-            end
-
-
-            if(object3d.y < 1200) then
-                if(btn"4") thrust(object3d, 0.5, true)
-            end
-
-            clamp_speed(object3d, 8)
-
-            poke(0x5f5d,5)
-
-            if(btn"5")then
-                if(time() - shooting_cooldown > .1) shoot(object3d) add_score(-0x0.0001) shooting_cooldown=time()
-                if(not shoot_btn_last) then
-
-                    if(time() - time_last_shot < .2) then
-                        -- double click x
-                        missiles-=1
-                        if(missiles >= 0) then
-                            local new_missile = create_object3d(
-                                24,
-                                object3d.x,object3d.y,object3d.z,
-                                object3d.ay,object3d.ax,0,
-                                function(missile3d)  
-                                    gravity(missile3d, false,0)  
-                                    local x_z_distance_to_target = v_len(missile3d, missile3d.target)
-
-                                    local dx,dz = correct_for_wrap(missile3d, missile3d.target)
-
-                                    local destination_angle_y = -atan2(dx, dz)
-                                    missile3d.ay += (destination_angle_y-.25-missile3d.ay)
-                                    local destination_angle_x = atan2(x_z_distance_to_target, missile3d.y - missile3d.target.y)
-                                    missile3d.ax += (destination_angle_x-missile3d.ax)
-
-                                    missile3d.vx -= sin(missile3d.ay)
-                                    missile3d.vy -= sin(missile3d.ax)
-                                    missile3d.vz -= cos(missile3d.ay)
-
-                                    if(collide_enemies(missile3d, object3d, 100)) explode(missile3d)     
-                                    clamp_speed(missile3d,8)
-                                    smoke(missile3d)
-                                end,
-                                function(missile3d) 
-                                    missile3d.life_span = 10
-                                    local closest_enemy_id, closest_enemy_distance = 0, 32767
-                                    for i=1, #enemies do
-                                        
-                                        local x_z_distance_to_player = v_len(missile3d, enemies[i])
-                                        
-                                        if(x_z_distance_to_player < closest_enemy_distance) closest_enemy_id=i closest_enemy_distance=x_z_distance_to_player
-                                    end
-
-                                    missile3d.target = enemies[closest_enemy_id]
-                                end,
-                                object3d.vx - sin(object3d.ay) * 35, object3d.vy - sin(object3d.ax) * 35, object3d.vz - cos(object3d.ay) * 35
                             )
-                            new_missile.is_crash = function(missile) 
-                                explode(missile)     
-                            end
                         end
                     end
-
-                    time_last_shot, shoot_btn_last = time(), true
+                else
+                    if(t_height_cam_target == base_heights[terrain_type_count]) fuel=100
                 end
-            else
-                if(shoot_btn_last) shoot_btn_last = false
+
+
+                if(object3d.y < 1200) then
+                    if(fuel-0.05 >= 0) if(btn"4") thrust(object3d, 0.5, true) fuel-=0.05
+                end
+
+                clamp_speed(object3d, 8)
+
+                poke(0x5f5d,5)
+
+                if(btn"5")then
+                    if(time() - shooting_cooldown > .1) shoot(object3d) add_score(-0x0.0001) shooting_cooldown=time()
+                    if(not shoot_btn_last) then
+
+                        if(time() - time_last_shot < .2) then
+                            -- double click x
+                            missiles-=1
+                            if(missiles >= 0) then
+                                local new_missile = create_object3d(
+                                    24,
+                                    object3d.x,object3d.y,object3d.z,
+                                    object3d.ay,object3d.ax,0,
+                                    function(missile3d)  
+                                        gravity(missile3d, false,0)  
+                                        local x_z_distance_to_target = v_len(missile3d, missile3d.target)
+
+                                        local dx,dz = correct_for_wrap(missile3d, missile3d.target)
+
+                                        local destination_angle_y = -atan2(dx, dz)
+                                        missile3d.ay += (destination_angle_y-.25-missile3d.ay)
+                                        local destination_angle_x = atan2(x_z_distance_to_target, missile3d.y - missile3d.target.y)
+                                        missile3d.ax += (destination_angle_x-missile3d.ax)
+
+                                        missile3d.vx -= sin(missile3d.ay)
+                                        missile3d.vy -= sin(missile3d.ax)
+                                        missile3d.vz -= cos(missile3d.ay)
+
+                                        if(collide_enemies(missile3d, object3d, 100)) explode(missile3d)     
+                                        clamp_speed(missile3d,8)
+                                        smoke(missile3d)
+                                    end,
+                                    function(missile3d) 
+                                        missile3d.life_span = 10
+                                        local closest_enemy_id, closest_enemy_distance = 0, 32767
+                                        for i=1, #enemies do
+                                            
+                                            local x_z_distance_to_player = v_len(missile3d, enemies[i])
+                                            
+                                            if(x_z_distance_to_player < closest_enemy_distance) closest_enemy_id=i closest_enemy_distance=x_z_distance_to_player
+                                        end
+
+                                        missile3d.target = enemies[closest_enemy_id]
+                                    end,
+                                    object3d.vx - sin(object3d.ay) * 35, object3d.vy - sin(object3d.ax) * 35, object3d.vz - cos(object3d.ay) * 35
+                                )
+                                new_missile.is_crash = function(missile) 
+                                    explode(missile)     
+                                end
+                            end
+                        end
+
+                        time_last_shot, shoot_btn_last = time(), true
+                    end
+                else
+                    if(shoot_btn_last) shoot_btn_last = false
+                end
+                reset_srand()
             end
-            reset_srand()
         end
     )   
     player.ordering_offset = 1
@@ -994,11 +994,6 @@ function clamp_speed(object3d, max_speed)
     local f = (n > max_speed) and max_speed / n or 1
     
     object3d.vx, object3d.vy, object3d.vz = f*object3d.vx, f*object3d.vy, f*object3d.vz
-end
-
-function destroy_player()
-    explode(player)
-    damage_player()
 end
 
 function logic_update()
