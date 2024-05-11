@@ -403,6 +403,7 @@ function game_init()
     -- pest
     add(spawn_funcs, function(x,y,z) create_pest_like(x,y,z) end)
     
+    --[[
     -- attractor
     add(spawn_funcs, function (x,y,z)
         local dx, dz = 0.5 *rnd_sgn(), 0.87 *rnd_sgn()
@@ -799,7 +800,7 @@ function score_hit_death(object3d, damage)
     add_score(death_score>>16)
     flying_text(object3d, death_score)
     sfx(10, 3)
-    if(not object3d.hit_points or object3d.hit_points <= 0) explode(object3d) if(death_score != 150) kill_count_lvl += 1
+    if(not object3d.hit_points or object3d.hit_points <= 0) if(death_score != 150) then kill_count_lvl += 1 end explode(object3d)
 end
 
 function collide_enemies(object, emitter, damage)
