@@ -1,6 +1,7 @@
 local terrain_type, terrain_type_count, base_heights = split "50,35,85", 1, split "90,50,180"
 
 function generate_terrain()
+    infectable_areas = 0
     for y=0,TERRAIN_NUMVERTS-1 do
         cls()
         terrainmesh[y] = {}

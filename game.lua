@@ -132,10 +132,10 @@ function create_pest_like(x,y,z, is_mini)
             object3d.ax +=  0.03
 
             local dx,dz = correct_for_wrap(player, object3d)
-            local dist_player = v_len(player, object3d)
+            local dist_player = v_len(player, object3d, true)
 
             object3d.vx += dx / dist_player*.06
-            object3d.vy += (player.y - object3d.y) / dist_player *.06
+            object3d.vy += (max(get_height_pos(object3d.x,object3d.z)+200, player.y) - object3d.y) / dist_player *.06
             object3d.vz += dz / dist_player *.06
             clamp_speed(object3d, 4)
 
@@ -570,11 +570,13 @@ function add_virus_level_pos(posx,posz)
 end
 
 function damage_player() 
-    explode(player)
-    damaged = true
-    lives -=1
-    if(lives < 0) extcmd("reset")
-    damaged_counter = time()
+    if(not damaged) then
+        explode(player)
+        damaged = true
+        lives -=1
+        if(lives < 0) extcmd("reset")
+        damaged_counter = time()
+    end
 end
 
 function destroy(object)
@@ -610,7 +612,7 @@ end
 function check_wave_end()
     if(kill_count_lvl >= #counts_lvl[wave]) then
         bonus_score = max(0,(infectable_areas-infected_area - infected_area)/(max(32/wave, 4)))
-        score += bonus_score
+        add_score(bonus_score)
         dset(0, max(dget(0), score))
         sfx(7, 3)
         main_update_draw = wave_completed_draw
@@ -691,34 +693,30 @@ function thrust(ship,intensity,is_player)
     local is_player = is_player or false
     local intensity = intensity or 0.2
 
-    if((fuel > 0 and is_player) or not is_player) then 
-        if (fuel > 0 and is_player) then fuel-=0.05 end
+    ship.vy += intensity*cos(ship.ax)*cos(ship.az)
+    ship.vx += intensity*sin(ship.ay)*-sin(ship.ax)
+    ship.vz += intensity*-cos(ship.ay)*sin(ship.ax)
 
-        ship.vy += intensity*cos(ship.ax)*cos(ship.az)
-        ship.vx += intensity*sin(ship.ay)*-sin(ship.ax)
-        ship.vz += intensity*-cos(ship.ay)*sin(ship.ax)
+    local dy = cos(ship.ax)*cos(ship.az)
+    local dx = sin(ship.ay)*-sin(ship.ax) 
+    local dz = -cos(ship.ay)*sin(ship.ax) 
 
-        local dy = cos(ship.ax)*cos(ship.az)
-        local dx = sin(ship.ay)*-sin(ship.ax) 
-        local dz = -cos(ship.ay)*sin(ship.ax) 
+    play_audio_vicinity(ship, 0, 1)
 
-        play_audio_vicinity(ship, 0, 1)
-
-        if(ship.is_visible) then
-            srand(time())
-            for i=0,1 do
-                srand(i * time())
-                create_sprite(
-                    ship.x+rnd"8"-4,ship.y+rnd"8"-4,ship.z+rnd"8"+4 + 20,
-                    -dx*4+rnd"2"-1+ship.vx,-dy*4+ship.vy+ rnd"2"-1,-dz*4+rnd"2"-1+ship.vz,
-                    function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd"1"*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
-                    function(sprite) gravity(sprite, true,0.1) end,
-                    function(sprite) sprite.y=ship.y+0.001  end,
-                    0.4
-                )
-            end
-            reset_srand()
+    if(ship.is_visible) then
+        srand(time())
+        for i=0,1 do
+            srand(i * time())
+            create_sprite(
+                ship.x+rnd"8"-4,ship.y+rnd"8"-4,ship.z+rnd"8"+4 + 20,
+                -dx*4+rnd"2"-1+ship.vx,-dy*4+ship.vy+ rnd"2"-1,-dz*4+rnd"2"-1+ship.vz,
+                function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) local color=7+rnd"1"*3 if(sprite.life_span < 0.2) then color=8 end  circfill(sx, sy, 0, color) end,
+                function(sprite) gravity(sprite, true,0.1) end,
+                function(sprite) sprite.y=ship.y+0.001  end,
+                0.4
+            )
         end
+        reset_srand()
     end
 end
 
@@ -818,6 +816,7 @@ function collide_enemies(object, emitter, damage)
                     score_hit_death(enemies[i], damage)
                 else
                     fuel-=20
+                    if(fuel < 0) damage_player()
                 end
 
                 return true
@@ -899,14 +898,14 @@ function reset_player()
                     if(object3d.y > 200)then
                         srand(time())
                         create_sprite(
-                                object3d.x+rnd"200"-100,object3d.y+rnd"200"-50,object3d.z+rnd"200"-100,
-                                0,0,0,
-                                function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 7 ) end,
-                                NOP,
-                                NOP,
-                                3,
-                                true,
-                                true
+                            object3d.x+rnd"200"-100,object3d.y+rnd"200"-50,object3d.z+rnd"200"-100,
+                            0,0,0,
+                            function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) circfill(sx, sy, 0, 7 ) end,
+                            NOP,
+                            NOP,
+                            3,
+                            true,
+                            true
                         )
                     end
                 end
@@ -916,7 +915,7 @@ function reset_player()
 
 
             if(object3d.y < 1200) then
-                if(btn"4") thrust(object3d, 0.5, true)
+                if(fuel-0.05 >= 0) if(btn"4") thrust(object3d, 0.5, true) fuel-=0.05
             end
 
             clamp_speed(object3d, 8)
@@ -994,11 +993,6 @@ function clamp_speed(object3d, max_speed)
     local f = (n > max_speed) and max_speed / n or 1
     
     object3d.vx, object3d.vy, object3d.vz = f*object3d.vx, f*object3d.vy, f*object3d.vz
-end
-
-function destroy_player()
-    explode(player)
-    damage_player()
 end
 
 function logic_update()
