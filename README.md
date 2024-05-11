@@ -6,6 +6,7 @@
   - fix player losing multiple lives as once
   - give 5k rewards when wave ends
   - player now dies when it has no fuel and gets shot
+  - pest doesnt count to finish wave
 - v1.1.4
   - fix shadow flickering (thx @krispykrouton)
 - v1.1.3
