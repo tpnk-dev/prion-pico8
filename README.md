@@ -1,6 +1,8 @@
 # prion-pico8
 
 ## Changelog 
+- v1.1.3
+  - fix major kill count bug (was counting hits as kills :S)
 - v1.1.2
   - fix missile and enemy tracking considering wrapping map
   - fixed bug where wave can end before all enemies are killed
