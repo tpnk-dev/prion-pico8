@@ -269,7 +269,7 @@ function game_init()
                     --object3d.landing_gears[i] = landing_gear
                 end 
                 
-                object3d.landed=false object3d.seed_count=0
+                object3d.landed=false object3d.seed_count=0 object3d.shadow.ordering_offset = 0
             end)  
         
         add(enemies, new_seeder)
@@ -402,7 +402,7 @@ function game_init()
 
     -- pest
     add(spawn_funcs, function(x,y,z) create_pest_like(x,y,z) end)
-    --[[
+    
     -- attractor
     add(spawn_funcs, function (x,y,z)
         local dx, dz = 0.5 *rnd_sgn(), 0.87 *rnd_sgn()
@@ -420,6 +420,7 @@ function game_init()
             function(object3d) 
                 object3d.return_blip_color=function() if(time()%.5 < 0.25) return 8 else return 0 end 
                 object3d.hit_points = 5
+                object3d.shadow.ordering_offset = 0
                 object3d.bean = create_sprite(0,0,0,0,0,0,
                     function(sprite) 
                         local x_z_distance_to_player = v_len(sprite, player, true)
@@ -979,11 +980,13 @@ function reset_player()
                 if(shoot_btn_last) shoot_btn_last = false
             end
             reset_srand()
-        end)   
-        player.is_crash = function(object3d) 
-            if(sqrt(object3d.vx^2+object3d.vy^2+object3d.vz^2) > 3 or abs(object3d.ax) > 0.03) damage_player()    
         end
-        cam_target = player
+    )   
+    player.ordering_offset = 1
+    player.is_crash = function(object3d) 
+        if(sqrt(object3d.vx^2+object3d.vy^2+object3d.vz^2) > 3 or abs(object3d.ax) > 0.03) damage_player()    
+    end
+    cam_target = player
 end
 
 function clamp_speed(object3d, max_speed)
