@@ -383,7 +383,7 @@ function order_objects()
     for i=#game_objects3d,1,-1 do
         local game_object = game_objects3d[i]
         game_object:transform()
-        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y)) then game_object.is_visible=true add(depth_buffer[abs(game_object.d_z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], game_object) else game_object.is_visible=false end  --add(to_draw, game_objects3d[i])
+        if(is_inside_cam_cone_z(game_object.d_z) and is_inside_cam_cone_x(game_object.d_x) and is_inside_cam_cone_y(game_object.y)) then game_object.is_visible=true add(depth_buffer[abs(game_object.d_z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE - game_object.ordering_offset], game_object) else game_object.is_visible=false end  --add(to_draw, game_objects3d[i])
     end
 end
 
@@ -538,7 +538,8 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
         d_z = 0,
         t_verts={},
         draw=draw_func or draw_object3d,
-        no_shadow = no_shadow
+        no_shadow = no_shadow,
+        ordering_offset = 0
     }
     
     is_terrain = is_terrain
@@ -581,6 +582,7 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
             )  
         end 
     end
+    if(object3d.shadow) object3d.shadow.ordering_offset = 1
 
     if is_terrain then
         add(envir,object3d)

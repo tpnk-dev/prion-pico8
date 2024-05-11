@@ -402,7 +402,7 @@ function game_init()
 
     -- pest
     add(spawn_funcs, function(x,y,z) create_pest_like(x,y,z) end)
-
+    --[[
     -- attractor
     add(spawn_funcs, function (x,y,z)
         local dx, dz = 0.5 *rnd_sgn(), 0.87 *rnd_sgn()
@@ -476,7 +476,7 @@ function game_init()
             score_hit_death(object3d, 1000) 
         end
     end)
-
+    --]]
     local lvl = 1
     for i=1808, 1878, 7 do -- 1401 = 1387+7*2 
         counts_lvl[lvl] = {}
