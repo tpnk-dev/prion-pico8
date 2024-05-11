@@ -1319,9 +1319,9 @@ end
 
 function wave_completed_draw()
     print("Attack Wave  "..wave.." completed",18,60,7)
-    print("Area infected  . . .     "..tostr(infected_area, 0x2),7,80,7)
-    print("Area uninfected  . . .   "..tostr(infectable_areas, 0x2),7,90,7)
-    print("Bonus uninfected area .  "..tostr(bonus_score, 0x2),7,105,7)
+    print("Area infected  . . .     "..infected_area,7,80,7)
+    print("Area uninfected  . . .   "..infectable_areas,7,90,7)
+    print("Bonus uninfected area .  "..bonus_score,7,105,7)
 end
 
 function wave_completed_update()
@@ -1592,7 +1592,7 @@ function collide_env(object)
                 end
                 
             end
-            if(env_type==6) add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0800 
+            if(env_type==6) add_score(40) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0800 
             if(env_type==9) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0b00  
             if(env_type==13) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0E00  
 
@@ -1606,7 +1606,7 @@ end
 function add_score(amount)
     score += amount
     -- 0x0000.1388 = 5000
-    if(score > (fivek_counter * 0x0000.1388)) then
+    if(score > (fivek_counter * 5000)) then
         fivek_counter += 1
         lives += 1
         missiles += 1
@@ -1628,7 +1628,7 @@ function reset_player()
                     if(btn"2") then if(abs(object3d.ax-0.02) < 0.2) then object3d.ax -= 0.02 end end
                     if(btn"3") then if(abs(object3d.ax+0.02) < 0.2) then object3d.ax += 0.02 end end
 
-                    if(time()%0x0000.0001 == 0) then
+                    if(time()%0x0001 == 0) then
                         if(object3d.y > 200)then
                             srand(time())
                             create_sprite(
@@ -1765,7 +1765,7 @@ function render_gamegui()
 
     --x[[
     print("score",NUMSECTS+1+1,1,7)
-    print(tostr(score,0x2),NUMSECTS+1+1,7,7)
+    print(score,NUMSECTS+1+1,7,7)
 
     --print("prion",NUMSECTS+1+30,1,8)
     for i=1,missiles do spr( 65, 58 + i*5 + 3, 5) end
@@ -1775,7 +1775,7 @@ function render_gamegui()
     print(wave,NUMSECTS+1+58,7,7)
 
     print("best",NUMSECTS+1+78,1,7)
-    print(tostr(dget(0),0x2),NUMSECTS+1+78,7,7)
+    print(dget(0),NUMSECTS+1+78,7,7)
     --]]
 
     --[[
