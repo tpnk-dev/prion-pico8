@@ -1,6 +1,19 @@
 # prion-pico8
 
 ## Changelog 
+- v1.1.2
+  - fix missile and enemy tracking considering wrapping map
+  - fixed bug where wave can end before all enemies are killed
+  - make fixed path ships only face a certain direction for the entire wave
+  - fixed jumpy spacecraft heights
+  - fixed bug where sometimes the death score of the kill didn't count
+  - it's 2024 not 2023
+  - make drones a little less likely to become mutant
+  - some performance fixes with particles
+- v1.1.1
+  - fix cartdata name
+  - fix randomicity of spawns
+  - make gravity changes a little lighter
 - v1.1
   - add starting screen music
   - first refinement of sound effects
