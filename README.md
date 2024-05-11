@@ -1,6 +1,8 @@
 # prion-pico8
 
 ## Changelog 
+- v1.1.4
+  - fix shadow flickering (thx @krispykrouton)
 - v1.1.3
   - fix major kill count bug (was counting hits as kills :S)
 - v1.1.2
