@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-05-11 22:13:43",modified="2024-05-11 22:17:22",revision=7]]
+--[[pod_format="raw",created="2024-05-11 22:13:43",modified="2024-05-11 22:57:11",revision=68]]
 
 local terrain_type, terrain_type_count, base_heights = split "50,35,85", 1, split "90,50,180"
 
@@ -37,10 +37,10 @@ function generate_terrain()
             if(noise <= 0)  then
                 noise = 0 
             else 
-                infectable_areas += 0x0.0001
+                infectable_areas += 1
             end
 
-            terrainmesh[y][x] |=  noise&0x00ff.ffff
+            terrainmesh[y][x] |=  flr(noise) & 0x00ff
         end
     end
 
@@ -58,7 +58,7 @@ function generate_terrain()
     for j=0,8 do 
         for i=0, 8 do
            terrainmesh[i+114][j+114] = base_heights[terrain_type_count]
-           infectable_areas -= 0x0.0001
+           infectable_areas -= 1
            --print((0x8033&0x8000)>>15)
            --stop()
         end
@@ -202,7 +202,7 @@ end
 --end 
 
 function get_height_pos(posx,posz)
-    return (terrainmesh[(posx%terrain_size)\TILE_SIZE][(posz%terrain_size)\TILE_SIZE]&0x00ff.ffff)--/HEIGHTMULTIPLIER
+    return (terrainmesh[(posx%terrain_size)\TILE_SIZE][(posz%terrain_size)\TILE_SIZE]&0x00ff)--/HEIGHTMULTIPLIER
 end
 
 function get_type_id(idx,idz)
@@ -210,7 +210,7 @@ function get_type_id(idx,idz)
 end
 
 function get_height_id(idx,idz)
-    return (terrainmesh[idx][idz]&0x00ff.ffff)--/HEIGHTMULTIPLIER
+    return (terrainmesh[idx][idz]&0x00ff)--/HEIGHTMULTIPLIER
 end
 
 function mat_rotate_cam_point(x,y,z)
@@ -248,12 +248,12 @@ end
 -- #electricgryphon's/ trifill method, credits to them
 function trifill(x1,y1,x2,y2,x3,y3, color)
 	local color1 = color
-	local x1_band=band(x1,0xffff)
-    local x2_band=band(x2,0xffff)
-    local y1_band=band(y1,0xffff)
-    local y2_band=band(y2,0xffff)
-    local x3_band=band(x3,0xffff)
-    local y3_band=band(y3,0xffff)
+	 local x1_band= flr(x1) & 0xffff
+    local x2_band= flr(x2) & 0xffff
+    local y1_band= flr(y1) & 0xffff
+    local y2_band= flr(y2) & 0xffff
+    local x3_band= flr(x3) & 0xffff
+    local y3_band= flr(y3) & 0xffff
     
     local nsx,nex
     --sort y1,y2,y3
@@ -387,7 +387,7 @@ function render_terrain()
     order_objects()
     update_view()
     rectfill(0,0,128,128,0)
-    if is_inside_cam_cone_y((terrainmesh[1][1])&0x00ff.ffff) then
+    if is_inside_cam_cone_y((terrainmesh[1][1])&0x00ff) then
         local trans_proj_verts = {}
         for v=(mesh_numverts)*(mesh_numverts)-1,0,-1 do
             -- instantiate vertices
@@ -1296,10 +1296,10 @@ function add_virus_level_pos(posx,posz)
         sset(minimap_memory_start+(posx_trunc\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz_trunc\(sector_numfaces*TILE_SIZE)),4)
 
         local env_type = get_type_id(idx, idz)
-        if(env_type==1) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0F00
-        if(env_type==13) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x1200
+        if(env_type==1) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0F00
+        if(env_type==13) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x1200
 
-        infected_area += 0x0.0001
+        infected_area += 1
     end
 end
 
@@ -1585,16 +1585,16 @@ function collide_env(object)
 
 
             if(env_type==1 or env_type==15) then 
-                explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
+                explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0800 
                 if(env_type==15) then
                     add_score(40>>16)
                     flying_text(object, "40")
                 end
                 
             end
-            if(env_type==6) add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
-            if(env_type==9) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0b00  
-            if(env_type==13) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0E00  
+            if(env_type==6) add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0800 
+            if(env_type==9) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0b00  
+            if(env_type==13) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff) | 0x0E00  
 
             return true
         end
@@ -1657,7 +1657,7 @@ function reset_player()
                 poke(0x5f5d,5)
 
                 if(btn"5")then
-                    if(time() - shooting_cooldown > .1) shoot(object3d) add_score(-0x0.0001) shooting_cooldown=time()
+                    if(time() - shooting_cooldown > .1) shoot(object3d) add_score(-1) shooting_cooldown=time()
                     if(not shoot_btn_last) then
 
                         if(time() - time_last_shot < .2) then

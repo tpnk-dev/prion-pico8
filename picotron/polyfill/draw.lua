@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-03-19 23:27:45",modified="2024-03-22 13:58:18",revision=468]]
+--[[pod_format="raw",created="2024-03-19 23:27:45",modified="2024-05-11 22:58:37",revision=513]]
 --COMPAT: p8scii is not supported. other differences?
 function p8env.print(...)
 	if select("#",...)==2 then
