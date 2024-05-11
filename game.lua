@@ -403,7 +403,6 @@ function game_init()
     -- pest
     add(spawn_funcs, function(x,y,z) create_pest_like(x,y,z) end)
     
-    --[[
     -- attractor
     add(spawn_funcs, function (x,y,z)
         local dx, dz = 0.5 *rnd_sgn(), 0.87 *rnd_sgn()
