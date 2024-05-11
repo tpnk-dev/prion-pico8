@@ -1,7 +1,7 @@
--- v1.1.2
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
+-- v1.1.3
 local d,e,l=split"50,35,85",1,split"90,50,180"function ed()for f=0,x-1do cls()a[f]={}for l=0,x-1do a[f][l]=0local n,c=l/240,f/240local o,t,i,u,n=cos(n)*1,cos(c)*1,sin(n)*1,sin(c)*1,0local r,c=o*cos(.15)-t*sin(.35),o*cos(.15)-t*sin(.15)n=abs(sin(o/4+sin(i/15)))*d[e]n+=abs(sin(u/4+sin(i/15)))*45n+=abs(sin(r/4+sin(t/30)))*35n+=abs(sin(c/4+sin(i/30)))*d[e]n+=abs(sin(c/4+sin(o/30)))*35n+=abs(sin(c/4+sin(u/30)))*d[e]n-=145if(n<=0)n=0else 𝘺+=.00002
 a[f][l]|=n&255.99999end end for n=0,x-1do for e=0,x-1do srand(e*n)if(flr(rnd(22))==1and a[e][n]>4)a[e][n]=a[e][n]&~16128|256
 if(flr(rnd(44))==2and a[e][n]>4)a[e][n]=a[e][n]&~16128|3328
@@ -50,7 +50,7 @@ end end 𝘥()end,function(n)n.b,n.m,n.𝘦=function()return 12end,function()for
 return 100end,o for e=0,3do n.𝘦[e].𝘪=function(f)f.f,f.e,f.o=n.f+sgn(e-2)*10,n.e-8,n.o+(e%2-1)*10end end n.𝘣,n.𝘨=false,0end)add(s,n)end)add(o,function(n,e,f)local o,l=.5*𝘸(),.87*𝘸()local n=g(6,n,e,f,.25,0,0,function(n)srand(time())local e=j(i,n)if e<600or n.w then n𝘻(n,n.e-𝘧(n.f,n.o),e)else if time()-n.j>.7then local e,f=n.f%u,n.o%u local e=sget(p+e\(r*v),p+c-f\(r*v))if e==4then if(flr(rnd"100")==1)n.𝘸,n.q,n.w=𝘵[16][2],.14,true
 end end n.l=.917n.f+=o n.o+=l end 𝘥()𝘹(n,4)end,function(n)n.w,n.q=false,.7n.m,n.b,n.j=function()if(n.w)return 500else return 300end,function()if(n.w)if(time()%.5<.25)return 8else return 9else return 9end,time()end)add(s,n)n.s=function()𝘫(n,1000)end end)add(o,function(n,o,l)local e,f=1.5*𝘸(),2.61*𝘸()local d=-atan2(e,f)+.25local n=g(19,n,o,l,.25,0,0,function(n)q(n,5,-1)nc(n,100)n.f+=e n.o+=f if(time()%1==0)local n=k(n.f,n.e,n.o,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)spr(67,n,e)end,function(n)_(n,true,.2)end)n.s=function(e)e.x=true for e=-3,3do for f=-3,3do local e,f=e*v,f*v n𝘢(n.f+e,n.o+f)end end end
 end,function(n)n.m,n.b,n.l=function()return 800end,function()if(time()%.5<.25)return 12else return 0end,d end)add(s,n)n.s=function()𝘫(n,1000)end end)add(o,function(n,e,f)local n=g(21,n,e,f,.25,0,0,function(n)n𝘻(n,n.e-𝘧(n.f,n.o))𝘹(n,4)end,function(n)n.q,n._=.3,2n.m,n.b,n.j=function()if(n._<=0)return 700else n.𝘸,n.q=𝘵[23][2],.6return 200end,function()if(time()%.5<.25)return 10else return 0end,time()end)add(s,n)n.s=function()𝘫(n,1000)end end)add(o,function(n,e,f)n𝘹(n,e,f)end)add(o,function(n,e,f)local o,l=.5*𝘸(),.87*𝘸()local n=g(28,n,e,f,0,0,0,function(n)q(n,8,-1)nc(n,50)n.l+=.01n.f+=o n.o+=l n.y.f,n.y.e,n.y.o=n.f,n.e,n.o end,function(n)n.b,n._=function()if(time()%.5<.25)return 8else return 0end,5n.y=k(0,0,0,0,0,0,function(n)local e=j(n,i,true)if(e<100)q(n,9,1)local e,f=m(n.c,n.u,n.r)local o,l=m(i.h[1][1],i.h[1][2],i.h[1][3])srand(time()%2)local d,t=(e+o)/2+rnd(16)-8,(f+l)/2line(e,f,d,t,7)line(d,t,o,l)local n,e=n.f-i.f,n.e-i.e local f=sqrt(n*n+e*e)local f=1/f*.2i.i+=f*n i.t+=f*e
-end)n.m=function()if(n._<=0)n.y.x=true return 1000else return 0end end)add(s,n)end)add(o,function(n,e,f)local o,l,d=1.5*𝘸(),2.61*𝘸(),-atan2(e𝘰,e𝘱)-.25local n=g(30,n,e,f,.25,0,0,function(n)nc(n,300)n.f+=o n.o+=l if time()%8==0then if(j(n,i)<150)n𝘹(n.f,n.e,n.o,true)
+end)n.m=function()if(n._<=0)n.y.x=true return 1000else return 0end end)add(s,n)end)add(o,function(n,o,l)local e,f=1.5*𝘸(),2.61*𝘸()local d=-atan2(e,f)+.25local n=g(30,n,o,l,.25,0,0,function(n)nc(n,300)n.f+=e n.o+=f if time()%8==0then if(j(n,i)<150)n𝘹(n.f,n.e,n.o,true)
 end end,function(n)n.m,n.b,n._,n.l=function()if(n._<=0)return 2000else return 0end,function()return 0end,25,d end)add(s,n)n.s=function(n)𝘫(n,1000)end end)local n=1for f=1808,1878,7do 𝘪[n]={}for e=0,6do for f=1,@(f+e)do local f=20*n*(e+1)*f add(𝘪[n],{eq[e+1],function()srand(f)o[e+1](flr(rnd(u)),300,flr(rnd(u)))end})end end n+=1end n𝘪()nu,nr=en,e0 ng()end function e𝘢(f,o)local d,t=no(f,o),ee(f,o)srand(o*f)local i,n=(f%4+o%4+flr((rnd"6")))%4+1,1if(d>0)n=10
 if(d>15)n=ew[i]
 if(d==l[e])n=ej[(f%2+o%2+flr((rnd"2")))%2+1]
@@ -76,7 +76,7 @@ k(n.f,n.e,n.o,rnd"2"-1,rnd"2",rnd"2"-1,function(n)local n,f=m(n.c,n.u,n.r)circfi
 else if(n.e-i.e<3or f<60)n𝘧(n,.2)e=0
 if(time()-n.j>n.q)ef(n)n.j=time()
 end n.l+=(l+.25-n.l)*.3n.d+=(e-n.d)*.5end function 𝘫(n,e)if(n._)n._-=e
-local e=n.m()n2(e>>16)el(n,e)sfx(10,3)nv+=1if(not n._ or n._<=0)𝘣(n)
+local e=n.m()n2(e>>16)el(n,e)sfx(10,3)if(not n._ or n._<=0)nv+=1𝘣(n)
 end function n𝘸(l,f,o)o,f=o or 1,f or l local n=s n[0]=i for e=#n,0,-1do if n[e].e~=f.e and n[e].f~=f.f then if j(l,n[e],true)<20then if(e>0)𝘫(s[e],o)else 𝘩-=20
 return true end end end return false end function el(n,e)if(e~=0)k(n.f,n.e,n.o,0,0,0,function(n)local n,f=m(n.c,n.u,n.r)print(e,n,f,7)end,function(n)n.e+=.1end,b,5,false,true)
 end function eo(o)for n=#𝘢,1,-1do if sqrt(abs(o.v-𝘢[n].v)+abs(o.e-𝘢[n].e)+abs(o.p-𝘢[n].p))<5then 𝘢[n].i=o.i 𝘢[n].a=o.a 𝘢[n].t=o.t local e,f=𝘨(𝘢[n].v%u),𝘨(𝘢[n].p%u)local l=𝘴(e,f)if l==1or l==15then 𝘣(𝘢[n])a[e][f]=a[e][f]&~16128|2048if(l==15)n2(.00062)el(o,"40")
@@ -98,10 +98,10 @@ if not n1 then if time()-n𝘴<.2then nd-=1if nd>=0then local n=g(24,n.f,n.e,n.o
 𝘹(e,8)n𝘺(e)end,function(n)n.𝘢=10local e,f=0,32767for o=1,#s do local n=j(n,s[o])if(n<f)e,f=o,n
 end n.𝘩=s[e]end,n.i-sin(n.l)*35,n.t-sin(n.d)*35,n.a-cos(n.l)*35)n.s=function(n)𝘣(n)end end end n𝘴,n1=time(),true end else if(n1)n1=false
 end 𝘥()end)i.s,f=function(n)if(sqrt(n.i^2+n.t^2+n.a^2)>3or abs(n.d)>.03)na()
-end,i end function 𝘹(n,e)local f=sqrt(n.i^2+n.t^2+n.a^2)local e=f>e and e/f or 1n.i,n.t,n.a=e*n.i,e*n.t,e*n.a end function e𝘲()𝘣(i)na()end function e0()if(nb)if(time()-n𝘶>5)nb=false ng()
+end,i end function 𝘹(n,e)local f=sqrt(n.i^2+n.t^2+n.a^2)local e=f>e and e/f or 1n.i,n.t,n.a=e*n.i,e*n.t,e*n.a end function e𝘰()𝘣(i)na()end function e0()if(nb)if(time()-n𝘶>5)nb=false ng()
 e𝘸()nj,𝘢,𝘻,nn=time(),{},f.f,f.o-er if(f.e>𝘭+50)𝘦=f.e-20else 𝘦=𝘭+30
 nm+=1if 𝘷<#𝘪[n]+1then if(nm>=𝘪[n][𝘷][1])nm=0𝘪[n][𝘷][2]()𝘷+=1
-end end function e𝘥()rectfill(c+1,0,128,12,6)print("score",c+1+1,1,7)print(tostr(𝘶,2),c+1+1,7,7)for n=1,nd do spr(65,58+n*5+3,5)end for n=1,nl do spr(64,58+n*5,0)end print("wave",c+1+58,1,7)print(n,c+1+58,7,7)print("best",c+1+78,1,7)print(tostr(dget(0),2),c+1+78,7,7)rectfill(c,14,𝘩+c,14,10)rectfill(c,16,i.e/7+c,16,11)end function en()ev()e𝘥()e_()end nr,nu=ei,eu function _init()cartdata"marcospiv_prion_v1_1_2"et()end function _update()nr()end function _draw()nu()end
+end end function e𝘥()rectfill(c+1,0,128,12,6)print("score",c+1+1,1,7)print(tostr(𝘶,2),c+1+1,7,7)for n=1,nd do spr(65,58+n*5+3,5)end for n=1,nl do spr(64,58+n*5,0)end print("wave",c+1+58,1,7)print(n,c+1+58,7,7)print("best",c+1+78,1,7)print(tostr(dget(0),2),c+1+78,7,7)rectfill(c,14,𝘩+c,14,10)rectfill(c,16,i.e/7+c,16,11)end function en()ev()e𝘥()e_()end nr,nu=ei,eu function _init()cartdata"marcospiv_prion_v1_1_3"et()end function _update()nr()end function _draw()nu()end
 __gfx__
 b130005050a030700050000000500060a00000005000509160a05000c040506000102030407080903050000010b1200000001050400090801050600000403040
 3000205000204000504210206030203060303040603040506030501060b0103020c0305040c0105030cd708090a040004030f020000000005040009080005060

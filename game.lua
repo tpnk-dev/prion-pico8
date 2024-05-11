@@ -800,8 +800,7 @@ function score_hit_death(object3d, damage)
     add_score(death_score>>16)
     flying_text(object3d, death_score)
     sfx(10, 3)
-    kill_count_lvl += 1
-    if(not object3d.hit_points or object3d.hit_points <= 0) explode(object3d)
+    if(not object3d.hit_points or object3d.hit_points <= 0) kill_count_lvl += 1 explode(object3d)
 end
 
 function collide_enemies(object, emitter, damage)
