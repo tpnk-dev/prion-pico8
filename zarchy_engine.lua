@@ -26,7 +26,7 @@ cam_ax,cam_ay,cam_az = 0,0.5,0
 -- cam_target GLOBAL PARAMS
 cam_target, mov_tiles_x,mov_tiles_z,sub_mov_x,sub_mov_z,t_height_cam_target=nil,0,0,0,0,0
 -- RENDER STUFF
-depth_buffer, game_objects3d, disposables, disposables_index, disposables_size={},{},{},0,50
+depth_buffer, game_objects3d, disposables, disposables_index, disposables_size={},{},{},0,30
 -- cam_matrix_transform
 cam_sx,cam_sy,cam_sz,cam_cx,cam_cy,cam_cz=sin(cam_ax),sin(cam_ay),sin(cam_az),cos(cam_ax),cos(cam_ay),cos(cam_az)
 cam_mat00,cam_mat10,cam_mat20,cam_mat01,cam_mat11,cam_mat21,cam_mat02,cam_mat12,cam_mat22=cam_cz*cam_cy,-cam_sz,cam_cz*cam_sy,cam_cx*cam_sz*cam_cy+cam_sx*cam_sy,cam_cx*cam_cz,cam_cx*cam_sz*cam_sy-cam_sx*cam_cy,cam_sx*cam_sz*cam_cy-cam_cx*cam_sy,cam_sx*cam_cz,cam_sx*cam_sz*cam_sy+cam_cx*cam_cy
