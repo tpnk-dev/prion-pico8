@@ -1,4 +1,14 @@
 # prion-pico8
+## Game
+
+**Play it here: https://tpnk-dev.itch.io/prion**
+
+<p align="center">
+  <img width="400" height="400" src="https://img.itch.zone/aW1hZ2UvMjY5NjY2Ny8xNjA3NTg5Ni5naWY=/347x500/9o97vF.gif">
+  <img width="400" height="400" src="https://img.itch.zone/aW1nLzE2MDg2ODUzLmdpZg==/original/cruq7r.gif">
+</p>
+
+```Aliens are infecting Earth with a deadly disease. You have been tasked to destroy all spacecraft that pose a threat to our planet. Please act fast, as your reward is based on the amount of uninfected land in each wave of enemies. There are an estimated 10 waves of increasingly harder alien reinforcements. Reports also show that the extraterrestrials possess a device that can alter the force of gravity. We have equipped your ship with fuel and altitude gauges, a scanner, a laser cannon , and homing missiles.```
 
 ## Changelog 
 - v1.1.5
