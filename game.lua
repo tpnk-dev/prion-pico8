@@ -578,7 +578,7 @@ function damage_player()
         explode(player)
         damaged = true
         lives -=1
-        if(lives < 0) extcmd("reset")
+        if(lives < 0) poke4(0x5f88,score) poke(0x5f82,1) extcmd("reset")
         damaged_counter = time()
     end
 end
