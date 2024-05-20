@@ -15,7 +15,7 @@ mesh_numverts=mesh_numfaces + 1
 -- SECTOR SETTINGS
 NUMSECTS=30 --terrain_numfaces MUST BE DIVISIBLE BY THIS!
 -- MINIMAP SETTINGS
-minimap_memory_start = 16*8 -(ceil(NUMSECTS/8)*8)
+minimap_memory_start = 96
 -- TILE SETTING
 TILE_SIZE=20
 -- PROJECTION SETTINGS
