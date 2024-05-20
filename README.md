@@ -40,7 +40,7 @@
 - Terrain
   - [x] Terrain rendering
   - [x] Trees (mutated and not)
-  - [ ] Create house
+  - [x] Create house
   - [ ] Add fishes :)
 - Map
   - [x] On-screen map
@@ -67,19 +67,18 @@
   - [x] Add sound to objects
 - Others
   - [x] Add cart figure
-  - [ ] Create manual
+  - [x] Create manual
 - Fixes
   - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
   - [ ] Fix ship proportions
-  - [ ] Fix suicidal pests
-  - [ ] Change size of terrain 3, too much uninfected land and a lot of points
+  - [x] Fix suicidal pests
 
 ## Levels
 
 1. 3 seeders                      1 drones
 2. 4 seeders            1 bombers 3 drones
 3. 5 seeders 1 fighters 1 bombers 4 drones
-4. 3 seeders 4 fighters 2 bombers 4 drones 4 pest 1 attractor
+4. 1 seeders 4 fighters 2 bombers 4 drones 4 pest 1 attractor
 5. 1 seeders 4 fighters 2 bombers 4 drones 5 pest 2 attractors
 6. 1 seeders 4 fighters 3 bombers 2 drones 6 pest 2 attractor 1 mystery
 7. 2 seeder  3 fighter  3 bombers 1 drone  8 pest 3 attractor 1 mystery
