@@ -1,6 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
+-- v1.1.7
 local d,e,l=split"50,35,85",1,split"90,50,180"function 𝘩(n,e,o)h[n][e]=h[n][e]&~16128|o end function ed()𝘭=0for o=0,s-1do cls()h[o]={}for l=0,s-1do h[o][l]=0local n,c=l/240,o/240local f,t,i,u,n=cos(n)*1,cos(c)*1,sin(n)*1,sin(c)*1,0local r,c=f*cos(.15)-t*sin(.35),f*cos(.15)-t*sin(.15)n=abs(sin(f/4+sin(i/15)))*d[e]n+=abs(sin(u/4+sin(i/15)))*45n+=abs(sin(r/4+sin(t/30)))*35n+=abs(sin(c/4+sin(i/30)))*d[e]n+=abs(sin(c/4+sin(f/30)))*35n+=abs(sin(c/4+sin(u/30)))*d[e]n-=145if(n<=0)n=0else 𝘭+=.00002
 h[o][l]|=n&255.99999end end for n=0,s-1do for e=0,s-1do srand(e*n)if(flr(rnd(22))==1and h[e][n]>4)𝘩(e,n,256)
 if(flr(rnd(44))==2and h[e][n]>4)𝘩(e,n,3328)
