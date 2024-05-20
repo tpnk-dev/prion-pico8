@@ -83,6 +83,7 @@
 - Others
   - [x] Add cart figure
   - [x] Create manual
+  - [ ] Online leaderboards (like Demi Daggers by freds72)
 - Fixes
   - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
   - [ ] Fix ship proportions
