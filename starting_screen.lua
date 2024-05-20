@@ -30,9 +30,7 @@ function draw_starting_screen()
     print('prion',12,2,8) 
     print('tpnk_dev 2024',47,2,7) 
 
-    if @0x5f81==0 then
-        print("High score: "..tostr(dget(0), 0x2),27,20,10)
-    else
+    if @0x5f81==4 then
         local colors_rank = split "10,6,4,7"
         local y,mem=20,0x5f91
         for i=1,@0x5f90 do
@@ -40,6 +38,8 @@ function draw_starting_screen()
             print("\t"..tostr(peek4(mem+17),0x2),1,y,colors_rank[i]) y+=7
             mem+=21
         end
+    else
+        print("High score: "..tostr(dget(0), 0x2),27,20,10)
     end
 
     print('🅾️thrust',20,100,8) 

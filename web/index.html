@@ -211,7 +211,6 @@
 		switch(pico8_gpio[3]) {
 			case 1:
 				// still connected?
-				console.log("NGIO - isReady " + NGIO.isReady);
 				if(NGIO.isReady) {
 					NGIO.getScores(scoreboard_id, {
 						period: NGIO.PERIOD_ALL_TIME,
