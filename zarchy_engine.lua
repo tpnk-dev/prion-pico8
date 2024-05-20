@@ -584,7 +584,7 @@ function _create_object3d(obj_id,x,y,z,ay,ax,az,update_func,start_func,draw_func
 
     if is_terrain then
         add(envir,object3d)
-        add(depth_buffer[abs(object3d.z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE], object3d)
+        add(depth_buffer[abs(object3d.z-mesh_downmost_z*TILE_SIZE)\TILE_SIZE - 1], object3d)
     else
         add(game_objects3d, object3d)
     end
