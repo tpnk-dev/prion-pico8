@@ -1,7 +1,6 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
--- v1.1.6
 local d,e,l=split"50,35,85",1,split"90,50,180"function 𝘧(n,e,o)h[n][e]=h[n][e]&~16128|o end function e1()𝘭=0for o=0,s-1do cls()h[o]={}for l=0,s-1do h[o][l]=0local n,c=l/240,o/240local f,t,i,u,n=cos(n)*1,cos(c)*1,sin(n)*1,sin(c)*1,0local r,c=f*cos(.15)-t*sin(.35),f*cos(.15)-t*sin(.15)n=abs(sin(f/4+sin(i/15)))*d[e]n+=abs(sin(u/4+sin(i/15)))*45n+=abs(sin(r/4+sin(t/30)))*35n+=abs(sin(c/4+sin(i/30)))*d[e]n+=abs(sin(c/4+sin(f/30)))*35n+=abs(sin(c/4+sin(u/30)))*d[e]n-=145if(n<=0)n=0else 𝘭+=.00002
 h[o][l]|=n&255.99999end end for n=0,s-1do for e=0,s-1do srand(e*n)if(flr(rnd(22))==1and h[e][n]>4)𝘧(e,n,256)
 if(flr(rnd(44))==2and h[e][n]>4)𝘧(e,n,3328)
@@ -38,7 +37,7 @@ else n.t,n.i,n.a,n.e=0,0,0,e end end end function e𝘧(e,o)local n=false for e 
 end return n end function k(n,e,o,f,l,d,t,i,c,u,r,a)return n𝘲(0,n,e,o,0,0,0,i,c,t,f,l,d,r,false,u,a)end function 𝘦(n,e,o,f,l,d,t,i,c,u,r,a,h,s)return n𝘲(n,e,o,f,l,d,t,i,c,b,u,r,a,h,s)end function n𝘲(e,n,d,t,i,c,u,r,a,h,s,x,p,_,o,f,l)local n={𝘯=e,o=n,e=d,f=t,d=c or 0,l=i or 0,𝘥=u or 0,𝘪=r or b,𝘮=a or b,t=x or 0,i=s or 0,a=p or 0,k=f,𝘰=l,𝘤=𝘷[e][1],𝘧=𝘷[e][2],c=0,u=0,r=0,v=0,p=0,h={},𝘦=h or n𝘰,𝘫=_}o=o if e==0then n.z=e𝘦 if l then if(n7[𝘰]~=nil)n7[𝘰].x=true
 n7[𝘰],𝘰=n,(𝘰+1)%e2 end if not n.𝘫 then n.m=k(n.o,g(n.o,n.f),n.f,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,0)end,function(e)e.o,e.f=n.o,n.f+.05e.e=g(n.o,n.f)if(n.e<=e.e)e.x=true
 end,b,f,true)end else n.z,n.𝘦=eg,n𝘰 if(not n.𝘫)n.m=𝘦(e+1,0,0,0,0,0,0,function(e)e.o,e.f=n.o,n.f e.e,e.l=g(n.o,n.f),n.l end,b,0,0,0,true)
-end if(o)add(𝘢,n)add(j[abs(n.f-z*v)\v],n)else add(𝘥,n)
+end if(o)add(𝘢,n)add(j[abs(n.f-z*v)\v-1],n)else add(𝘥,n)
 for e=1,#n.𝘤 do n.h[e]={}for o=1,3do n.h[e][o]=0end end n:𝘮()n:z()return n end ew,e𝘬,e𝘭,i,r,𝘢,n,n𝘳,nd,nb,𝘨,e𝘮,n1,nt,nm,n𝘴,n𝘵,ni,e𝘯,n𝘶,n𝘷,𝘹,𝘭,nc,ej,eq,n𝘹,f,e𝘰,𝘫,e𝘣,n𝘱,n𝘢,𝘺,ey,𝘷=peek(24388),0,0,{},{},{},1,1,0,0,100,0,3,3,0,time(),time(),false,false,0,0,false,0,0,split"11,4,15,10",split"6,7",split"2,4,10,3,5",{},{},{},split"1, 1.3, 1.7",1,0,1,split"40,200,200,200,200,200,200",{[0]={{{0,0,0}},{}}}for n=1986,2055,2do add(𝘷,et(%n))end e𝘢={[8]=function(n)if(time()%3==0)k(n.o+rnd"10"-4,n.e+10+rnd"8",n.f+rnd"10"-4,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,5)end,function(n)n.e+=rnd"0.4"n.o+=rnd"0.4"-.2n.f+=rnd"0.4"-.2end,b,4,false,true)
 end,[9]=function(n)n.𝘭,n.l=split"1,2,3,4",time()𝘦(10,n.o,n.e,n.f,n.l,nil,nil,nil,nil,nil,nil,nil,true,true)end}pal(1,140,1)pal(13,134,1)pal(15,138,1)pal(2,131,1)function 𝘩()poke(24388,ew)end function nu(n,e)local n,e=n.o-e.o,n.f-e.f if(abs(n)>2410)n-=sgn(n)*4820
 if(abs(e)>2410)e-=sgn(e)*4820
