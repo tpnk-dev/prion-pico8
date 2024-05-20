@@ -1,6 +1,11 @@
 # prion-pico8
 
 ## Changelog 
+- v1.1.6
+  - add HOUSE
+  - infected bush now gives 40 points, just like infected tree
+  - attractor beam reduces player fuel
+  - whole best score can now be seen (fixed identation)
 - v1.1.5
   - fix suicidal pests (hitting the ground)
   - fix player losing multiple lives as once
