@@ -56,12 +56,14 @@ spawn_timer, spawn_index, spawn_timers = 0,1,split"40,200,200,200,200,200,200"
 -- 31: mystery spacecraft shadow
 -- 32: little pest
 -- 33: little pest shadow
+-- 34: house 1
+-- 35: house 1 destroyed
 
 
 
 -- load object data 1386 = 1337 + 47-> num_models*2-1
 OBJS_DATA = {[0]={{{0,0,0}},{}}}
-for i=1742, 1807, 2 do  
+for i=1986, 2055, 2 do  
     add(OBJS_DATA, decode_model(%i))
 end
 
@@ -292,7 +294,7 @@ function game_init()
                     -- if on virused square, become mutated 1/5 times
                     if(time() - object3d.shooting_cooldown > .7) then 
                         local posx, posz = object3d.x%terrain_size, object3d.z%terrain_size
-                        local v_level = sget(minimap_memory_start+(posx\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz\(sector_numfaces*TILE_SIZE)))
+                        local v_level = sget(minimap_memory_start+(posx\160),126-(posz\160))
                         if(v_level == 4) then
                             if flr(rnd"100") == 1 then
                                 object3d.tris = OBJS_DATA[16][2]
@@ -345,7 +347,7 @@ function game_init()
                     local bomb = create_sprite(
                         object3d.x,object3d.y,object3d.z,
                         0,0,0,
-                        function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) spr(67, sx, sy) end,
+                        function(sprite) local sx,sy=project_point(sprite.t_x,sprite.t_y,sprite.t_z) spr(115, sx, sy) end,
                         function(sprite) gravity(sprite, true,0.2) end
                     )
                     bomb.is_crash = function(sprite) 
@@ -439,6 +441,7 @@ function game_init()
                             local force = 1 / distance *.2
                             player.vx += force * dx
                             player.vy += force * dy
+                            fuel-=0x0.1
                         end
                     end
                 )
@@ -479,7 +482,7 @@ function game_init()
     end)
     --]]
     local lvl = 1
-    for i=1808, 1878, 7 do -- 1401 = 1387+7*2 
+    for i=2056, 2126, 7 do -- 1401 = 1387+7*10
         counts_lvl[lvl] = {}
         for z = 0, 6 do
             for amount = 1, @(i+z) do
@@ -559,7 +562,8 @@ function add_virus_level_pos(posx,posz)
     local virus_level = get_virus_level_id(idx,idz)
     if(virus_level == 0 and height > 0 and height != base_heights[terrain_type_count]) then
         terrainmesh[idx][idz] += 0x4000
-        sset(minimap_memory_start+(posx_trunc\(sector_numfaces*TILE_SIZE)),(minimap_memory_start+NUMSECTS)-(posz_trunc\(sector_numfaces*TILE_SIZE)),4)
+        -- 126 = minimap_memory_start+NUMSECTS
+        sset(minimap_memory_start+posx_trunc\160,126-posz_trunc\160,4)
 
         local env_type = get_type_id(idx, idz)
         if(env_type==1) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0F00
@@ -849,18 +853,16 @@ function collide_env(object)
             local idx, idz = get_tileid(envir[i].d_x%terrain_size), get_tileid(envir[i].d_z%terrain_size)
             local env_type = get_type_id(idx, idz)
 
-
-            if(env_type==1 or env_type==15) then 
-                explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
-                if(env_type==15) then
-                    add_score(40>>16)
-                    flying_text(object, "40")
-                end
-                
+            if(env_type==1) explode(envir[i]) set_env_type_id(idx, idz, 0x0800)
+            if(env_type==15 or env_type==18) then 
+                explode(envir[i])
+                add_score(40>>16) flying_text(object, "40")
+                if(env_type==15) set_env_type_id(idx, idz, 0x0800) else set_env_type_id(idx, idz, 0x0E00)         
             end
-            if(env_type==6) add_score(0x0.0028) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0800 
-            if(env_type==9) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0b00  
-            if(env_type==13) explode(envir[i]) terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | 0x0E00  
+
+            if(env_type==9) explode(envir[i]) set_env_type_id(idx, idz, 0x0b00)  
+            if(env_type==13) explode(envir[i]) set_env_type_id(idx, idz, 0x0E00)  
+            if(env_type==34) explode(envir[i]) set_env_type_id(idx, idz, 0x2300)  
 
             return true
         end
@@ -1027,21 +1029,22 @@ function logic_update()
 end
 
 function render_gamegui()
-    rectfill(NUMSECTS+1,0,128,12,6)
+    rectfill(31,0,128,12,6)
 
+    -- 30 = NUMSECTS
     --x[[
-    print("score",NUMSECTS+1+1,1,7)
-    print(tostr(score,0x2),NUMSECTS+1+1,7,7)
+    print("score",32,1,7)
+    print(tostr(score,0x2),32,7,7)
 
     --print("prion",NUMSECTS+1+30,1,8)
-    for i=1,missiles do spr( 65, 58 + i*5 + 3, 5) end
-    for i=1,lives do spr( 64, 58 + i*5, 0) end
+    for i=1,missiles do spr( 113, 52 + i*5 + 3, 5) end
+    for i=1,lives do spr( 112, 52 + i*5, 0) end
     
-    print("wave",NUMSECTS+1+58,1,7)
-    print(wave,NUMSECTS+1+58,7,7)
+    print("wave",85,1,7)
+    print(wave,85,7,7)
 
-    print("best",NUMSECTS+1+78,1,7)
-    print(tostr(dget(0),0x2),NUMSECTS+1+78,7,7)
+    print("best",104,1,7)
+    print(tostr(dget(0),0x2),104,7,7)
     --]]
 
     --[[

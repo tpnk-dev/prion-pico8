@@ -1,106 +1,108 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
---v1.1.5
-local d,e,l=split"50,35,85",1,split"90,50,180"function ed()𝘬=0for f=0,x-1do cls()a[f]={}for l=0,x-1do a[f][l]=0local n,c=l/240,f/240local o,t,i,u,n=cos(n)*1,cos(c)*1,sin(n)*1,sin(c)*1,0local r,c=o*cos(.15)-t*sin(.35),o*cos(.15)-t*sin(.15)n=abs(sin(o/4+sin(i/15)))*d[e]n+=abs(sin(u/4+sin(i/15)))*45n+=abs(sin(r/4+sin(t/30)))*35n+=abs(sin(c/4+sin(i/30)))*d[e]n+=abs(sin(c/4+sin(o/30)))*35n+=abs(sin(c/4+sin(u/30)))*d[e]n-=145if(n<=0)n=0else 𝘬+=.00002
-a[f][l]|=n&255.99999end end for n=0,x-1do for e=0,x-1do srand(e*n)if(flr(rnd(22))==1and a[e][n]>4)a[e][n]=a[e][n]&~16128|256
-if(flr(rnd(44))==2and a[e][n]>4)a[e][n]=a[e][n]&~16128|3328
-end end for n=0,8do for f=0,8do a[f+114][n+114]=l[e]𝘬-=.00002end end for n=24,x-1-24,48do for e=24,x-1-24,48do a[e][n]|=2304end end end function e1(n)local e,o=n+1,peek(n)local l,f=peek(e+o),e+o+1local n,d=f+l,{}for f=0,o-3,3do add(d,{(peek(e+f)-peek(n))*peek(n+3),(peek(e+f+1)-peek(n+1))*peek(n+3),(peek(e+f+2)-peek(n+2))*peek(n+3)})end local e={}for n=0,l-4,4do add(e,{peek(f+n),peek(f+n+1),peek(f+n+2),peek(f+n+3)})end local n={peek(n),peek(n+1),peek(n+2),peek(n+3)}return{d,e,n}end n5,𝘣,f,n𝘣=10,0,i function et()music(0)i=g(2,0,0,500,0,0,0)end function ei()i.l-=.02i.d+=.05if(i.o-n5>40)i.o-=n5
-if(i.o>1000)ec()
-if(btn(5))n5,n𝘣=-40,true
-end function eu()rectfill(0,0,128,128,0)n𝘦()nw()n3()rectfill(0,0,128,8,6)print("prion",12,2,8)print("tpnk_dev 2024",47,2,7)print("🅾️thrust",20,100,8)print("❎ cannon",56,97,8)print("❎+❎ missile",56,103,8)print("<press ❎ to continue>",20,110,7)if(n𝘣)rectfill(0,80,128,128,0)print("loading terrain...",30,110,7)
-end nj,x,u,a,𝘭,nq,ny,y,z,r=time(),241,0,{},-33,33,1000,0,12h,c=z+1,30p,v,nz,n𝘤,e𝘨,n8,nh,nn,𝘣,n0,er,n𝘥,n𝘨,n𝘩,f,ne,nf,ns,n7,𝘮,𝘦,𝘤,nx,𝘯,ea=128-ceil(c/8)*8,20,80,63,63,-3,-300,0,0,0,125,0,.5,0,nil,0,0,0,0,0,{},{},{},0,30𝘰,𝘱,𝘲,𝘳,𝘴,no=sin(n𝘥),sin(n𝘨),sin(n𝘩),cos(n𝘥),cos(n𝘨),cos(n𝘩)e2,e4,e5,e3,e8,eh,es,e7,ex,b=no*𝘴,-𝘲,no*𝘱,𝘳*𝘲*𝘴+𝘰*𝘱,𝘳*no,𝘳*𝘲*𝘱-𝘰*𝘴,𝘰*𝘲*𝘴-𝘳*𝘱,𝘰*no,𝘰*𝘲*𝘱+𝘳*𝘴,function()end function n3()for n=0,z-1do 𝘦[n]={}end end n3()function n𝘪()ed()local n=x-1u,r=x*v,n/c e6()end function e9(n)n.f%=u n.o%=u end function 𝘨(n)return n\v end function e𝘩(e,f,n)return(1-n)*e+n*f end function e𝘪(n,e)return n.f-e.f,n.e-e.e,n.o-e.o end function 𝘧(n,e)return a[n%u\v][e%u\v]&255.99999end function 𝘵(n,e)return(a[n][e]&16128)>>>8end function nl(n,e)return a[n][e]&255.99999end function n6(n,e,f)return n*e2+e*e4+f*e5,n*e3+e*e8+f*eh,n*es+e*e7+f*ex end function n𝘫(d,o,l,n,e,f)local n,o,l=d,o*cos(n)+l*sin(n),o*-sin(n)+l*cos(n)n,o,l=n*cos(f)+o*sin(f),n*-sin(f)+o*cos(f),l return n*cos(e)+l*sin(e),o,n*-sin(e)+l*cos(e)end function n9(n)return n>𝘭*v and n<nq*v end function np(n)return n>y*v and n<ny*v end function n𝘬(n)return n>𝘣-200and n<𝘣+200end function n𝘭(n,e)local f=n if(n9(n-u))f=n-u
-if(n9(n+u))f=n+u
-local n=e if(np(e-u))n=e-u
-if(np(e+u))n=e+u
-return f,n end function n_(n,e,o,l,d,u,f)local c,f,t,n,e,i,o,l,d=f,band(n,-1),band(o,-1),band(e,-1),band(l,-1),band(d,-1),band(u,-1)if(n>e)n,e,f,t=e,n,t,f
-if(n>o)n,o,f,i=o,n,i,f
-if(e>o)e,o,t,i=o,e,i,t
-if n~=e then local o,t,i,e=(i-f)/(o-n),(t-f)/(e-n),min(e,128)if(n>0)l,d,e=f,f,n else l,d,e=f-o*n,f-t*n,0
-for n=e,i-1do rectfill(l,n,d,n,c)l+=o d+=t end else l,d=f,t end if o~=e then local u,i=(i-f)/(o-n),(i-t)/(o-e)n𝘮,ep=e,min(o,128)if(e<0)d,l,n𝘮=t-i*e,f-u*n,0
-for n=n𝘮,ep do rectfill(l,n,d,n,c)d+=i l+=u end else rectfill(l,o,d,o,c)end end function m(e,f,n)return e*nz/n+n𝘤,f*nz/n+n𝘤 end function e6()local n,e,f=0,0,{}for o=x-r,0,-r do f[n]={}for l=0,x-r,r do local d,o=2,nl(l+r\2,o+r\2)d=f[n][(e-1)%c]and o-f[n][(e-1)%c]or o local l=1l=d>=0and 3or 11if(o==0)l=1
-f[n][e]=o sset(p+e,p+n,l)e+=1end e=0n+=1end for n=0,1do for e=0,1do sset(p+e+13,p+n+14,7)end end end function e_()sspr(p,p,c,c,0,0,c+1,c+1)pset(ne\r,c+-nf\r,7)for n=1,#s do local n=s[n]local e,f=𝘨(n.f),𝘨(n.o)pset(e\r,c+-f\r,n.b())end for n=24,x-1-24,48do for e=24,x-1-24,48do if(𝘵(e,n)==11)rectfill((e-24)/48*6,abs((n-24)/48*6-c),(e-24)/48*6+5+1,abs((n-24)/48*6+5-c+1),0)
-end end end function ev()n𝘦()eb()rectfill(0,0,128,128,0)if n𝘬(a[1][1]&255.99999)then local e={}for n=h*h-1,0,-1do local o,l=(n%h+𝘭)%x,(n\h+y)%x local c,u,i=n%h*v+𝘭*v,nl(o,l),n\h*v+y*v local f,t,d=c-nn,u-𝘣,i-n0 if n%h==0then f+=ns*v elseif n%h==z then f+=ns*v-v elseif n\h==0then d+=n7*v elseif n\h==z then d+=n7*v-v end f,t,d=n6(f,t,d)local d,r=m(f,t,d)add(e,{f,t,i,d,r,o,l})if n%h~=0and n%h<h-1and n\h~=0then local n=𝘵(o,l)srand(o*l)if(n>0)g(𝘵(o,l),c,u,i,nil,nil,nil,nil,em[n],nil,nil,nil,true,true)
-end end for n=1,#e do if n%h~=0and n>h-1then local n,o,l,u=e[n+1],e[n-h+1],e[n],e[n-h]local e,f,d,t,i,c,o,l,n=n[4],n[5],o[4],o[5],l[4],l[5],u[4],u[5],e𝘢(n[6],n[7],true)if((e-d)*(l-t)-(f-t)*(o-d)<0)n_(e,f,d,t,o,l,n)
-if((o-i)*(f-c)-(l-c)*(e-i)<0)n_(o,l,i,c,e,f,n)
-fillp()else if n%h==0then local n=abs((n-(z+1))\h-(z+1))if(n<z)for e=#𝘦[n],1,-1do 𝘦[n][e]:g()end
-end end end else nw()end n3()end function nw()for n=#𝘦,0,-1do for e=#𝘦[n],1,-1do 𝘦[n][e]:g()end end end function n𝘦()for n=#𝘤,1,-1do local n=𝘤[n]n:z()if(np(n.p)and n9(n.v)and n𝘬(n.e))n.𝘧=true add(𝘦[abs(n.p-y*v)\v-1],n)else n.𝘧=false
-end end function eb()ne,nf,ns,n7=𝘨(f.f),𝘨(f.o),f.f/v%1,f.o/v%1𝘮,𝘭,nq,y,ny=nl(ne,nf),ne-(h\2-1),h+𝘭-1,nf-(h\2-1),h+y-1end function n𝘯(n)for e=1,#n.h do local n=n.h[e]n[4],n[5]=m(n[1],n[2],n[3])end for e=1,#n.𝘸 do local e=n.𝘸[e]local d=e[4]if(d&240>0)fillp(42405)else fillp()
-local f,o,l=n.h[e[1]],n.h[e[2]],n.h[e[3]]local n,e,t=f[3],o[3],l[3]if n>nh or e>nh or t>nh then if n<n8 and e<n8 and t<n8 then local e,t,n,o,f,l=f[4],f[5],o[4],o[5],l[4],l[5]if max(f,max(e,n))>0and min(f,min(e,n))<128then if((e-n)*(l-o)-(t-o)*(f-n)<0)n_(e,t,n,o,f,l,d)
-end end end end fillp()end function ek(n)n.v,n.p=n𝘭(n.f,n.o)local e,f,o=n.v-nn,n.e-𝘣,n.p-n0 n.c,n.u,n.r=n6(e,f,o)end function eg(e)e.v,e.p=n𝘭(e.f,e.o)for o=1,#e.𝘤 do local n,f=e.h[o],e.𝘤[o]if(e𝘧(e.𝘭,o))n[1],n[2],n[3]=n𝘫(f[1],f[2],f[3],0,0,0)else n[1],n[2],n[3]=n𝘫(f[1],f[2],f[3],e.d,e.l,e.𝘥)
-n[1]+=e.v-nn n[2]+=e.e-𝘣 n[3]+=e.p-n0 n[1],n[2],n[3]=n6(n[1],n[2],n[3])end end function e𝘸()for f=#𝘤,1,-1do local n,e=𝘤[f],false if n.k~=nil then n.k-=time()-nj if(n.k<0)e=true
+-- v1.1.6
+local d,e,l=split"50,35,85",1,split"90,50,180"function 𝘧(n,e,o)h[n][e]=h[n][e]&~16128|o end function e1()𝘭=0for o=0,s-1do cls()h[o]={}for l=0,s-1do h[o][l]=0local n,c=l/240,o/240local f,t,i,u,n=cos(n)*1,cos(c)*1,sin(n)*1,sin(c)*1,0local r,c=f*cos(.15)-t*sin(.35),f*cos(.15)-t*sin(.15)n=abs(sin(f/4+sin(i/15)))*d[e]n+=abs(sin(u/4+sin(i/15)))*45n+=abs(sin(r/4+sin(t/30)))*35n+=abs(sin(c/4+sin(i/30)))*d[e]n+=abs(sin(c/4+sin(f/30)))*35n+=abs(sin(c/4+sin(u/30)))*d[e]n-=145if(n<=0)n=0else 𝘭+=.00002
+h[o][l]|=n&255.99999end end for n=0,s-1do for e=0,s-1do srand(e*n)if(flr(rnd(22))==1and h[e][n]>4)𝘧(e,n,256)
+if(flr(rnd(44))==2and h[e][n]>4)𝘧(e,n,3328)
+if(flr(rnd(400))==1and h[e][n]>4)𝘧(e,n,8704)
+end end for n=0,8do for o=0,8do h[o+114][n+114]=l[e]𝘭-=.00002end end for n=24,s-1-24,48do for e=24,s-1-24,48do h[e][n]|=2304end end end function et(n)local e,f=n+1,peek(n)local l,o=peek(e+f),e+f+1local n,d=o+l,{}for o=0,f-3,3do add(d,{(peek(e+o)-peek(n))*peek(n+3),(peek(e+o+1)-peek(n+1))*peek(n+3),(peek(e+o+2)-peek(n+2))*peek(n+3)})end local e={}for n=0,l-4,4do add(e,{peek(o+n),peek(o+n+1),peek(o+n+2),peek(o+n+3)})end local n={peek(n),peek(n+1),peek(n+2),peek(n+3)}return{d,e,n}end n3,𝘣,o,n𝘣=10,0,i function ei()music(0)i=𝘦(2,0,0,500,0,0,0)end function ec()i.l-=.02i.d+=.05if(i.f-n3>40)i.f-=n3
+if(i.f>1000)eu()
+if(btn(5))n3,n𝘣=-40,true
+end function er()rectfill(0,0,128,128,0)nw()nj()nh()rectfill(0,0,128,8,6)print("prion",12,2,8)print("tpnk_dev 2024",47,2,7)print("🅾️thrust",20,100,8)print("❎ cannon",56,97,8)print("❎+❎ missile",56,103,8)print("<press ❎ to continue>",20,110,7)if(n𝘣)rectfill(0,80,128,128,0)print("loading terrain...",30,110,7)
+end nq,s,c,h,𝘮,ny,nz,z,𝘤,x=time(),241,0,{},-33,33,1000,0,12a,u,w,v,n𝘤,n𝘥,e𝘩,n8,ns,nn,𝘣,n0,ea,n𝘨,n𝘩,n𝘪,o,ne,no,nx,n6,𝘯,j,𝘥,n7,𝘰,e2=𝘤+1,30,96,20,80,63,63,-3,-300,0,0,0,125,0,.5,0,nil,0,0,0,0,0,{},{},{},0,30𝘱,𝘲,𝘳,𝘴,𝘵,nf=sin(n𝘨),sin(n𝘩),sin(n𝘪),cos(n𝘨),cos(n𝘩),cos(n𝘪)e4,e5,e3,eh,e8,es,ex,e6,e7,b=nf*𝘵,-𝘳,nf*𝘲,𝘴*𝘳*𝘵+𝘱*𝘲,𝘴*nf,𝘴*𝘳*𝘲-𝘱*𝘵,𝘱*𝘳*𝘵-𝘴*𝘲,𝘱*nf,𝘱*𝘳*𝘲+𝘴*𝘵,function()end function nh()for n=0,𝘤-1do j[n]={}end end nh()function n𝘫()e1()local n=s-1c,x=s*v,n/u e9()end function ep(n)n.o%=c n.f%=c end function 𝘪(n)return n\v end function e𝘪(e,o,n)return(1-n)*e+n*o end function e𝘫(n,e)return n.o-e.o,n.e-e.e,n.f-e.f end function g(n,e)return h[n%c\v][e%c\v]&255.99999end function 𝘶(n,e)return(h[n][e]&16128)>>>8end function nl(n,e)return h[n][e]&255.99999end function n9(n,e,o)return n*e4+e*e5+o*e3,n*eh+e*e8+o*es,n*ex+e*e6+o*e7 end function n𝘬(d,f,l,n,e,o)local n,f,l=d,f*cos(n)+l*sin(n),f*-sin(n)+l*cos(n)n,f,l=n*cos(o)+f*sin(o),n*-sin(o)+f*cos(o),l return n*cos(e)+l*sin(e),f,n*-sin(e)+l*cos(e)end function np(n)return n>𝘮*v and n<ny*v end function n_(n)return n>z*v and n<nz*v end function n𝘭(n)return n>𝘣-200and n<𝘣+200end function n𝘮(n,e)local o=n if(np(n-c))o=n-c
+if(np(n+c))o=n+c
+local n=e if(n_(e-c))n=e-c
+if(n_(e+c))n=e+c
+return o,n end function nv(n,e,f,l,d,u,o)local c,o,t,n,e,i,f,l,d=o,band(n,-1),band(f,-1),band(e,-1),band(l,-1),band(d,-1),band(u,-1)if(n>e)n,e,o,t=e,n,t,o
+if(n>f)n,f,o,i=f,n,i,o
+if(e>f)e,f,t,i=f,e,i,t
+if n~=e then local f,t,i,e=(i-o)/(f-n),(t-o)/(e-n),min(e,128)if(n>0)l,d,e=o,o,n else l,d,e=o-f*n,o-t*n,0
+for n=e,i-1do rectfill(l,n,d,n,c)l+=f d+=t end else l,d=o,t end if f~=e then local u,i=(i-o)/(f-n),(i-t)/(f-e)n𝘯,e_=e,min(f,128)if(e<0)d,l,n𝘯=t-i*e,o-u*n,0
+for n=n𝘯,e_ do rectfill(l,n,d,n,c)d+=i l+=u end else rectfill(l,f,d,f,c)end end function m(e,o,n)return e*n𝘤/n+n𝘥,o*n𝘤/n+n𝘥 end function e9()local n,e,o=0,0,{}for f=s-x,0,-x do o[n]={}for l=0,s-x,x do local d,f=2,nl(l+x\2,f+x\2)d=o[n][(e-1)%u]and f-o[n][(e-1)%u]or f local l=1l=d>=0and 3or 11if(f==0)l=1
+o[n][e]=f sset(w+e,w+n,l)e+=1end e=0n+=1end for n=0,1do for e=0,1do sset(w+e+13,w+n+14,7)end end end function ev()sspr(w,w,u,u,0,0,u+1,u+1)pset(ne\x,u+-no\x,7)for n=1,#r do local n=r[n]local e,o=𝘪(n.o),𝘪(n.f)pset(e\x,u+-o\x,n.b())end for n=24,s-1-24,48do for e=24,s-1-24,48do if(𝘶(e,n)==11)rectfill((e-24)/48*6,abs((n-24)/48*6-u),(e-24)/48*6+5+1,abs((n-24)/48*6+5-u+1),0)
+end end end function eb()nw()em()rectfill(0,0,128,128,0)if n𝘭(h[1][1]&255.99999)then local e={}for n=a*a-1,0,-1do local f,l=(n%a+𝘮)%s,(n\a+z)%s local c,u,i=n%a*v+𝘮*v,nl(f,l),n\a*v+z*v local o,t,d=c-nn,u-𝘣,i-n0 if n%a==0then o+=nx*v elseif n%a==𝘤 then o+=nx*v-v elseif n\a==0then d+=n6*v elseif n\a==𝘤 then d+=n6*v-v end o,t,d=n9(o,t,d)local d,r=m(o,t,d)add(e,{o,t,i,d,r,f,l})if n%a~=0and n%a<a-1and n\a~=0then local n=𝘶(f,l)srand(f*l)if(n>0)𝘦(𝘶(f,l),c,u,i,nil,nil,nil,nil,e𝘢[n],nil,nil,nil,true,true)
+end end for n=1,#e do if n%a~=0and n>a-1then local n,f,l,u=e[n+1],e[n-a+1],e[n],e[n-a]local e,o,d,t,i,c,f,l,n=n[4],n[5],f[4],f[5],l[4],l[5],u[4],u[5],ek(n[6],n[7],true)if((e-d)*(l-t)-(o-t)*(f-d)<0)nv(e,o,d,t,f,l,n)
+if((f-i)*(o-c)-(l-c)*(e-i)<0)nv(f,l,i,c,e,o,n)
+fillp()else if n%a==0then local n=abs((n-(𝘤+1))\a-(𝘤+1))if(n<𝘤)for e=#j[n],1,-1do j[n][e]:𝘦()end
+end end end else nj()end nh()end function nj()for n=#j,0,-1do for e=#j[n],1,-1do j[n][e]:𝘦()end end end function nw()for n=#𝘥,1,-1do local n=𝘥[n]n:z()if(n_(n.p)and np(n.v)and n𝘭(n.e))n.g=true add(j[abs(n.p-z*v)\v-1],n)else n.g=false
+end end function em()ne,no,nx,n6=𝘪(o.o),𝘪(o.f),o.o/v%1,o.f/v%1𝘯,𝘮,ny,z,nz=nl(ne,no),ne-(a\2-1),a+𝘮-1,no-(a\2-1),a+z-1end function n𝘰(n)for e=1,#n.h do local n=n.h[e]n[4],n[5]=m(n[1],n[2],n[3])end for e=1,#n.𝘧 do local e=n.𝘧[e]local d=e[4]if(d&240>0)fillp(42405)else fillp()
+local o,f,l=n.h[e[1]],n.h[e[2]],n.h[e[3]]local n,e,t=o[3],f[3],l[3]if n>ns or e>ns or t>ns then if n<n8 and e<n8 and t<n8 then local e,t,n,f,o,l=o[4],o[5],f[4],f[5],l[4],l[5]if max(o,max(e,n))>0and min(o,min(e,n))<128then if((e-n)*(l-f)-(t-f)*(o-n)<0)nv(e,t,n,f,o,l,d)
+end end end end fillp()end function e𝘦(n)n.v,n.p=n𝘮(n.o,n.f)local e,o,f=n.v-nn,n.e-𝘣,n.p-n0 n.c,n.u,n.r=n9(e,o,f)end function eg(e)e.v,e.p=n𝘮(e.o,e.f)for f=1,#e.𝘤 do local n,o=e.h[f],e.𝘤[f]if(e𝘧(e.𝘭,f))n[1],n[2],n[3]=n𝘬(o[1],o[2],o[3],0,0,0)else n[1],n[2],n[3]=n𝘬(o[1],o[2],o[3],e.d,e.l,e.𝘥)
+n[1]+=e.v-nn n[2]+=e.e-𝘣 n[3]+=e.p-n0 n[1],n[2],n[3]=n9(n[1],n[2],n[3])end end function e𝘸()for o=#𝘥,1,-1do local n,e=𝘥[o],false if n.k~=nil then n.k-=time()-nq if(n.k<0)e=true
 end if n.x~=nil then if(n.x)e=true
-end if not e then n:𝘪()e9(n)else deli(𝘤,f)if(n.m~=nil)n.m.x=true
-end end end function _(n,f,o)local e=𝘧(n.f,n.o)if n.e+n.t>e then n.e+=n.t n.f+=n.i n.o+=n.a n.t-=o*e𝘣[n𝘰]else if(n.s~=nil and n:s())return true
-if f then if(abs(n.t)<.1)n.t,n.i,n.a,n.e=0,0,0,e else n.t=-n.t/4
-else n.t,n.i,n.a,n.e=0,0,0,e end end end function e𝘧(e,f)local n=false for e in all(e)do if(e==f)n=true
-end return n end function k(n,e,f,o,l,d,t,i,c,u,r,a)return n𝘱(0,n,e,f,0,0,0,i,c,t,o,l,d,r,false,u,a)end function g(n,e,f,o,l,d,t,i,c,u,r,a,h,s)return n𝘱(n,e,f,o,l,d,t,i,c,b,u,r,a,h,s)end function n𝘱(e,n,d,t,i,c,u,r,a,h,s,x,p,_,f,o,l)local n={𝘯=e,f=n,e=d,o=t,d=c or 0,l=i or 0,𝘥=u or 0,𝘪=r or b,𝘮=a or b,t=x or 0,i=s or 0,a=p or 0,k=o,𝘰=l,𝘤=𝘶[e][1],𝘸=𝘶[e][2],c=0,u=0,r=0,v=0,p=0,h={},g=h or n𝘯,𝘫=_}f=f if e==0then n.z=ek if l then if(nx[𝘯]~=nil)nx[𝘯].x=true
-nx[𝘯],𝘯=n,(𝘯+1)%ea end if not n.𝘫 then n.m=k(n.f,𝘧(n.f,n.o),n.o,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,0)end,function(e)e.f,e.o=n.f,n.o+.05e.e=𝘧(n.f,n.o)if(n.e<=e.e)e.x=true
-end,b,o,true)end else n.z,n.g=eg,n𝘯 if(not n.𝘫)n.m=g(e+1,0,0,0,0,0,0,function(e)e.f,e.o=n.f,n.o e.e,e.l=𝘧(n.f,n.o),n.l end,b,0,0,0,true)
-end if(f)add(𝘢,n)add(𝘦[abs(n.o-y*v)\v],n)else add(𝘤,n)
-for e=1,#n.𝘤 do n.h[e]={}for f=1,3do n.h[e][f]=0end end n:𝘮()n:z()return n end e𝘦,e𝘫,e𝘬,i,s,𝘢,n,n𝘲,nd,nv,𝘩,e𝘭,n1,nt,nb,n𝘳,n𝘴,ni,e𝘮,n𝘵,n𝘶,𝘷,𝘬,nc,ew,ej,n𝘷,o,e𝘯,𝘪,e𝘣,n𝘰,nm,𝘹,eq,𝘶=peek(24388),0,0,{},{},{},1,1,0,0,100,0,3,3,0,time(),time(),false,false,0,0,false,0,0,split"11,4,15,10",split"6,7",split"2,4,10,3,5",{},{},{},split"1, 1.3, 1.7",1,0,1,split"40,200,200,200,200,200,200",{[0]={{{0,0,0}},{}}}for n=1742,1807,2do add(𝘶,e1(%n))end em={[8]=function(n)if(time()%3==0)k(n.f+rnd"10"-4,n.e+10+rnd"8",n.o+rnd"10"-4,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,5)end,function(n)n.e+=rnd"0.4"n.f+=rnd"0.4"-.2n.o+=rnd"0.4"-.2end,b,4,false,true)
-end,[9]=function(n)n.𝘭,n.l=split"1,2,3,4",time()g(10,n.f,n.e,n.o,n.l,nil,nil,nil,nil,nil,nil,nil,true,true)end}pal(1,140,1)pal(13,134,1)pal(15,138,1)pal(2,131,1)function 𝘥()poke(24388,e𝘦)end function nu(n,e)local n,e=n.f-e.f,n.o-e.o if(abs(n)>2410)n-=sgn(n)*4820
+end if not e then n:𝘪()ep(n)else deli(𝘥,o)if(n.m~=nil)n.m.x=true
+end end end function p(n,o,f)local e=g(n.o,n.f)if n.e+n.t>e then n.e+=n.t n.o+=n.i n.f+=n.a n.t-=f*e𝘣[n𝘱]else if(n.s~=nil and n:s())return true
+if o then if(abs(n.t)<.1)n.t,n.i,n.a,n.e=0,0,0,e else n.t=-n.t/4
+else n.t,n.i,n.a,n.e=0,0,0,e end end end function e𝘧(e,o)local n=false for e in all(e)do if(e==o)n=true
+end return n end function k(n,e,o,f,l,d,t,i,c,u,r,a)return n𝘲(0,n,e,o,0,0,0,i,c,t,f,l,d,r,false,u,a)end function 𝘦(n,e,o,f,l,d,t,i,c,u,r,a,h,s)return n𝘲(n,e,o,f,l,d,t,i,c,b,u,r,a,h,s)end function n𝘲(e,n,d,t,i,c,u,r,a,h,s,x,p,_,o,f,l)local n={𝘯=e,o=n,e=d,f=t,d=c or 0,l=i or 0,𝘥=u or 0,𝘪=r or b,𝘮=a or b,t=x or 0,i=s or 0,a=p or 0,k=f,𝘰=l,𝘤=𝘷[e][1],𝘧=𝘷[e][2],c=0,u=0,r=0,v=0,p=0,h={},𝘦=h or n𝘰,𝘫=_}o=o if e==0then n.z=e𝘦 if l then if(n7[𝘰]~=nil)n7[𝘰].x=true
+n7[𝘰],𝘰=n,(𝘰+1)%e2 end if not n.𝘫 then n.m=k(n.o,g(n.o,n.f),n.f,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,0)end,function(e)e.o,e.f=n.o,n.f+.05e.e=g(n.o,n.f)if(n.e<=e.e)e.x=true
+end,b,f,true)end else n.z,n.𝘦=eg,n𝘰 if(not n.𝘫)n.m=𝘦(e+1,0,0,0,0,0,0,function(e)e.o,e.f=n.o,n.f e.e,e.l=g(n.o,n.f),n.l end,b,0,0,0,true)
+end if(o)add(𝘢,n)add(j[abs(n.f-z*v)\v],n)else add(𝘥,n)
+for e=1,#n.𝘤 do n.h[e]={}for o=1,3do n.h[e][o]=0end end n:𝘮()n:z()return n end ew,e𝘬,e𝘭,i,r,𝘢,n,n𝘳,nd,nb,𝘨,e𝘮,n1,nt,nm,n𝘴,n𝘵,ni,e𝘯,n𝘶,n𝘷,𝘹,𝘭,nc,ej,eq,n𝘹,f,e𝘰,𝘫,e𝘣,n𝘱,n𝘢,𝘺,ey,𝘷=peek(24388),0,0,{},{},{},1,1,0,0,100,0,3,3,0,time(),time(),false,false,0,0,false,0,0,split"11,4,15,10",split"6,7",split"2,4,10,3,5",{},{},{},split"1, 1.3, 1.7",1,0,1,split"40,200,200,200,200,200,200",{[0]={{{0,0,0}},{}}}for n=1986,2055,2do add(𝘷,et(%n))end e𝘢={[8]=function(n)if(time()%3==0)k(n.o+rnd"10"-4,n.e+10+rnd"8",n.f+rnd"10"-4,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,5)end,function(n)n.e+=rnd"0.4"n.o+=rnd"0.4"-.2n.f+=rnd"0.4"-.2end,b,4,false,true)
+end,[9]=function(n)n.𝘭,n.l=split"1,2,3,4",time()𝘦(10,n.o,n.e,n.f,n.l,nil,nil,nil,nil,nil,nil,nil,true,true)end}pal(1,140,1)pal(13,134,1)pal(15,138,1)pal(2,131,1)function 𝘩()poke(24388,ew)end function nu(n,e)local n,e=n.o-e.o,n.f-e.f if(abs(n)>2410)n-=sgn(n)*4820
 if(abs(e)>2410)e-=sgn(e)*4820
-return n,e end function w(e,f,d)local o,l=nu(e,f)local n=0if(d)n=e.e-f.e
-local e=atan2(o,n)local n=o*cos(e)+n*sin(e)local e=atan2(n,l)return n*cos(e)+l*sin(e)end function n𝘹(e,f,o,n)local l=n and 32or 26local n=g(l,e,f,o,.25,0,0,function(n)_(n,false,0)j(n,6,-1)n.l+=.03n.d+=.03local f,o=nu(i,n)local e=w(i,n,true)n.i+=f/e*.06n.t+=(max(𝘧(n.f,n.o)+200,i.e)-n.e)/e*.06n.a+=o/e*.06𝘺(n,4)n𝘺(n)end,function(e)e.𝘢,e.b=function()return n and 150or 400end,function()return n and 8or 14end end)add(s,n)n.s=function()𝘫(n,1000)end end function nr(n,e)local f=𝘧(n.f,n.o)n.e+=sgn(f+e-n.e)*.5end function 𝘸()return sgn(rnd"2"-1)end function ec()music(-1,500)add(o,function(n,e,f)local o={}for l=0,3do o[l]=k(n,e,f,0,0,0)end local l,d=.5*𝘸(),.87*𝘸()local n=g(4,n,e,f,0,0,0,function(n)local e=𝘧(n.f,n.o)n.l+=.01if n.𝘣 then if(n.e-1>e+20)n.e-=1
-if(n.𝘨>30)for e=0,3do n.𝘦[e].g=b end n.𝘣=false
-else j(n,4,-1)nr(n,50)n.f+=l n.o+=d if time()%30==0then if(e>20)n.𝘣,n.𝘨=true,0for e=0,3do n.𝘦[e].g=function(n)local n,f=m(n.c,n.u,n.r)line(n,f,n+sgn(e-2)*3,f+5,10)end end
-end end if e>0then if time()%.5==0then n.𝘨+=1if(n.𝘧)for e=0,7do srand(e*time())local n=k(n.f,n.e,n.o,rnd"4"-2,rnd"4",rnd"4"-2,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,8)end,function(n)_(n,true,.1)end,b,10,false,true)n.s=function(n)n.x=true n𝘢(n.f,n.o)end end else for e=0,7do srand(e*time())n𝘢(n.f+(rnd"14"-7)*v,n.o+(rnd"14"-7)*v)end
-end end 𝘥()end,function(n)n.b,n.𝘢,n.𝘦=function()return 12end,function()for e=0,3do nk(n.𝘦[e])end if(n.𝘣)return 50
-return 100end,o for e=0,3do n.𝘦[e].𝘪=function(f)f.f,f.e,f.o=n.f+sgn(e-2)*10,n.e-8,n.o+(e%2-1)*10end end n.𝘣,n.𝘨,n.m.𝘬=false,0,0end)add(s,n)end)add(o,function(n,e,f)local o,l=.5*𝘸(),.87*𝘸()local n=g(6,n,e,f,.25,0,0,function(n)srand(time())local e=w(i,n)if e<600or n.w then n𝘻(n,n.e-𝘧(n.f,n.o),e)else if time()-n.j>.7then local e,f=n.f%u,n.o%u local e=sget(p+e\(r*v),p+c-f\(r*v))if e==4then if(flr(rnd"100")==1)n.𝘸,n.q,n.w=𝘶[16][2],.14,true
-end end n.l=.917n.f+=o n.o+=l end 𝘥()𝘺(n,4)end,function(n)n.w,n.q=false,.7n.𝘢,n.b,n.j=function()if(n.w)return 500else return 300end,function()if(n.w)if(time()%.5<.25)return 8else return 9else return 9end,time()end)add(s,n)n.s=function()𝘫(n,1000)end end)add(o,function(n,o,l)local e,f=1.5*𝘸(),2.61*𝘸()local d=-atan2(e,f)+.25local n=g(19,n,o,l,.25,0,0,function(n)j(n,5,-1)nr(n,100)n.f+=e n.o+=f if(time()%1==0)local n=k(n.f,n.e,n.o,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)spr(67,n,e)end,function(n)_(n,true,.2)end)n.s=function(e)e.x=true for e=-3,3do for f=-3,3do local e,f=e*v,f*v n𝘢(n.f+e,n.o+f)end end end
-end,function(n)n.𝘢,n.b,n.l=function()return 800end,function()if(time()%.5<.25)return 12else return 0end,d end)add(s,n)n.s=function()𝘫(n,1000)end end)add(o,function(n,e,f)local n=g(21,n,e,f,.25,0,0,function(n)n𝘻(n,n.e-𝘧(n.f,n.o))𝘺(n,4)end,function(n)n.q,n._=.3,2n.𝘢,n.b,n.j=function()if(n._<=0)return 700else n.𝘸,n.q=𝘶[23][2],.6return 200end,function()if(time()%.5<.25)return 10else return 0end,time()end)add(s,n)n.s=function()𝘫(n,1000)end end)add(o,function(n,e,f)n𝘹(n,e,f)end)add(o,function(n,e,f)local o,l=.5*𝘸(),.87*𝘸()local n=g(28,n,e,f,0,0,0,function(n)j(n,8,-1)nr(n,50)n.l+=.01n.f+=o n.o+=l n.y.f,n.y.e,n.y.o=n.f,n.e,n.o end,function(n)n.b,n._,n.m.𝘬=function()if(time()%.5<.25)return 8else return 0end,5,0n.y=k(0,0,0,0,0,0,function(n)local e=w(n,i,true)if(e<100)j(n,9,1)local e,f=m(n.c,n.u,n.r)local o,l=m(i.h[1][1],i.h[1][2],i.h[1][3])srand(time()%2)local d,t=(e+o)/2+rnd(16)-8,(f+l)/2line(e,f,d,t,7)line(d,t,o,l)local n,e=n.f-i.f,n.e-i.e local f=sqrt(n*n+e*e)local f=1/f*.2i.i+=f*n i.t+=f*e
-end)n.𝘢=function()if(n._<=0)n.y.x=true return 1000else return 0end end)add(s,n)end)add(o,function(n,o,l)local e,f=1.5*𝘸(),2.61*𝘸()local d=-atan2(e,f)+.25local n=g(30,n,o,l,.25,0,0,function(n)nr(n,300)n.f+=e n.o+=f if time()%8==0then if(w(n,i)<150)n𝘹(n.f,n.e,n.o,true)
-end end,function(n)n.𝘢,n.b,n._,n.l=function()if(n._<=0)return 2000else return 0end,function()return 0end,25,d end)add(s,n)n.s=function(n)𝘫(n,1000)end end)local n=1for f=1808,1878,7do 𝘪[n]={}for e=0,6do for f=1,@(f+e)do local f=20*n*(e+1)*f add(𝘪[n],{eq[e+1],function()srand(f)o[e+1](flr(rnd(u)),300,flr(rnd(u)))end})end end n+=1end n𝘪()na,n2=en,e0 ng()end function e𝘢(f,o)local d,t=nl(f,o),ee(f,o)srand(o*f)local i,n=(f%4+o%4+flr((rnd"6")))%4+1,1if(d>0)n=10
-if(d>15)n=ew[i]
-if(d==l[e])n=ej[(f%2+o%2+flr((rnd"2")))%2+1]
+return n,e end function q(e,o,d)local f,l=nu(e,o)local n=0if(d)n=e.e-o.e
+local e=atan2(f,n)local n=f*cos(e)+n*sin(e)local e=atan2(n,l)return n*cos(e)+l*sin(e)end function n𝘺(e,o,f,n)local l=n and 32or 26local n=𝘦(l,e,o,f,.25,0,0,function(n)p(n,false,0)y(n,6,-1)n.l+=.03n.d+=.03local o,f=nu(i,n)local e=q(i,n,true)n.i+=o/e*.06n.t+=(max(g(n.o,n.f)+200,i.e)-n.e)/e*.06n.a+=f/e*.06𝘻(n,4)n𝘻(n)end,function(e)e.𝘢,e.b=function()return n and 150or 400end,function()return n and 8or 14end end)add(r,n)n.s=function()𝘬(n,1000)end end function nr(n,e)local o=g(n.o,n.f)n.e+=sgn(o+e-n.e)*.5end function _()return sgn(rnd"2"-1)end function eu()music(-1,500)add(f,function(n,e,o)local f={}for l=0,3do f[l]=k(n,e,o,0,0,0)end local l,d=.5*_(),.87*_()local n=𝘦(4,n,e,o,0,0,0,function(n)local e=g(n.o,n.f)n.l+=.01if n.𝘸 then if(n.e-1>e+20)n.e-=1
+if(n.𝘨>30)for e=0,3do n.𝘣[e].𝘦=b end n.𝘸=false
+else y(n,4,-1)nr(n,50)n.o+=l n.f+=d if time()%30==0then if(e>20)n.𝘸,n.𝘨=true,0for e=0,3do n.𝘣[e].𝘦=function(n)local n,o=m(n.c,n.u,n.r)line(n,o,n+sgn(e-2)*3,o+5,10)end end
+end end if e>0then if time()%.5==0then n.𝘨+=1if(n.g)for e=0,7do srand(e*time())local n=k(n.o,n.e,n.f,rnd"4"-2,rnd"4",rnd"4"-2,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,8)end,function(n)p(n,true,.1)end,b,10,false,true)n.s=function(n)n.x=true nk(n.o,n.f)end end else for e=0,7do srand(e*time())nk(n.o+(rnd"14"-7)*v,n.f+(rnd"14"-7)*v)end
+end end 𝘩()end,function(n)n.b,n.𝘢,n.𝘣=function()return 12end,function()for e=0,3do n𝘦(n.𝘣[e])end if(n.𝘸)return 50
+return 100end,f for e=0,3do n.𝘣[e].𝘪=function(o)o.o,o.e,o.f=n.o+sgn(e-2)*10,n.e-8,n.f+(e%2-1)*10end end n.𝘸,n.𝘨,n.m.𝘬=false,0,0end)add(r,n)end)add(f,function(n,e,o)local f,l=.5*_(),.87*_()local n=𝘦(6,n,e,o,.25,0,0,function(n)srand(time())local e=q(i,n)if e<600or n.w then en(n,n.e-g(n.o,n.f),e)else if time()-n.j>.7then local e,o=n.o%c,n.f%c local e=sget(w+e\160,126-o\160)if e==4then if(flr(rnd"100")==1)n.𝘧,n.q,n.w=𝘷[16][2],.14,true
+end end n.l=.917n.o+=f n.f+=l end 𝘩()𝘻(n,4)end,function(n)n.w,n.q=false,.7n.𝘢,n.b,n.j=function()if(n.w)return 500else return 300end,function()if(n.w)if(time()%.5<.25)return 8else return 9else return 9end,time()end)add(r,n)n.s=function()𝘬(n,1000)end end)add(f,function(n,f,l)local e,o=1.5*_(),2.61*_()local d=-atan2(e,o)+.25local n=𝘦(19,n,f,l,.25,0,0,function(n)y(n,5,-1)nr(n,100)n.o+=e n.f+=o if(time()%1==0)local n=k(n.o,n.e,n.f,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)spr(115,n,e)end,function(n)p(n,true,.2)end)n.s=function(e)e.x=true for e=-3,3do for o=-3,3do local e,o=e*v,o*v nk(n.o+e,n.f+o)end end end
+end,function(n)n.𝘢,n.b,n.l=function()return 800end,function()if(time()%.5<.25)return 12else return 0end,d end)add(r,n)n.s=function()𝘬(n,1000)end end)add(f,function(n,e,o)local n=𝘦(21,n,e,o,.25,0,0,function(n)en(n,n.e-g(n.o,n.f))𝘻(n,4)end,function(n)n.q,n._=.3,2n.𝘢,n.b,n.j=function()if(n._<=0)return 700else n.𝘧,n.q=𝘷[23][2],.6return 200end,function()if(time()%.5<.25)return 10else return 0end,time()end)add(r,n)n.s=function()𝘬(n,1000)end end)add(f,function(n,e,o)n𝘺(n,e,o)end)add(f,function(n,e,o)local f,l=.5*_(),.87*_()local n=𝘦(28,n,e,o,0,0,0,function(n)y(n,8,-1)nr(n,50)n.l+=.01n.o+=f n.f+=l n.y.o,n.y.e,n.y.f=n.o,n.e,n.f end,function(n)n.b,n._,n.m.𝘬=function()if(time()%.5<.25)return 8else return 0end,5,0n.y=k(0,0,0,0,0,0,function(n)local e=q(n,i,true)if(e<100)y(n,9,1)local e,o=m(n.c,n.u,n.r)local f,l=m(i.h[1][1],i.h[1][2],i.h[1][3])srand(time()%2)local d,t=(e+f)/2+rnd(16)-8,(o+l)/2line(e,o,d,t,7)line(d,t,f,l)local n,e=n.o-i.o,n.e-i.e local o=sqrt(n*n+e*e)local o=1/o*.2i.i+=o*n i.t+=o*e 𝘨-=0x.1
+end)n.𝘢=function()if(n._<=0)n.y.x=true return 1000else return 0end end)add(r,n)end)add(f,function(n,f,l)local e,o=1.5*_(),2.61*_()local d=-atan2(e,o)+.25local n=𝘦(30,n,f,l,.25,0,0,function(n)nr(n,300)n.o+=e n.f+=o if time()%8==0then if(q(n,i)<150)n𝘺(n.o,n.e,n.f,true)
+end end,function(n)n.𝘢,n.b,n._,n.l=function()if(n._<=0)return 2000else return 0end,function()return 0end,25,d end)add(r,n)n.s=function(n)𝘬(n,1000)end end)local n=1for o=2056,2126,7do 𝘫[n]={}for e=0,6do for o=1,@(o+e)do local o=20*n*(e+1)*o add(𝘫[n],{ey[e+1],function()srand(o)f[e+1](flr(rnd(c)),300,flr(rnd(c)))end})end end n+=1end n𝘫()na,n2=e0,ee ng()end function ek(o,f)local d,t=nl(o,f),eo(o,f)srand(f*o)local i,n=(o%4+f%4+flr((rnd"6")))%4+1,1if(d>0)n=10
+if(d>15)n=ej[i]
+if(d==l[e])n=eq[(o%2+f%2+flr((rnd"2")))%2+1]
 if t>=1then fillp(42405)local e=split"0x46, 0x44, 0x66"if(n==11)n=e[flr(rnd"3")+1]
 if(n==4)n=136
 local e=split"0x44,0x66,0x88"if(n==15)n=e[flr(rnd"3")+1]
 if(n==10)n=138
-else fillp()end 𝘥()return n end function ee(n,e)return(a[n][e]&49152)>>>14end function n𝘢(n,f)local o,d=n%u,f%u local n,f,t=o\v,d\v,𝘧(o,d)local i=ee(n,f)if i==0and t>0and t~=l[e]then a[n][f]+=16384sset(p+o\(r*v),p+c-d\(r*v),4)local e=𝘵(n,f)if(e==1)a[n][f]=a[n][f]&~16128|3840
-if(e==13)a[n][f]=a[n][f]&~16128|4608
-nc+=.00002end end function n4()if not 𝘷 then q(i)𝘷=true n1-=1if(n1<0)extcmd"reset"
-n𝘶=time()end end function nk(n)n.x=true if(n.m~=nil)n.m.x=true
-end function ey()print("𝘢ttack 𝘸ave  "..n.." completed",18,60,7)print("𝘢rea infected  . . .     "..tostr(nc,2),7,80,7)print("𝘢rea uninfected  . . .   "..tostr(𝘬,2),7,90,7)print("𝘣onus uninfected area .  "..tostr(nv,2),7,105,7)end function ez()if time()-n𝘵>5then 𝘹=1n+=1nb=0if(n>10)extcmd"reset"
-if(n==5or n==7)e+=1n𝘰+=1n𝘪()
-na,n2,𝘤=en,e0,{}nk(i)ng()end end function e𝘤()if(nb>=#𝘪[n])nv=max(0,(𝘬-nc-nc)/max(32/n,4))𝘻(nv)dset(0,max(dget(0),nd))sfx(7,3)na,n2,n𝘵=ey,ez,time()
-end function q(n)local f=𝘧(n.f,n.o)sfx(3,2)for e=0,2do srand(e)k(n.f+rnd"10"-4,n.e+10+rnd"8",n.o+rnd"10"-4,0,0,0,function(n)local n,f=m(n.c,n.u,n.r)for o=0,7do srand(o*e)circfill(n+rnd"5"-4,f+rnd"5"-4,0,5)end end,function(n)n.e+=rnd"0.4"n.f+=rnd"0.4"-.2n.o+=rnd"0.4"-.2end,b,4,false,true)end for e=0,5do srand(e)local e=n𝘷[flr(rnd"5")+1]if(f==0and n.e<=1)e=12-flr(rnd"2")*5
-k(n.f,n.e,n.o+5,rnd"2"-1,rnd"4"+2,rnd"2"-1,function(n)local n,f=m(n.c,n.u,n.r)circfill(n,f,0,e)end,function(n)_(n,true,.2)end,b,10,false,true)end 𝘥()nk(n)del(s,n)e𝘤()end function j(n,e,f)if(n.𝘧)sfx(e,f)
-end function n𝘺(n)srand(n.f)if(time()%0x.02==0)k(n.f+rnd"16"-8,n.e+rnd"16"-8,n.o+5,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,5)end,b,b,3)
-end function n𝘧(n,e,f)local f,e=f or false,e or.2n.t+=e*cos(n.d)*cos(n.𝘥)n.i+=e*sin(n.l)*-sin(n.d)n.a+=e*-cos(n.l)*sin(n.d)local e,f,o=cos(n.d)*cos(n.𝘥),sin(n.l)*-sin(n.d),-cos(n.l)*sin(n.d)j(n,0,1)if n.𝘧 then srand(time())for l=0,1do srand(l*time())k(n.f+rnd"8"-4,n.e+rnd"8"-4,n.o+rnd"8"+4+20,-f*4+rnd"2"-1+n.i,-e*4+n.t+rnd"2"-1,-o*4+rnd"2"-1+n.a,function(n)local f,o=m(n.c,n.u,n.r)local e=7+rnd"1"*3if(n.k<.2)e=8
-circfill(f,o,0,e)end,function(n)_(n,true,.1)end,function(e)e.e=n.e+.001end,.4)end 𝘥()end end function ef(n)local e,f,o=sin(n.d),sin(n.l)*cos(n.d),cos(n.l)*cos(n.d)j(n,1,3)local n=k(n.f,n.e,n.o,10*-f+n.i,10*-e+n.t,10*-o+n.a,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,7)end,function(e)_(e,false,0)if(n𝘸(e,n))e.k=-1
-eo(e)end,b,1)n.s=function(n)j(n,2,1)n.x=true local f=𝘧(n.f,n.o)for e=0,2do srand(e*time())local e=12-flr(rnd"2")*5if(f>0)e=n𝘷[flr(rnd"5")+1]
-k(n.f,n.e,n.o,rnd"2"-1,rnd"2",rnd"2"-1,function(n)local n,f=m(n.c,n.u,n.r)circfill(n,f,0,e)end,function(n)_(n,true,.1)end,b,1,false,true)end 𝘥()end end function n𝘻(n,f,e)local o=e or w(i,n)_(n,false,.05)local e,l=nu(i,n)local l,e=-atan2(e,l),-atan2(o,i.e-n.e)if o>100then n𝘧(n,.4)if(n.e-i.e<20or f<60)e=-.15else e=-.25
-else if(n.e-i.e<3or f<60)n𝘧(n,.2)e=0
+else fillp()end 𝘩()return n end function eo(n,e)return(h[n][e]&49152)>>>14end function nk(n,o)local f,d=n%c,o%c local n,o,t=f\v,d\v,g(f,d)local i=eo(n,o)if i==0and t>0and t~=l[e]then h[n][o]+=16384sset(w+f\160,126-d\160,4)local e=𝘶(n,o)if(e==1)h[n][o]=h[n][o]&~16128|3840
+if(e==13)h[n][o]=h[n][o]&~16128|4608
+nc+=.00002end end function n4()if not 𝘹 then 𝘸(i)𝘹=true n1-=1if(n1<0)extcmd"reset"
+n𝘷=time()end end function n𝘦(n)n.x=true if(n.m~=nil)n.m.x=true
+end function ez()print("𝘢ttack 𝘸ave  "..n.." completed",18,60,7)print("𝘢rea infected  . . .     "..tostr(nc,2),7,80,7)print("𝘢rea uninfected  . . .   "..tostr(𝘭,2),7,90,7)print("𝘣onus uninfected area .  "..tostr(nb,2),7,105,7)end function e𝘤()if time()-n𝘶>5then 𝘺=1n+=1nm=0if(n>10)extcmd"reset"
+if(n==5or n==7)e+=1n𝘱+=1n𝘫()
+na,n2,𝘥=e0,ee,{}n𝘦(i)ng()end end function e𝘥()if(nm>=#𝘫[n])nb=max(0,(𝘭-nc-nc)/max(32/n,4))n5(nb)dset(0,max(dget(0),nd))sfx(7,3)na,n2,n𝘶=ez,e𝘤,time()
+end function 𝘸(n)local o=g(n.o,n.f)sfx(3,2)for e=0,2do srand(e)k(n.o+rnd"10"-4,n.e+10+rnd"8",n.f+rnd"10"-4,0,0,0,function(n)local n,o=m(n.c,n.u,n.r)for f=0,7do srand(f*e)circfill(n+rnd"5"-4,o+rnd"5"-4,0,5)end end,function(n)n.e+=rnd"0.4"n.o+=rnd"0.4"-.2n.f+=rnd"0.4"-.2end,b,4,false,true)end for e=0,5do srand(e)local e=n𝘹[flr(rnd"5")+1]if(o==0and n.e<=1)e=12-flr(rnd"2")*5
+k(n.o,n.e,n.f+5,rnd"2"-1,rnd"4"+2,rnd"2"-1,function(n)local n,o=m(n.c,n.u,n.r)circfill(n,o,0,e)end,function(n)p(n,true,.2)end,b,10,false,true)end 𝘩()n𝘦(n)del(r,n)e𝘥()end function y(n,e,o)if(n.g)sfx(e,o)
+end function n𝘻(n)srand(n.o)if(time()%0x.02==0)k(n.o+rnd"16"-8,n.e+rnd"16"-8,n.f+5,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,5)end,b,b,3)
+end function n𝘧(n,e,o)local o,e=o or false,e or.2n.t+=e*cos(n.d)*cos(n.𝘥)n.i+=e*sin(n.l)*-sin(n.d)n.a+=e*-cos(n.l)*sin(n.d)local e,o,f=cos(n.d)*cos(n.𝘥),sin(n.l)*-sin(n.d),-cos(n.l)*sin(n.d)y(n,0,1)if n.g then srand(time())for l=0,1do srand(l*time())k(n.o+rnd"8"-4,n.e+rnd"8"-4,n.f+rnd"8"+4+20,-o*4+rnd"2"-1+n.i,-e*4+n.t+rnd"2"-1,-f*4+rnd"2"-1+n.a,function(n)local o,f=m(n.c,n.u,n.r)local e=7+rnd"1"*3if(n.k<.2)e=8
+circfill(o,f,0,e)end,function(n)p(n,true,.1)end,function(e)e.e=n.e+.001end,.4)end 𝘩()end end function ef(n)local e,o,f=sin(n.d),sin(n.l)*cos(n.d),cos(n.l)*cos(n.d)y(n,1,3)local n=k(n.o,n.e,n.f,10*-o+n.i,10*-e+n.t,10*-f+n.a,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,7)end,function(e)p(e,false,0)if(n𝘸(e,n))e.k=-1
+el(e)end,b,1)n.s=function(n)y(n,2,1)n.x=true local o=g(n.o,n.f)for e=0,2do srand(e*time())local e=12-flr(rnd"2")*5if(o>0)e=n𝘹[flr(rnd"5")+1]
+k(n.o,n.e,n.f,rnd"2"-1,rnd"2",rnd"2"-1,function(n)local n,o=m(n.c,n.u,n.r)circfill(n,o,0,e)end,function(n)p(n,true,.1)end,b,1,false,true)end 𝘩()end end function en(n,o,e)local f=e or q(i,n)p(n,false,.05)local e,l=nu(i,n)local l,e=-atan2(e,l),-atan2(f,i.e-n.e)if f>100then n𝘧(n,.4)if(n.e-i.e<20or o<60)e=-.15else e=-.25
+else if(n.e-i.e<3or o<60)n𝘧(n,.2)e=0
 if(time()-n.j>n.q)ef(n)n.j=time()
-end n.l+=(l+.25-n.l)*.3n.d+=(e-n.d)*.5end function 𝘫(n,e)if(n._)n._-=e
-local e=n.𝘢()𝘻(e>>16)el(n,e)sfx(10,3)if(not n._ or n._<=0)if e~=150then nb+=1end q(n)
-end function n𝘸(l,f,o)o,f=o or 1,f or l local n=s n[0]=i for e=#n,0,-1do if n[e].e~=f.e and n[e].f~=f.f then if w(l,n[e],true)<20then if e>0then 𝘫(s[e],o)else 𝘩-=20if(𝘩<0)n4()
-end return true end end end return false end function el(n,e)if(e~=0)k(n.f,n.e,n.o,0,0,0,function(n)local n,f=m(n.c,n.u,n.r)print(e,n,f,7)end,function(n)n.e+=.1end,b,5,false,true)
-end function eo(o)for n=#𝘢,1,-1do if sqrt(abs(o.v-𝘢[n].v)+abs(o.e-𝘢[n].e)+abs(o.p-𝘢[n].p))<5then 𝘢[n].i=o.i 𝘢[n].a=o.a 𝘢[n].t=o.t local e,f=𝘨(𝘢[n].v%u),𝘨(𝘢[n].p%u)local l=𝘵(e,f)if l==1or l==15then q(𝘢[n])a[e][f]=a[e][f]&~16128|2048if(l==15)𝘻(.00062)el(o,"40")
-end if(l==6)𝘻(.00062)q(𝘢[n])a[e][f]=a[e][f]&~16128|2048
-if(l==9)q(𝘢[n])a[e][f]=a[e][f]&~16128|2816
-if(l==13)q(𝘢[n])a[e][f]=a[e][f]&~16128|3584
-return true end end return false end function 𝘻(n)nd+=n if(nd>n𝘲*.0763)n𝘲+=1n1+=1nt+=1
-end function ng()i=g(2,118*v,0,118.5*v,.25,0,0,function(n)if not 𝘷 then _(n,false,.12)if(n𝘸(n))n4()
-if(eo(n))n4()
-if n.e>𝘮 then if(btn"0")n.l+=.03
+end n.l+=(l+.25-n.l)*.3n.d+=(e-n.d)*.5end function 𝘬(n,e)if(n._)n._-=e
+local e=n.𝘢()n5(e>>16)ed(n,e)sfx(10,3)if(not n._ or n._<=0)if e~=150then nm+=1end 𝘸(n)
+end function n𝘸(l,o,f)f,o=f or 1,o or l local n=r n[0]=i for e=#n,0,-1do if n[e].e~=o.e and n[e].o~=o.o then if q(l,n[e],true)<20then if e>0then 𝘬(r[e],f)else 𝘨-=20if(𝘨<0)n4()
+end return true end end end return false end function ed(n,e)if(e~=0)k(n.o,n.e,n.f,0,0,0,function(n)local n,o=m(n.c,n.u,n.r)print(e,n,o,7)end,function(n)n.e+=.1end,b,5,false,true)
+end function el(e)for n=#𝘢,1,-1do if sqrt(abs(e.v-𝘢[n].v)+abs(e.e-𝘢[n].e)+abs(e.p-𝘢[n].p))<5then 𝘢[n].i=e.i 𝘢[n].a=e.a 𝘢[n].t=e.t local o,f=𝘪(𝘢[n].v%c),𝘪(𝘢[n].p%c)local l=𝘶(o,f)if(l==1)𝘸(𝘢[n])𝘧(o,f,2048)
+if l==15or l==18then 𝘸(𝘢[n])n5(.00062)ed(e,"40")if(l==15)𝘧(o,f,2048)else 𝘧(o,f,3584)
+end if(l==9)𝘸(𝘢[n])𝘧(o,f,2816)
+if(l==13)𝘸(𝘢[n])𝘧(o,f,3584)
+if(l==34)𝘸(𝘢[n])𝘧(o,f,8960)
+return true end end return false end function n5(n)nd+=n if(nd>n𝘳*.0763)n𝘳+=1n1+=1nt+=1
+end function ng()i=𝘦(2,118*v,0,118.5*v,.25,0,0,function(n)if not 𝘹 then p(n,false,.12)if(n𝘸(n))n4()
+if(el(n))n4()
+if n.e>𝘯 then if(btn"0")n.l+=.03
 if(btn"1")n.l-=.03
 if btn"2"then if(abs(n.d-.02)<.2)n.d-=.02
 end if btn"3"then if(abs(n.d+.02)<.2)n.d+=.02
-end if time()%.00002==0then if(n.e>200)srand(time())k(n.f+rnd"200"-100,n.e+rnd"200"-50,n.o+rnd"200"-100,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,7)end,b,b,3,true,true)
-end else if(𝘮==l[e])𝘩=100
-end if n.e<1200then if(𝘩-.05>=0)if(btn"4")n𝘧(n,.5,true)𝘩-=.05
-end 𝘺(n,8)poke(24413,5)if btn"5"then if(time()-n𝘳>.1)ef(n)𝘻(~0)n𝘳=time()
-if not ni then if time()-n𝘴<.2then nt-=1if nt>=0then local n=g(24,n.f,n.e,n.o,n.l,n.d,0,function(e)_(e,false,0)local f,o,l=w(e,e.𝘩),nu(e,e.𝘩)local o=-atan2(o,l)e.l+=o-.25-e.l local f=atan2(f,e.e-e.𝘩.e)e.d+=f-e.d e.i-=sin(e.l)e.t-=sin(e.d)e.a-=cos(e.l)if(n𝘸(e,n,100))q(e)
-𝘺(e,8)n𝘺(e)end,function(n)n.k=10local e,f=0,32767for o=1,#s do local n=w(n,s[o])if(n<f)e,f=o,n
-end n.𝘩=s[e]end,n.i-sin(n.l)*35,n.t-sin(n.d)*35,n.a-cos(n.l)*35)n.s=function(n)q(n)end end end n𝘴,ni=time(),true end else if(ni)ni=false
-end 𝘥()end end)i.𝘬,i.s,f=1,function(n)if(sqrt(n.i^2+n.t^2+n.a^2)>3or abs(n.d)>.03)n4()
-end,i end function 𝘺(n,e)local f=sqrt(n.i^2+n.t^2+n.a^2)local e=f>e and e/f or 1n.i,n.t,n.a=e*n.i,e*n.t,e*n.a end function e0()if(𝘷)if(time()-n𝘶>5)𝘷=false ng()
-e𝘸()nj,𝘢,nn,n0=time(),{},f.f,f.o-er if(f.e>𝘮+50)𝘣=f.e-20else 𝘣=𝘮+30
-nm+=1if 𝘹<#𝘪[n]+1then if(nm>=𝘪[n][𝘹][1])nm=0𝘪[n][𝘹][2]()𝘹+=1
-end end function e𝘥()rectfill(c+1,0,128,12,6)print("score",c+1+1,1,7)print(tostr(nd,2),c+1+1,7,7)for n=1,nt do spr(65,58+n*5+3,5)end for n=1,n1 do spr(64,58+n*5,0)end print("wave",c+1+58,1,7)print(n,c+1+58,7,7)print("best",c+1+78,1,7)print(tostr(dget(0),2),c+1+78,7,7)rectfill(c,14,𝘩+c,14,10)rectfill(c,16,i.e/7+c,16,11)end function en()ev()e𝘥()e_()end n2,na=ei,eu function _init()cartdata"marcospiv_prion_v1_1_5"et()end function _update()n2()end function _draw()na()end
+end if time()%.00002==0then if(n.e>200)srand(time())k(n.o+rnd"200"-100,n.e+rnd"200"-50,n.f+rnd"200"-100,0,0,0,function(n)local n,e=m(n.c,n.u,n.r)circfill(n,e,0,7)end,b,b,3,true,true)
+end else if(𝘯==l[e])𝘨=100
+end if n.e<1200then if(𝘨-.05>=0)if(btn"4")n𝘧(n,.5,true)𝘨-=.05
+end 𝘻(n,8)poke(24413,5)if btn"5"then if(time()-n𝘴>.1)ef(n)n5(~0)n𝘴=time()
+if not ni then if time()-n𝘵<.2then nt-=1if nt>=0then local n=𝘦(24,n.o,n.e,n.f,n.l,n.d,0,function(e)p(e,false,0)local o,f,l=q(e,e.𝘩),nu(e,e.𝘩)local f=-atan2(f,l)e.l+=f-.25-e.l local o=atan2(o,e.e-e.𝘩.e)e.d+=o-e.d e.i-=sin(e.l)e.t-=sin(e.d)e.a-=cos(e.l)if(n𝘸(e,n,100))𝘸(e)
+𝘻(e,8)n𝘻(e)end,function(n)n.k=10local e,o=0,32767for f=1,#r do local n=q(n,r[f])if(n<o)e,o=f,n
+end n.𝘩=r[e]end,n.i-sin(n.l)*35,n.t-sin(n.d)*35,n.a-cos(n.l)*35)n.s=function(n)𝘸(n)end end end n𝘵,ni=time(),true end else if(ni)ni=false
+end 𝘩()end end)i.𝘬,i.s,o=1,function(n)if(sqrt(n.i^2+n.t^2+n.a^2)>3or abs(n.d)>.03)n4()
+end,i end function 𝘻(n,e)local o=sqrt(n.i^2+n.t^2+n.a^2)local e=o>e and e/o or 1n.i,n.t,n.a=e*n.i,e*n.t,e*n.a end function ee()if(𝘹)if(time()-n𝘷>5)𝘹=false ng()
+e𝘸()nq,𝘢,nn,n0=time(),{},o.o,o.f-ea if(o.e>𝘯+50)𝘣=o.e-20else 𝘣=𝘯+30
+n𝘢+=1if 𝘺<#𝘫[n]+1then if(n𝘢>=𝘫[n][𝘺][1])n𝘢=0𝘫[n][𝘺][2]()𝘺+=1
+end end function e𝘨()rectfill(31,0,128,12,6)print("score",32,1,7)print(tostr(nd,2),32,7,7)for n=1,nt do spr(113,52+n*5+3,5)end for n=1,n1 do spr(112,52+n*5,0)end print("wave",85,1,7)print(n,85,7,7)print("best",104,1,7)print(tostr(dget(0),2),104,7,7)rectfill(u,14,𝘨+u,14,10)rectfill(u,16,i.e/7+u,16,11)end function e0()eb()e𝘨()ev()end n2,na=ec,er function _init()cartdata"marcospiv_prion_v1_1_5"ei()end function _update()n2()end function _draw()na()end
 __gfx__
 b130005050a030700050000000500060a00000005000509160a05000c040506000102030407080903050000010b1200000001050400090801050600000403040
 3000205000204000504210206030203060303040603040506030501060b0103020c0305040c0105030cd708090a040004030f020000000005040009080005060
@@ -129,9 +131,33 @@ c080b010a080409080807020608030305020511000a05000a0300000000090200050600090400050
 000040207020400060400080000040200000008020408080008060408004801070601080306060103060406030706040506050a09060a05040604080a0603080
 4060208070602090a0608020a0707010606060207060205090605020606040204030c00000800000008000808000008020104000103040004000403021200020
 00304000300020602040304040300002106030805060108010302080205010804060507060403070203040702040507020302010c00000400000004000404000
-00802010400010304000200020100000d200270039007f00831019104c10ed10c120632005204720c9206b203e20c330f6307930fc309e307340f540da402150
-93501750b8504e50ef502660c7604b60301000000000004010100000000050401010000000104020405010001040204050200010203040602010201030308030
-10101040509030201010406090302010104050903020000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+008020104000103040002000201003100020105060905060905020900020100060900060105020906040106040004000006040004080a06040a04000a0408084
+30504060503070605010407030206070607030701080407060801060208060602090a07030902070a0908070809040704030907080a02070f0b0e080c0e0b080
+e0c0d080d001e0805000403003100020102060901060901020900020100060900060102020100020102060901060901020900020100060900060102020044050
+306070305060401050702070606010806070608020706070100070501000c0b0d070f0d0b070c0d09070a0e0f07090e00170e0a00170e090f070f090d0705000
+40300000d200270039007f00831019104c10ed10c120632005204720c9206b203e20c330f6307930fc309e307340f540da40215093501750b8504e50ef502660
+c7604b60ec60c4703010000000000040101000000000504010100000001040204050100010402040502000102030406020102010303080301010104050903020
+10104060903020101040509030200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0333b30000007700c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+3333b330000775001c0cccc077777777000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+3333bb3388775000c1cccccc60000606000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0333bb33877500001c1c1c1066006006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0033bbb077580000c101c10006666666000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0003bbb0758800001000000000666660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000066000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -142,7 +168,6 @@ c080b010a080409080807020608030305020511000a05000a0300000000090200050600090400050
 0333bb33877500001c1c1c1066006006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0033bbb077580000c101c10006666666000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0003bbb0758800001000000000666660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000066000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 01010000166221a6221a622196221762213622106220f622116221462217622186221762217622166221562213622106220c6220a622076220662204622036120261202612016120161200610006100061000610
 000100001a6202362029420377202472019720147200b720077200572003720027200172001720017200000000000000000000000000000000000000000000000000000000000000000000000000000000000000

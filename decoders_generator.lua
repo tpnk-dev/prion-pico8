@@ -1,5 +1,9 @@
 local terrain_type, terrain_type_count, base_heights = split "50,35,85", 1, split "90,50,180"
 
+function set_env_type_id(idx, idz, env_type)
+    terrainmesh[idx][idz] = (terrainmesh[idx][idz]&0xc0ff.ffff) | env_type
+end
+
 function generate_terrain()
     infectable_areas = 0
     for y=0,TERRAIN_NUMVERTS-1 do
@@ -46,8 +50,9 @@ function generate_terrain()
     for j=0,TERRAIN_NUMVERTS-1 do 
         for i=0, TERRAIN_NUMVERTS-1 do
             srand(i*j)
-            if(flr(rnd(22)) == 1 and terrainmesh[i][j] > 4) terrainmesh[i][j] = (terrainmesh[i][j] & ~0x3f00) | 0x0100
-            if(flr(rnd(44)) == 2 and terrainmesh[i][j] > 4) terrainmesh[i][j] = (terrainmesh[i][j] & ~0x3f00) | 0x0d00
+            if(flr(rnd(22)) == 1 and terrainmesh[i][j] > 4) set_env_type_id(i, j, 0x0100) 
+            if(flr(rnd(44)) == 2 and terrainmesh[i][j] > 4) set_env_type_id(i, j, 0x0d00) 
+            if(flr(rnd(400)) == 1 and terrainmesh[i][j] > 4) set_env_type_id(i, j, 0x2200) 
         end
     end
     
