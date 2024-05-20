@@ -11,6 +11,9 @@
 ```Aliens are infecting Earth with a deadly disease. You have been tasked to destroy all spacecraft that pose a threat to our planet. Please act fast, as your reward is based on the amount of uninfected land in each wave of enemies. There are an estimated 10 waves of increasingly harder alien reinforcements. Reports also show that the extraterrestrials possess a device that can alter the force of gravity. We have equipped your ship with fuel and altitude gauges, a scanner, a laser cannon , and homing missiles.```
 
 ## Changelog 
+- v1.1.7
+  - add online leaderboard on newgrounds (https://www.newgrounds.com/portal/view/931049) - code taken from https://github.com/freds72/daggers by freds72
+  - add player high score on title screen
 - v1.1.6
   - add HOUSE
   - infected bush now gives 40 points, just like infected tree
@@ -83,7 +86,7 @@
 - Others
   - [x] Add cart figure
   - [x] Create manual
-  - [ ] Online leaderboards (like Demi Daggers by freds72)
+  - [x] Online leaderboards (like Demi Daggers by freds72)
 - Fixes
   - [ ] Balance firing rates, enemy AI, spawn timer, virus diffusion, etc
   - [ ] Fix ship proportions
